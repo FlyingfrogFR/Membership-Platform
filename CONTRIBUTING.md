@@ -40,7 +40,7 @@ Texte de conclusion optionnel, en markdown, affiché après les sections des pô
 Règles :
 
 - `name` doit être un pôle de la liste `src/config/departments.ts` (`NAV`, `Training ATC`, `Pilot Training`, `Digital Services`, `Documentation`, `CDM`, `Events`, `Membership`). L'ordre d'affichage sur le site suit cette liste, pas l'ordre du fichier.
-- `done`, `in_progress`, `next`, `help_wanted` sont tous optionnels — n'indiquez que ce qui existe. Un pôle sans aucun item n'apparaît pas dans l'export Discord.
+- `done`, `in_progress`, `next`, `help_wanted` sont tous optionnels — n'indiquez que ce qui existe. Un pôle sans aucun item n'apparaît ni sur le site ni dans l'export Discord.
 - Phrases courtes, orientées résultat : elles sont affichées telles quelles en puces, sur le site comme sur Discord.
 
 ## Ajouter un besoin au tableau Contribuer
@@ -61,6 +61,8 @@ Ajoutez un item au tableau dans `content/contribuer/needs.yaml` :
 ```
 
 Quand un besoin est pourvu, passez son `status` à `"filled"` (ou `"closed"` s'il est abandonné) plutôt que de le supprimer : le tableau garde ainsi la trace de ce qui avance.
+
+Un fichier vide (ou ne contenant que des commentaires) est accepté : le site affiche alors simplement un tableau vide.
 
 ## Vérifier avant d'ouvrir la PR
 

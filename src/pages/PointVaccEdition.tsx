@@ -28,7 +28,11 @@ export function PointVaccEdition() {
   // Edition bodies come from this repository and are reviewed before merge, so
   // rendering the generated HTML directly is safe — no user-submitted input here.
   const bodyHtml = edition.body ? (marked.parse(edition.body) as string) : ''
-  const departments = sortByDepartmentOrder(edition.departments, (d) => d.name)
+  // Drop all-empty entries so the page matches the Discord export, which skips them.
+  const departments = sortByDepartmentOrder(
+    edition.departments.filter((d) => d.done.length + d.in_progress.length + d.next.length + d.help_wanted.length > 0),
+    (d) => d.name,
+  )
 
   return (
     <article>

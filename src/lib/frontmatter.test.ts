@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseFrontmatter } from './frontmatter'
+import { loadYamlDocument, parseFrontmatter } from './frontmatter'
 
 describe('parseFrontmatter', () => {
   it('separates YAML data from the markdown body', () => {
@@ -21,5 +21,21 @@ describe('parseFrontmatter', () => {
 
   it('throws when the frontmatter block is missing', () => {
     expect(() => parseFrontmatter('just some text', 'foo.md')).toThrow(/foo\.md/)
+  })
+
+  it('strips a UTF-8 BOM before parsing', () => {
+    const { data } = parseFrontmatter('\uFEFF---\ntitle: "Test"\n---\n')
+    expect(data).toEqual({ title: 'Test' })
+  })
+})
+
+describe('loadYamlDocument', () => {
+  it('returns null for empty or comments-only input', () => {
+    expect(loadYamlDocument('')).toBeNull()
+    expect(loadYamlDocument('# rien pour le moment\n')).toBeNull()
+  })
+
+  it('parses a regular document', () => {
+    expect(loadYamlDocument('a: 1')).toEqual({ a: 1 })
   })
 })

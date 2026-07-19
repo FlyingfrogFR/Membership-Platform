@@ -1,8 +1,8 @@
 export const SITE = {
-  name: 'Membership · vACC France',
   vatsimFrUrl: 'https://vatsim.fr',
-  // ❓ Replace with the direct link to the Discord server / "Membership" ticket
-  // category once confirmed with Pierre. vatsim.fr is a safe landing page meanwhile.
+  // ❓ Replace with the direct invite to the vACC Discord (ticket category
+  // "Membership") once confirmed with Pierre; until then the buttons point to
+  // vatsim.fr and their label only promises the Discord, not a ticket.
   discordTicketsUrl: 'https://vatsim.fr',
   repoUrl: 'https://github.com/FlyingfrogFR/Membership-Platform',
 }

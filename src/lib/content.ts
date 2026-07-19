@@ -1,5 +1,4 @@
-import { load } from 'js-yaml'
-import { parseFrontmatter } from './frontmatter'
+import { loadYamlDocument, parseFrontmatter } from './frontmatter'
 import { editionSchema, needsFileSchema, type Edition, type Need } from './schemas'
 import needsRaw from '../../content/contribuer/needs.yaml?raw'
 
@@ -33,7 +32,7 @@ export function getEdition(slug: string): Edition | undefined {
 export function getNeeds(): Need[] {
   if (!needsCache) {
     needsCache = needsFileSchema
-      .parse(load(needsRaw))
+      .parse(loadYamlDocument(needsRaw))
       .sort(
         (a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status] || b.posted.getTime() - a.posted.getTime(),
       )

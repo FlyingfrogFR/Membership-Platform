@@ -21,8 +21,15 @@ export function Contribuer() {
   const [time, setTime] = useState('all')
 
   const timeOptions = useMemo(
-    () => [...new Set(needs.map((need) => need.time_estimate).filter((value): value is string => Boolean(value)))],
-    [needs],
+    () => [
+      ...new Set(
+        needs
+          .filter((need) => need.type === tab)
+          .map((need) => need.time_estimate)
+          .filter((value): value is string => Boolean(value)),
+      ),
+    ],
+    [needs, tab],
   )
   const visible = needs.filter(
     (need) =>
@@ -30,6 +37,12 @@ export function Contribuer() {
       (department === 'all' || need.department === department) &&
       (time === 'all' || need.time_estimate === time),
   )
+
+  function switchTab(value: Tab) {
+    setTab(value)
+    // Time estimates differ per tab; a stale selection would guarantee zero results.
+    setTime('all')
+  }
 
   return (
     <div>
@@ -44,7 +57,7 @@ export function Contribuer() {
             <button
               key={value}
               type="button"
-              onClick={() => setTab(value)}
+              onClick={() => switchTab(value)}
               aria-pressed={tab === value}
               className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-colors ${
                 tab === value ? 'bg-accent text-white' : 'text-ink-soft hover:text-ink'
@@ -92,6 +105,10 @@ export function Contribuer() {
         </div>
       </div>
 
+      <h2 className="sr-only">{tabs.find(({ value }) => value === tab)?.label}</h2>
+      <p aria-live="polite" className="sr-only">
+        {fr.contribuer.resultsCount(visible.length)}
+      </p>
       {visible.length === 0 ? (
         <p className="mt-8 text-ink-soft">{fr.contribuer.empty}</p>
       ) : (

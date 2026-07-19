@@ -1,11 +1,10 @@
 // Build-time validation of everything under /content. A malformed edition or
 // needs file must fail the build (npm run build), never the live site.
-import { readFileSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
-import { load } from 'js-yaml'
 import { ZodError } from 'zod'
-import { parseFrontmatter } from '../src/lib/frontmatter'
+import { loadYamlDocument, parseFrontmatter } from '../src/lib/frontmatter'
 import { editionSchema, needsFileSchema } from '../src/lib/schemas'
 
 const root = path.resolve(import.meta.dirname, '..')
@@ -32,8 +31,13 @@ function describeError(error: unknown): string[] {
   return [error instanceof Error ? error.message : String(error)]
 }
 
+const editionFiles = existsSync(editionsDir)
+  ? readdirSync(editionsDir).filter((name) => name.endsWith('.md')).sort()
+  : []
+if (editionFiles.length === 0) console.log('note  no Point vACC editions found (that is a valid state)')
+
 const seenSlugs = new Map<string, string>()
-for (const file of readdirSync(editionsDir).filter((name) => name.endsWith('.md')).sort()) {
+for (const file of editionFiles) {
   const fullPath = path.join(editionsDir, file)
   const errors: string[] = []
   try {
@@ -59,7 +63,10 @@ for (const file of readdirSync(editionsDir).filter((name) => name.endsWith('.md'
 {
   const errors: string[] = []
   try {
-    const needs = needsFileSchema.parse(load(readFileSync(needsFile, 'utf8')))
+    // The app imports this file statically, so its absence must fail loudly here
+    // with a clear message rather than as an opaque bundler error.
+    if (!existsSync(needsFile)) throw new Error('file is missing (an empty board is fine, but the file must exist)')
+    const needs = needsFileSchema.parse(loadYamlDocument(readFileSync(needsFile, 'utf8')))
     const ids = needs.map((need) => need.id)
     for (const id of new Set(ids.filter((n, i) => ids.indexOf(n) !== i))) {
       errors.push(`id "${id}" appears more than once`)

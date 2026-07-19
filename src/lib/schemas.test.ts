@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { editionSchema, needSchema } from './schemas'
+import { editionSchema, needSchema, needsFileSchema } from './schemas'
 
 const validEdition = {
   title: 'Point vACC — T2 2026',
@@ -50,6 +50,21 @@ describe('editionSchema', () => {
 
   it('rejects a non-kebab-case slug', () => {
     expect(() => editionSchema.parse({ ...validEdition, slug: '2026 Q2' })).toThrow()
+  })
+
+  it('rejects a numeric published value instead of reading it as an epoch date', () => {
+    expect(() => editionSchema.parse({ ...validEdition, published: 12345 })).toThrow()
+  })
+
+  it('rejects an unparsable date string', () => {
+    expect(() => editionSchema.parse({ ...validEdition, published: 'bientôt' })).toThrow()
+  })
+})
+
+describe('needsFileSchema', () => {
+  it('treats an empty YAML document as an empty board', () => {
+    expect(needsFileSchema.parse(null)).toEqual([])
+    expect(needsFileSchema.parse(undefined)).toEqual([])
   })
 })
 

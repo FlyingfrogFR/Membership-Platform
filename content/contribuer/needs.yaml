@@ -28,7 +28,7 @@
   title: "EXEMPLE — Tests de la prochaine version de CoFrance"
   department: "Digital Services"
   description: "Dérouler un scénario de test fourni sur la version bêta de CoFrance et remonter les anomalies rencontrées."
-  skills: ["Contrôler régulièrement sur le réseau"]
+  skills: ["Contrôle régulier sur le réseau"]
   time_estimate: "1–2 h"
   contact: "Canal Digital Services sur Discord"
   status: "open"

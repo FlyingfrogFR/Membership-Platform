@@ -4,6 +4,8 @@ export const fr = {
   site: {
     name: 'Membership · vACC France',
     tagline: 'Faire le lien entre le vACC et ses membres.',
+    metaDescription:
+      'Le Point vACC, le tableau Contribuer et le pôle Membership du vACC France (VATSIM France) : toute l’activité du vACC, rendue visible.',
   },
   a11y: {
     skipToContent: 'Aller au contenu',
@@ -24,7 +26,7 @@ export const fr = {
     eyebrow: 'VATSIM France · pôle Membership',
     heroTitle: 'Faire le lien entre le vACC et ses membres',
     heroText:
-      'Le vACC France déborde d’activité : espace aérien, formation, événements, outils… mais elle est éparpillée. Ce site la rend visible, et vous aide à y prendre part — tout est bon à prendre, même deux heures de votre temps.',
+      'L’activité ne manque pas au vACC France : espace aérien, formation, événements, outils… mais elle est éparpillée. Ce site la rend visible, et vous aide à y prendre part — tout est bon à prendre, même deux heures de votre temps.',
     ctaContribuer: 'Donner un coup de main',
     ctaLatest: 'Lire le dernier Point vACC',
     latestTitle: 'Dernier Point vACC',
@@ -34,7 +36,7 @@ export const fr = {
     contactTitle: 'Contacter le Membership',
     contactText:
       'Une question, une idée, un souci ? Le plus simple : un ticket sur le Discord du vACC, catégorie « Membership ». On vous répond vite, et ça reste entre nous si besoin.',
-    contactCta: 'Ouvrir un ticket sur Discord',
+    contactCta: 'Rejoindre le Discord du vACC',
   },
   pointVacc: {
     title: 'Point vACC',
@@ -71,6 +73,8 @@ export const fr = {
     filterTime: 'Temps estimé',
     filterAll: 'Tous',
     empty: 'Rien ne correspond à ces filtres pour le moment — revenez bientôt, ça bouge vite.',
+    resultsCount: (n: number) =>
+      n === 0 ? 'Aucun résultat' : n === 1 ? '1 résultat affiché' : `${n} résultats affichés`,
     skills: 'Compétences',
     timeEstimate: 'Temps estimé',
     contact: 'Contact',
@@ -110,7 +114,7 @@ export const fr = {
     contactTitle: 'Le joindre',
     contactText:
       'Un ticket sur le Discord du vACC, catégorie « Membership », reste le canal officiel — pour une question, une idée, un désaccord à désamorcer ou juste dire bonjour.',
-    contactCta: 'Ouvrir un ticket sur Discord',
+    contactCta: 'Rejoindre le Discord du vACC',
   },
   notFound: {
     title: 'Page introuvable',

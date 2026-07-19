@@ -11,7 +11,7 @@ const statusVariants: Record<Need['status'], BadgeVariant> = {
 
 export function NeedCard({ need }: { need: Need }) {
   return (
-    <article className={`card flex h-full flex-col gap-3 p-5 ${need.status === 'open' ? '' : 'opacity-70'}`}>
+    <article className={`card flex h-full flex-col gap-3 p-5 ${need.status === 'open' ? '' : 'bg-canvas'}`}>
       <div className="flex flex-wrap items-center gap-2">
         <Badge variant="accent">{fr.contribuer.type[need.type]}</Badge>
         <Badge variant="neutral">{need.department}</Badge>

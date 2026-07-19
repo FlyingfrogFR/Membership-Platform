@@ -42,7 +42,11 @@ export function DiscordExport({ edition }: { edition: Edition }) {
       {panelOpen && (
         <div className="mt-4 space-y-4">
           {chunks.length > 1 && <p className="max-w-3xl text-sm text-ink-soft">{fr.discord.multiInfo(chunks.length)}</p>}
-          {manual && <p className="max-w-3xl text-sm font-semibold text-warn">{fr.discord.manualFallback}</p>}
+          {manual && (
+            <p role="alert" className="max-w-3xl text-sm font-semibold text-warn">
+              {fr.discord.manualFallback}
+            </p>
+          )}
           {chunks.map((chunk, i) => (
             <div key={i} className="card p-4">
               {chunks.length > 1 && (
@@ -57,7 +61,12 @@ export function DiscordExport({ edition }: { edition: Edition }) {
                   </button>
                 </div>
               )}
-              <pre className="mt-3 max-h-56 overflow-auto rounded-lg bg-canvas p-3 text-xs leading-relaxed whitespace-pre-wrap text-ink-soft">
+              <pre
+                tabIndex={0}
+                role="region"
+                aria-label={fr.discord.chunkTitle(i + 1, chunks.length)}
+                className="mt-3 max-h-56 overflow-auto rounded-lg bg-canvas p-3 text-xs leading-relaxed whitespace-pre-wrap text-ink-soft"
+              >
                 {chunk}
               </pre>
             </div>
