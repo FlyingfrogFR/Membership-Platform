@@ -1,0 +1,68 @@
+# EXEMPLE — besoins et postes d'exemple fournis avec la plateforme.
+# À remplacer par de vrais besoins avant la mise en ligne.
+# Format documenté dans CONTRIBUTING.md ; validé par `npm run validate`.
+- id: "nav-relecture-lfpg"
+  type: "ponctuel"
+  title: "EXEMPLE — Relecture de la documentation LFPG"
+  department: "NAV"
+  description: "Relire la nouvelle documentation de LFPG et signaler les coquilles ou passages peu clairs avant publication. Aucun niveau ATC particulier requis."
+  skills: ["Français écrit", "Rigueur"]
+  time_estimate: "2–3 h"
+  contact: "Ticket Membership sur Discord"
+  status: "open"
+  posted: 2026-06-05
+
+- id: "training-mentor-s1"
+  type: "poste"
+  title: "EXEMPLE — Mentor ATC (élèves S1/S2)"
+  department: "Training ATC"
+  description: "Accompagner les élèves S1 et S2 : sessions sweatbox, suivi de progression, disponibilité régulière en soirée."
+  skills: ["S3 minimum", "Pédagogie", "Patience"]
+  time_estimate: "2–4 h / semaine"
+  contact: "Ticket Membership ou chef du pôle Training ATC sur Discord"
+  status: "open"
+  posted: 2026-05-15
+
+- id: "digital-tests-cofrance"
+  type: "ponctuel"
+  title: "EXEMPLE — Tests de la prochaine version de CoFrance"
+  department: "Digital Services"
+  description: "Dérouler un scénario de test fourni sur la version bêta de CoFrance et remonter les anomalies rencontrées."
+  skills: ["Contrôle régulier sur le réseau"]
+  time_estimate: "1–2 h"
+  contact: "Canal Digital Services sur Discord"
+  status: "open"
+  posted: 2026-06-20
+
+- id: "events-affiche-rentree"
+  type: "ponctuel"
+  title: "EXEMPLE — Affiche pour l'événement de rentrée"
+  department: "Events"
+  description: "Créer l'affiche de l'événement de septembre à partir de la charte du vACC (logo et couleurs fournis)."
+  skills: ["Graphisme", "Photoshop ou équivalent"]
+  time_estimate: "3–4 h"
+  contact: "Ticket Membership sur Discord"
+  status: "open"
+  posted: 2026-06-12
+
+- id: "events-streamer"
+  type: "poste"
+  title: "EXEMPLE — Streamer pour les événements majeurs"
+  department: "Events"
+  description: "Assurer la retransmission en direct des événements majeurs du vACC : plateau, incrustations, commentaire."
+  skills: ["OBS", "Aisance au micro"]
+  time_estimate: "Selon le calendrier des événements"
+  contact: "Chef du pôle Events sur Discord"
+  status: "open"
+  posted: 2026-06-25
+
+- id: "doc-relecture-sop"
+  type: "ponctuel"
+  title: "EXEMPLE — Relecture des SOP harmonisées"
+  department: "Documentation"
+  description: "Relire les SOP harmonisées des terrains majeurs et vérifier la cohérence entre les documents."
+  skills: ["Connaissances ATC"]
+  time_estimate: "2 h"
+  contact: "Ticket Membership sur Discord"
+  status: "filled"
+  posted: 2026-05-02
