@@ -1,22 +1,22 @@
 @import 'tailwindcss';
 
-/* Friendly community theme for the vACC Membership platform — a warm cream
-   ground, a welcoming teal primary with a coral accent, generously rounded
-   shapes and soft shadows, set in Nunito (a rounded, warm sans, self-hosted via
-   Fontsource so the site stays static). All colour pairings are WCAG-AA
-   checked. Single source of truth for the theme. */
+/* Friendly community theme for the vACC Membership platform — a soft
+   light-blue ground (vACC dorian family), a friendly sky-blue primary with a
+   warm coral accent, generously rounded shapes and soft shadows, set in Nunito
+   (a rounded sans, self-hosted via Fontsource so the site stays static). All
+   colour pairings are WCAG-AA checked. Single source of truth for the theme. */
 @theme {
-  --color-accent: #0a7365; /* teal — primary: buttons, links, active states */
-  --color-accent-strong: #075a4f; /* hover */
-  --color-accent-soft: #def3ef; /* teal tint — badges & soft blocks */
+  --color-accent: #2a6cb0; /* friendly vACC sky-blue — buttons, links, active states */
+  --color-accent-strong: #22568c; /* hover */
+  --color-accent-soft: #e3effb; /* dorian light-blue tint — badges & soft blocks */
   --color-coral: #e8674c; /* warm coral — decorative accents (marks, dots) */
   --color-coral-strong: #be3f24; /* coral for text & tags */
   --color-coral-soft: #fce7e0;
-  --color-ink: #33303a; /* soft warm near-black */
-  --color-ink-soft: #6b6672;
+  --color-ink: #2a2f38; /* cool charcoal */
+  --color-ink-soft: #5c636e;
   --color-paper: #ffffff; /* cards */
-  --color-canvas: #fbf7f2; /* warm cream — page ground */
-  --color-line: #eee7dd; /* soft warm hairline */
+  --color-canvas: #f4f8fd; /* soft light-blue ground (dorian family) */
+  --color-line: #e1e8f0; /* soft cool hairline */
   --color-ok: #237a55; /* friendly green */
   --color-ok-soft: #e2f4ec;
   --color-warn: #8a5c12; /* warm amber */
