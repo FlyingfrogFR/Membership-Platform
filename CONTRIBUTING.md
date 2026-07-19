@@ -64,6 +64,26 @@ Quand un besoin est pourvu, passez son `status` à `"filled"` (ou `"closed"` s'i
 
 Un fichier vide (ou ne contenant que des commentaires) est accepté : le site affiche alors simplement un tableau vide.
 
+## Journal des sollicitations Membership (statistiques)
+
+En attendant un lien automatique avec Discord, le suivi des sollicitations se fait **à la main** dans `content/membership/tickets-log.yaml`. Ce fichier ne contient **aucune donnée personnelle** : uniquement le pôle concerné et des horodatages. Il alimente le bloc « Statistiques du Membership » de la page Point vACC.
+
+```yaml
+- id: "2026-06-01-nav"          # unique, en kebab-case
+  department: "NAV"             # un pôle de src/config/departments.ts
+  opened: 2026-06-01T18:30:00Z  # obligatoire (ISO 8601 avec fuseau)
+  first_response: 2026-06-01T19:05:00Z  # optionnel — sert au délai de 1re réponse
+  closed: 2026-06-03T20:00:00Z          # optionnel — absent = encore ouvert
+  outcome: "resolved"                   # optionnel : resolved | redirected | no_response | other
+```
+
+Règles :
+
+- **Ne mettez jamais de nom, de CID ou de contenu de message** : ce journal reste anonyme et agrégé.
+- La validation vérifie l'unicité des `id` et la chronologie (`opened` ≤ `first_response` ≤ `closed`).
+- Les entrées d'exemple ont un `id` qui commence par `exemple-` ; la page affiche alors un badge EXEMPLE. Remplacez-les par de vraies entrées (sans ce préfixe) pour le faire disparaître.
+- Un fichier vide est accepté : la page affiche « Aucune sollicitation enregistrée pour le moment ».
+
 ## Vérifier avant d'ouvrir la PR
 
 ```bash

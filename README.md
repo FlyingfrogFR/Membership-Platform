@@ -22,6 +22,7 @@ Dans les deux cas, le Head of Membership relit et harmonise le ton avant publica
 
 - `content/point-vacc/<slug>.md` — une édition du Point vACC par fichier (frontmatter YAML : intro du HoM + une section par pôle : fait / en cours / à venir / coup de main recherché).
 - `content/contribuer/needs.yaml` — le tableau Contribuer : un tableau d'items (`poste` ou `ponctuel`).
+- `content/membership/tickets-log.yaml` — journal manuel et **anonyme** des sollicitations Membership (pôle + horodatages, aucune donnée personnelle). Alimente les statistiques par pôle affichées sur la page Point vACC, en attendant l'accord pour un lien automatique avec Discord.
 
 La liste des pôles et leur ordre d'affichage sont définis à un seul endroit : `src/config/departments.ts`.
 

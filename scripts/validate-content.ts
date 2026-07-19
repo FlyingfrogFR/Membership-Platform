@@ -5,11 +5,12 @@ import path from 'node:path'
 import process from 'node:process'
 import { ZodError } from 'zod'
 import { loadYamlDocument, parseFrontmatter } from '../src/lib/frontmatter'
-import { editionSchema, needsFileSchema } from '../src/lib/schemas'
+import { editionSchema, needsFileSchema, ticketLogFileSchema } from '../src/lib/schemas'
 
 const root = path.resolve(import.meta.dirname, '..')
 const editionsDir = path.join(root, 'content', 'point-vacc')
 const needsFile = path.join(root, 'content', 'contribuer', 'needs.yaml')
+const ticketLogFile = path.join(root, 'content', 'membership', 'tickets-log.yaml')
 
 let failed = false
 
@@ -75,6 +76,22 @@ for (const file of editionFiles) {
     errors.push(...describeError(error))
   }
   report(needsFile, errors)
+}
+
+if (existsSync(ticketLogFile)) {
+  const errors: string[] = []
+  try {
+    const log = ticketLogFileSchema.parse(loadYamlDocument(readFileSync(ticketLogFile, 'utf8')))
+    const ids = log.map((entry) => entry.id)
+    for (const id of new Set(ids.filter((n, i) => ids.indexOf(n) !== i))) {
+      errors.push(`id "${id}" appears more than once`)
+    }
+  } catch (error) {
+    errors.push(...describeError(error))
+  }
+  report(ticketLogFile, errors)
+} else {
+  console.log('note  no Membership ticket log found (that is a valid state)')
 }
 
 if (failed) {
