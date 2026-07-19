@@ -1,31 +1,48 @@
 @import 'tailwindcss';
 
-/* Design tokens mapped from the vACC France official palette (vatsim.fr):
-   reflexblue #0055A4, primary sky #5A95F4, secondary coral #FF5D46, dark navy
-   #0B1A31, dorian #E4F2FC, success #31D0AA, warning #FFC107. Interactive and
-   text tokens are darkened from the raw brand color where it fails WCAG AA
-   contrast; the raw sky and coral are kept for decorative (non-text) use only.
-   This is the single place to adjust the theme. */
+/* "Chart paper" — warm editorial theme for the vACC Membership platform.
+   Warm sand ground, ivory paper, sepia ink; a deep muted-blue accent (a warmed
+   nod to the vACC blue) with brass hairline details used sparingly. Oldstyle
+   serif headings + sans body + monospace labels. All pairings are WCAG-AA
+   checked. This is the single place to adjust the theme. */
 @theme {
-  --color-accent: #0055a4; /* reflexblue — links, primary buttons, active states */
-  --color-accent-strong: #003f7d; /* hover */
-  --color-accent-soft: #e4f2fc; /* dorian — badges, soft blocks */
-  --color-accent-sky: #5a95f4; /* vACC primary — decorative only (fails AA as text) */
-  --color-secondary: #ff5d46; /* vACC coral — decorative accents only */
-  --color-ink: #0b1a31; /* vACC dark navy — headings and body text */
-  --color-ink-soft: #48566b;
-  --color-paper: #ffffff;
-  --color-canvas: #f3f8fd; /* light blue page background */
-  --color-line: #d9e5f1;
-  --color-ok: #0c7a62; /* accessible teal derived from success */
-  --color-ok-soft: #e3f7f1;
-  --color-warn: #8c5a00; /* accessible amber derived from warning */
-  --color-warn-soft: #fff4d6;
+  --color-accent: #0a5480; /* deep muted blue — links, buttons, active states */
+  --color-accent-strong: #073a5a; /* hover */
+  --color-accent-soft: #e3e7e4; /* pale slate — badges & soft blocks */
+  --color-brass: #8a5a1e; /* secondary warm accent — mark, rules, details */
+  --color-brass-soft: #efe4cf;
+  --color-ink: #23201a; /* warm near-black (bistre) */
+  --color-ink-soft: #5c5347; /* warm taupe */
+  --color-paper: #fbf7ef; /* warm ivory — cards, header */
+  --color-canvas: #f1eadb; /* warm sand — page ground */
+  --color-band: #e9dfcb; /* deeper sand — section bands */
+  --color-line: #e1d7c3; /* warm hairline */
+  --color-line-strong: #cfc1a6;
+  --color-ok: #566a2c; /* olive */
+  --color-ok-soft: #eaebd5;
+  --color-warn: #8a5712; /* warm amber */
+  --color-warn-soft: #f6e8cb;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, 'Times New Roman', serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Menlo, Consolas, monospace;
 }
 
 @layer base {
+  html {
+    font-family: var(--font-sans);
+  }
+
   body {
     @apply bg-canvas text-ink antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    letter-spacing: -0.01em;
   }
 
   :focus-visible {
@@ -35,23 +52,23 @@
 
 @layer components {
   .btn {
-    @apply inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors;
+    @apply inline-flex items-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold transition-colors;
   }
 
   .btn-primary {
-    @apply bg-accent text-white hover:bg-accent-strong;
+    @apply bg-accent text-paper hover:bg-accent-strong;
   }
 
   .btn-secondary {
-    @apply border border-line bg-paper text-ink hover:border-accent hover:text-accent-strong;
+    @apply border border-line-strong bg-transparent text-ink hover:border-accent hover:text-accent;
   }
 
   .card {
-    @apply rounded-2xl border border-line bg-paper;
+    @apply rounded-lg border border-line bg-paper;
   }
 
   .eyebrow {
-    @apply text-xs font-semibold tracking-widest text-accent uppercase;
+    @apply font-mono text-xs font-semibold tracking-[0.16em] text-brass uppercase;
   }
 
   .rich-text p {

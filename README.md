@@ -55,8 +55,8 @@ Sortie statique dans `dist/`, déployable telle quelle sur Vercel (config fourni
 ## Décisions (tranchées par Pierre)
 
 1. **Liste des pôles** : confirmée telle quelle — NAV, Training ATC, Pilot Training, Digital Services, Documentation, CDM, Events, Membership, dans cet ordre (`src/config/departments.ts`).
-2. **Thème** : palette officielle du vACC (vatsim.fr) appliquée aux tokens de `src/index.css` (reflexblue `#0055A4`, dorian `#E4F2FC`, navy `#0B1A31`…), assombrie là où le contraste WCAG l'exige.
-3. **Fusion à terme dans vatsim.fr** : c'est l'objectif à long terme. L'architecture est donc gardée « portable » (logique dans `src/lib`, composants présentationnels autonomes, thème et i18n centralisés). À noter : vatsim.fr tourne sous **Angular + Tailwind**, alors que cette plateforme est en **React + Vite + Tailwind** (stack habituelle de Pierre, cf. brief §8) — une fusion réelle impliquera soit d'embarquer ce build, soit de porter les composants ; les tokens de thème sont d'ores et déjà alignés.
+2. **Thème** : identité éditoriale « papier de carte » — fond sable chaud, encre sépia, accent bleu profond (clin d'œil à la charte VATSIM) et détails laiton ; titres en serif, libellés en monospace. Tout est centralisé dans un seul fichier (`src/index.css`), contrastes vérifiés WCAG AA.
+3. **Fusion à terme dans vatsim.fr** : c'est l'objectif à long terme. L'architecture est donc gardée « portable » (logique dans `src/lib`, composants présentationnels autonomes, thème et i18n centralisés). À noter : vatsim.fr tourne sous **Angular + Tailwind**, alors que cette plateforme est en **React + Vite + Tailwind** (stack habituelle de Pierre, cf. brief §8) — une fusion réelle impliquera soit d'embarquer ce build, soit de porter les composants ; le thème étant centralisé dans un seul fichier, il reste réalignable sur la charte de vatsim.fr si la fusion l'exige.
 4. **VATSIM Connect (phase 2)** : reporté à l'ouverture de la phase 2 (qui demande les identifiants OAuth2 sera décidé à ce moment-là).
 
 ## Questions encore ouvertes

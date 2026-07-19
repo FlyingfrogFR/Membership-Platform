@@ -58,7 +58,7 @@ export function Home() {
         )}
       </section>
 
-      <section aria-labelledby="contact-title" className="rounded-2xl bg-accent-soft p-6 sm:p-8">
+      <section aria-labelledby="contact-title" className="rounded-lg border border-line bg-band p-6 sm:p-8">
         <h2 id="contact-title" className="text-2xl font-bold">
           {fr.home.contactTitle}
         </h2>

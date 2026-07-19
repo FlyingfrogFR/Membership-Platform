@@ -21,22 +21,22 @@ export function Layout({ children }: { children: ReactNode }) {
       </a>
       <header className="border-b border-line bg-paper">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-4">
-          <Link to="/" className="flex items-center gap-2.5 font-bold tracking-tight">
+          <Link to="/" className="flex items-center gap-2.5">
             <PlaneMark />
-            <span>{fr.site.name}</span>
+            <span className="font-serif text-lg font-semibold tracking-tight">{fr.site.name}</span>
           </Link>
           <nav aria-label={fr.a11y.mainNav}>
-            <ul className="flex flex-wrap gap-1">
+            <ul className="flex flex-wrap gap-x-5 gap-y-1">
               {navItems.map((item) => (
                 <li key={item.to}>
                   <NavLink
                     to={item.to}
                     end={item.end}
                     className={({ isActive }) =>
-                      `block rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                      `block border-b-2 pb-0.5 text-sm font-medium transition-colors ${
                         isActive
-                          ? 'bg-accent-soft text-accent-strong'
-                          : 'text-ink-soft hover:bg-canvas hover:text-ink'
+                          ? 'border-brass text-ink'
+                          : 'border-transparent text-ink-soft hover:text-ink'
                       }`
                     }
                   >
@@ -72,7 +72,7 @@ function PlaneMark() {
   return (
     <svg
       viewBox="0 0 24 24"
-      className="h-7 w-7 rounded-lg bg-gradient-to-br from-accent-sky to-accent p-1.5 text-white"
+      className="h-7 w-7 rounded-[6px] bg-accent p-1.5 text-paper"
       aria-hidden="true"
     >
       <path
