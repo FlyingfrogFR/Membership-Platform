@@ -1,0 +1,65 @@
+@import 'tailwindcss';
+
+/* Design tokens — the single place to adjust once the vACC brand assets arrive. */
+@theme {
+  --color-accent: #1d4ed8;
+  --color-accent-strong: #1e40af;
+  --color-accent-soft: #eef4ff;
+  --color-ink: #0f172a;
+  --color-ink-soft: #46556b;
+  --color-paper: #ffffff;
+  --color-canvas: #f6f8fb;
+  --color-line: #e3e8f0;
+  --color-ok: #15803d;
+  --color-ok-soft: #ecfdf3;
+  --color-warn: #b45309;
+  --color-warn-soft: #fffbeb;
+}
+
+@layer base {
+  body {
+    @apply bg-canvas text-ink antialiased;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors;
+  }
+
+  .btn-primary {
+    @apply bg-accent text-white hover:bg-accent-strong;
+  }
+
+  .btn-secondary {
+    @apply border border-line bg-paper text-ink hover:border-accent hover:text-accent-strong;
+  }
+
+  .card {
+    @apply rounded-2xl border border-line bg-paper;
+  }
+
+  .eyebrow {
+    @apply text-xs font-semibold tracking-widest text-accent uppercase;
+  }
+
+  .rich-text p {
+    @apply mt-4 leading-relaxed text-ink-soft first:mt-0;
+  }
+
+  .rich-text a {
+    @apply text-accent underline underline-offset-2 hover:text-accent-strong;
+  }
+
+  .rich-text ul {
+    @apply mt-4 list-disc space-y-1.5 pl-5 text-ink-soft;
+  }
+
+  .rich-text strong {
+    @apply text-ink;
+  }
+}
