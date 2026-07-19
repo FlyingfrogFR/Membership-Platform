@@ -1,0 +1,73 @@
+# Contribuer au contenu
+
+Ce document décrit le flux « pull request » pour proposer du contenu. Si vous préférez, envoyez simplement votre texte au Head of Membership (ticket Discord catégorie « Membership ») — il s'occupe du reste.
+
+## Le principe
+
+- Tout le contenu vit dans `/content`. Publier = fusionner sur `main`.
+- Chaque PR est validée automatiquement (`npm run validate`) : schéma du frontmatter et du YAML, unicité des slugs et des ids. Une PR au mauvais format est bloquée avant publication.
+- Le Head of Membership relit chaque proposition et peut ajuster le ton pour garder une voix cohérente.
+
+## Ajouter ou modifier une édition du Point vACC
+
+Créez `content/point-vacc/<slug>.md` — le nom du fichier **doit** être égal au slug (minuscules, chiffres, tirets). Exemple complet :
+
+```markdown
+---
+title: "Point vACC — T3 2026"
+slug: "2026-q3"
+published: 2026-09-30
+intro: >-
+  Texte d'introduction du Head of Membership.
+departments:
+  - name: "NAV"
+    done:
+      - "Chose terminée ce trimestre"
+    in_progress:
+      - "Chose en cours"
+    next:
+      - "Chose prévue"
+    help_wanted:            # optionnel
+      - "Coup de main recherché"
+  - name: "Events"
+    done:
+      - "…"
+---
+
+Texte de conclusion optionnel, en markdown, affiché après les sections des pôles.
+```
+
+Règles :
+
+- `name` doit être un pôle de la liste `src/config/departments.ts` (`NAV`, `Training ATC`, `Pilot Training`, `Digital Services`, `Documentation`, `CDM`, `Events`, `Membership`). L'ordre d'affichage sur le site suit cette liste, pas l'ordre du fichier.
+- `done`, `in_progress`, `next`, `help_wanted` sont tous optionnels — n'indiquez que ce qui existe. Un pôle sans aucun item n'apparaît pas dans l'export Discord.
+- Phrases courtes, orientées résultat : elles sont affichées telles quelles en puces, sur le site comme sur Discord.
+
+## Ajouter un besoin au tableau Contribuer
+
+Ajoutez un item au tableau dans `content/contribuer/needs.yaml` :
+
+```yaml
+- id: "nav-relecture-lfpg"      # unique, en kebab-case
+  type: "ponctuel"              # ponctuel | poste
+  title: "Relecture documentation LFPG"
+  department: "NAV"             # un pôle de src/config/departments.ts
+  description: "Relire et commenter la nouvelle doc avant publication."
+  skills: ["Connaissances ATC"] # optionnel
+  time_estimate: "2–3 h"        # optionnel mais recommandé
+  contact: "Ticket Membership ou @pseudo sur Discord"
+  status: "open"                # open | filled | closed
+  posted: 2026-08-01
+```
+
+Quand un besoin est pourvu, passez son `status` à `"filled"` (ou `"closed"` s'il est abandonné) plutôt que de le supprimer : le tableau garde ainsi la trace de ce qui avance.
+
+## Vérifier avant d'ouvrir la PR
+
+```bash
+npm install
+npm run validate   # doit afficher « All content files are valid. »
+npm run dev        # pour voir le rendu en local
+```
+
+Merci ! Chaque contribution, même deux lignes, aide à faire le lien.
