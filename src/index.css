@@ -1,48 +1,69 @@
 @import 'tailwindcss';
 
-/* "Chart paper" — warm editorial theme for the vACC Membership platform.
-   Warm sand ground, ivory paper, sepia ink; a deep muted-blue accent (a warmed
-   nod to the vACC blue) with brass hairline details used sparingly. Oldstyle
-   serif headings + sans body + monospace labels. All pairings are WCAG-AA
-   checked. This is the single place to adjust the theme. */
+/* Colorful editorial theme for the vACC Membership platform — magazine bones
+   (Fraunces display + Newsreader text, drop caps, hairline rules, small-caps
+   departments, an asterism between sections) carried on a warm magazine white
+   with a signature editorial red and a peacock-blue second accent. Fonts are
+   self-hosted (Fontsource), so the site stays static. All pairings are
+   WCAG-AA checked. Single source of truth for the theme. */
 @theme {
-  --color-accent: #0a5480; /* deep muted blue — links, buttons, active states */
-  --color-accent-strong: #073a5a; /* hover */
-  --color-accent-soft: #e3e7e4; /* pale slate — badges & soft blocks */
-  --color-brass: #8a5a1e; /* secondary warm accent — mark, rules, details */
-  --color-brass-soft: #efe4cf;
-  --color-ink: #23201a; /* warm near-black (bistre) */
-  --color-ink-soft: #5c5347; /* warm taupe */
-  --color-paper: #fbf7ef; /* warm ivory — cards, header */
-  --color-canvas: #f1eadb; /* warm sand — page ground */
-  --color-band: #e9dfcb; /* deeper sand — section bands */
-  --color-line: #e1d7c3; /* warm hairline */
-  --color-line-strong: #cfc1a6;
-  --color-ok: #566a2c; /* olive */
-  --color-ok-soft: #eaebd5;
+  --color-accent: #b0342a; /* editorial red — rules, drop caps, links, primary CTA */
+  --color-accent-strong: #8a2820;
+  --color-accent-soft: #f4e5e1;
+  --color-blue: #1a566f; /* peacock — second accent, colored blocks, type badges */
+  --color-blue-strong: #123f52;
+  --color-blue-soft: #e3edf1;
+  --color-ink: #201b17; /* warm near-black */
+  --color-ink-soft: #575049;
+  --color-paper: #ffffff; /* cards */
+  --color-canvas: #faf6ef; /* warm magazine white — page ground */
+  --color-line: #e8ddcd; /* warm hairline rule */
+  --color-line-strong: #d8c8b0;
+  --color-ok: #506a2b; /* olive */
+  --color-ok-soft: #ebebd6;
   --color-warn: #8a5712; /* warm amber */
   --color-warn-soft: #f6e8cb;
 
+  --font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
+  --font-serif: 'Newsreader Variable', Georgia, 'Times New Roman', serif;
   --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, 'Times New Roman', serif;
-  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Menlo, Consolas, monospace;
 }
 
 @layer base {
   html {
-    font-family: var(--font-sans);
+    font-family: var(--font-serif);
   }
 
   body {
     @apply bg-canvas text-ink antialiased;
+    font-family: var(--font-serif);
+    font-optical-sizing: auto;
+    font-size: 1.05rem;
+    line-height: 1.65;
   }
 
   h1,
   h2,
   h3 {
-    font-family: var(--font-serif);
-    font-weight: 600;
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    color: var(--color-ink);
+  }
+  h1 {
+    font-variation-settings: 'opsz' 144, 'wght' 600;
+    letter-spacing: -0.015em;
+  }
+  h2 {
+    font-variation-settings: 'opsz' 72, 'wght' 560;
     letter-spacing: -0.01em;
+  }
+  h3 {
+    font-variation-settings: 'opsz' 34, 'wght' 590;
+  }
+
+  em,
+  i {
+    font-style: italic;
   }
 
   :focus-visible {
@@ -52,37 +73,57 @@
 
 @layer components {
   .btn {
-    @apply inline-flex items-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold transition-colors;
+    @apply inline-flex items-center gap-2 rounded-[3px] px-5 py-2.5 text-xs font-semibold tracking-[0.06em] uppercase transition-colors;
   }
 
   .btn-primary {
-    @apply bg-accent text-paper hover:bg-accent-strong;
+    @apply bg-accent text-white hover:bg-accent-strong;
   }
 
   .btn-secondary {
-    @apply border border-line-strong bg-transparent text-ink hover:border-accent hover:text-accent;
+    @apply border border-ink/25 bg-transparent text-ink hover:border-accent hover:text-accent;
   }
 
   .card {
-    @apply rounded-lg border border-line bg-paper;
+    @apply rounded-[3px] border border-line bg-paper;
   }
 
+  /* Small-caps-style department label, in the reading serif. */
   .eyebrow {
-    @apply font-mono text-xs font-semibold tracking-[0.16em] text-brass uppercase;
+    font-family: var(--font-serif);
+    @apply text-xs font-semibold tracking-[0.14em] text-accent uppercase;
+  }
+
+  /* Magazine drop cap on a lead paragraph. */
+  .dropcap::first-letter {
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 144, 'wght' 620;
+    float: left;
+    color: var(--color-accent);
+    font-size: 3.4em;
+    line-height: 0.78;
+    padding: 0.02em 0.09em 0 0;
+  }
+
+  /* Centered asterism between major sections (plain asterisks render everywhere). */
+  .ornament {
+    @apply flex items-center justify-center text-lg text-accent;
+    font-family: var(--font-serif);
+    letter-spacing: 0.6em;
+  }
+  .ornament::before {
+    content: '***';
   }
 
   .rich-text p {
     @apply mt-4 leading-relaxed text-ink-soft first:mt-0;
   }
-
   .rich-text a {
-    @apply text-accent underline underline-offset-2 hover:text-accent-strong;
+    @apply text-blue underline underline-offset-2 hover:text-blue-strong;
   }
-
   .rich-text ul {
     @apply mt-4 list-disc space-y-1.5 pl-5 text-ink-soft;
   }
-
   .rich-text strong {
     @apply text-ink;
   }

@@ -33,12 +33,17 @@ export function APropos() {
         </ol>
       </section>
 
-      <section aria-labelledby="apropos-contact-title" className="rounded-lg border border-line bg-band p-6 sm:p-8">
-        <h2 id="apropos-contact-title" className="text-2xl font-bold">
+      <section aria-labelledby="apropos-contact-title" className="rounded-[3px] bg-blue p-7 text-white sm:p-9">
+        <h2 id="apropos-contact-title" className="text-2xl text-white">
           {fr.aPropos.contactTitle}
         </h2>
-        <p className="mt-3 max-w-2xl leading-relaxed text-ink-soft">{fr.aPropos.contactText}</p>
-        <a href={SITE.discordTicketsUrl} target="_blank" rel="noreferrer" className="btn btn-primary mt-5">
+        <p className="mt-3 max-w-2xl leading-relaxed text-white/85">{fr.aPropos.contactText}</p>
+        <a
+          href={SITE.discordTicketsUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="btn mt-6 bg-white text-blue-strong hover:bg-white/90"
+        >
           {fr.aPropos.contactCta} ↗
         </a>
       </section>
