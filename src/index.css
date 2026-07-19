@@ -1,19 +1,26 @@
 @import 'tailwindcss';
 
-/* Design tokens — the single place to adjust once the vACC brand assets arrive. */
+/* Design tokens mapped from the vACC France official palette (vatsim.fr):
+   reflexblue #0055A4, primary sky #5A95F4, secondary coral #FF5D46, dark navy
+   #0B1A31, dorian #E4F2FC, success #31D0AA, warning #FFC107. Interactive and
+   text tokens are darkened from the raw brand color where it fails WCAG AA
+   contrast; the raw sky and coral are kept for decorative (non-text) use only.
+   This is the single place to adjust the theme. */
 @theme {
-  --color-accent: #1d4ed8;
-  --color-accent-strong: #1e40af;
-  --color-accent-soft: #eef4ff;
-  --color-ink: #0f172a;
-  --color-ink-soft: #46556b;
+  --color-accent: #0055a4; /* reflexblue — links, primary buttons, active states */
+  --color-accent-strong: #003f7d; /* hover */
+  --color-accent-soft: #e4f2fc; /* dorian — badges, soft blocks */
+  --color-accent-sky: #5a95f4; /* vACC primary — decorative only (fails AA as text) */
+  --color-secondary: #ff5d46; /* vACC coral — decorative accents only */
+  --color-ink: #0b1a31; /* vACC dark navy — headings and body text */
+  --color-ink-soft: #48566b;
   --color-paper: #ffffff;
-  --color-canvas: #f6f8fb;
-  --color-line: #e3e8f0;
-  --color-ok: #15803d;
-  --color-ok-soft: #ecfdf3;
-  --color-warn: #b45309;
-  --color-warn-soft: #fffbeb;
+  --color-canvas: #f3f8fd; /* light blue page background */
+  --color-line: #d9e5f1;
+  --color-ok: #0c7a62; /* accessible teal derived from success */
+  --color-ok-soft: #e3f7f1;
+  --color-warn: #8c5a00; /* accessible amber derived from warning */
+  --color-warn-soft: #fff4d6;
 }
 
 @layer base {

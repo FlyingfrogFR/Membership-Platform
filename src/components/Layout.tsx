@@ -70,7 +70,11 @@ export function Layout({ children }: { children: ReactNode }) {
 
 function PlaneMark() {
   return (
-    <svg viewBox="0 0 24 24" className="h-7 w-7 rounded-lg bg-accent p-1.5 text-white" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      className="h-7 w-7 rounded-lg bg-gradient-to-br from-accent-sky to-accent p-1.5 text-white"
+      aria-hidden="true"
+    >
       <path
         fill="currentColor"
         d="M6.1 17.9l11.63-4.99a1 1 0 0 0 0-1.83L6.1 6.1a.66.66 0 0 0-.93.6l.01 3.08c0 .33.25.62.58.66L14 12l-8.24 1.55a.67.67 0 0 0-.58.66l-.01 3.08c0 .48.5.8.93.61z"
