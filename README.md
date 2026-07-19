@@ -51,14 +51,18 @@ npm run preview    # sert le build de production en local
 
 Sortie statique dans `dist/`, déployable telle quelle sur Vercel (config fournie dans `vercel.json`), Netlify ou GitHub Pages. Par défaut : Vercel, en attendant la réponse sur l'hébergement (voir ci-dessous).
 
-## Questions ouvertes (à trancher par Pierre)
+## Décisions (tranchées par Pierre)
 
-1. **Liste des pôles** : noms exacts et ordre d'affichage (`src/config/departments.ts`).
-2. **Hébergement et domaine** : sous-domaine vatsim.fr ou site autonome ? Contraintes côté Digital Services ?
-3. **Fusion à terme dans vatsim.fr** : faut-il coller davantage à sa charte graphique ?
-4. **VATSIM Connect (phase 2)** : qui demande les identifiants OAuth2 ?
-5. **Logo et couleurs** du vACC : à fournir pour remplacer la couleur d'accent provisoire (`src/index.css`) et le favicon.
-6. **Lien Discord** : URL exacte vers le serveur / la catégorie de tickets « Membership » (`src/config/site.ts`).
+1. **Liste des pôles** : confirmée telle quelle — NAV, Training ATC, Pilot Training, Digital Services, Documentation, CDM, Events, Membership, dans cet ordre (`src/config/departments.ts`).
+2. **Thème** : palette officielle du vACC (vatsim.fr) appliquée aux tokens de `src/index.css` (reflexblue `#0055A4`, dorian `#E4F2FC`, navy `#0B1A31`…), assombrie là où le contraste WCAG l'exige.
+3. **Fusion à terme dans vatsim.fr** : c'est l'objectif à long terme. L'architecture est donc gardée « portable » (logique dans `src/lib`, composants présentationnels autonomes, thème et i18n centralisés). À noter : vatsim.fr tourne sous **Angular + Tailwind**, alors que cette plateforme est en **React + Vite + Tailwind** (stack habituelle de Pierre, cf. brief §8) — une fusion réelle impliquera soit d'embarquer ce build, soit de porter les composants ; les tokens de thème sont d'ores et déjà alignés.
+4. **VATSIM Connect (phase 2)** : reporté à l'ouverture de la phase 2 (qui demande les identifiants OAuth2 sera décidé à ce moment-là).
+
+## Questions encore ouvertes
+
+1. **Hébergement et domaine** : sous-domaine vatsim.fr ou site autonome ? À confirmer avec Digital Services — défaut Vercel (statique) en attendant.
+2. **Lien Discord** : URL exacte vers la catégorie de tickets « Membership » (`src/config/site.ts`, actuellement pointé sur vatsim.fr en placeholder).
+3. **Logo/favicon définitifs** : le placeholder reprend désormais les couleurs officielles, mais un logo vACC propre reste le bienvenu (`public/favicon.svg`).
 
 ## Contenu d'exemple
 
