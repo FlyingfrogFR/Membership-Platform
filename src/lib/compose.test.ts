@@ -18,8 +18,8 @@ const editionDraft: EditionDraft = {
   intro: "Un trimestre bien rempli, merci à tous d'être là.",
   body: 'Merci de votre lecture — **à bientôt**.',
   departments: [
-    { name: 'NAV', done: ['  Cartes LFPG publiées  ', ''], in_progress: ['Doc LFLL'], next: [], help_wanted: [] },
-    { name: 'Events', done: [], in_progress: [], next: [], help_wanted: [] },
+    { name: 'Nav Team', done: ['  Cartes LFPG publiées  ', ''], in_progress: ['Doc LFLL'], next: [], help_wanted: [] },
+    { name: 'Event Team', done: [], in_progress: [], next: [], help_wanted: [] },
   ],
 }
 
@@ -38,7 +38,7 @@ describe('composeEditionFile', () => {
 
   it('drops departments with no items and trims list entries', () => {
     const file = composeEditionFile(editionDraft)
-    expect(file).not.toContain('Events')
+    expect(file).not.toContain('Event Team')
     expect(file).not.toContain('  Cartes')
   })
 })
@@ -49,7 +49,7 @@ describe('composeNeedYaml', () => {
       id: 'nav-relecture-lfpg',
       type: 'ponctuel',
       title: 'Relecture LFPG',
-      department: 'NAV',
+      department: 'Nav Team',
       description: 'Relire la doc.',
       skills: [' Rigueur ', ''],
       time_estimate: '2–3 h',
@@ -69,7 +69,7 @@ describe('composeNeedYaml', () => {
       id: 'x-y',
       type: 'poste',
       title: 'T',
-      department: 'CDM',
+      department: 'Digital Team',
       description: 'D',
       skills: [],
       time_estimate: '',
@@ -85,8 +85,8 @@ describe('composeNeedYaml', () => {
 describe('composeTicketYaml', () => {
   it('round-trips through the ticket log schema', () => {
     const yaml = composeTicketYaml({
-      id: '2026-07-22-nav',
-      department: 'NAV',
+      id: '2026-07-22-nav-team',
+      department: 'Nav Team',
       opened: '2026-07-22T18:00:00.000Z',
       first_response: '2026-07-22T18:30:00.000Z',
       closed: '',
@@ -94,7 +94,7 @@ describe('composeTicketYaml', () => {
     })
     const [item] = load(yaml) as unknown[]
     const entry = ticketLogEntrySchema.parse(item)
-    expect(entry.department).toBe('NAV')
+    expect(entry.department).toBe('Nav Team')
     expect(entry.first_response!.getTime()).toBeGreaterThan(entry.opened.getTime())
     expect(yaml).not.toContain('closed')
     expect(yaml).not.toContain('outcome')

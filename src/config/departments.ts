@@ -1,14 +1,14 @@
-// Single source of truth for the department list and its display order.
-// ❓ Exact list, wording and order still to be confirmed with Pierre (see README).
+// Single source of truth for the team list and its display order, aligned with
+// the official vACC document "Fonctionnement des équipes". CDM/CPDLC tooling
+// sits under the Digital Team and ATC training under the Training Department —
+// they are not separate teams. Update only when the official document changes.
 export const DEPARTMENTS = [
-  'NAV',
-  'Training ATC',
-  'Pilot Training',
-  'Digital Services',
-  'Documentation',
-  'CDM',
-  'Events',
-  'Membership',
+  'Nav Team',
+  'Doc Team',
+  'Event Team',
+  'Digital Team',
+  'Training Department',
+  'vACC Directors',
 ] as const
 
 export type Department = (typeof DEPARTMENTS)[number]

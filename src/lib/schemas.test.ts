@@ -6,14 +6,14 @@ const validEdition = {
   slug: '2026-q2',
   published: new Date('2026-06-30'),
   intro: 'Intro.',
-  departments: [{ name: 'NAV', done: ['Fait quelque chose'] }],
+  departments: [{ name: 'Nav Team', done: ['Fait quelque chose'] }],
 }
 
 const validNeed = {
   id: 'nav-relecture',
   type: 'ponctuel',
   title: 'Relecture',
-  department: 'NAV',
+  department: 'Nav Team',
   description: 'Relire un document.',
   contact: 'Ticket Membership',
   status: 'open',
@@ -43,7 +43,7 @@ describe('editionSchema', () => {
     expect(() =>
       editionSchema.parse({
         ...validEdition,
-        departments: [{ name: 'NAV', helped_wanted: ['typo'] }],
+        departments: [{ name: 'Nav Team', helped_wanted: ['typo'] }],
       }),
     ).toThrow()
   })

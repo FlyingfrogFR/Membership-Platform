@@ -97,7 +97,7 @@ function toIso(local: string): string {
 }
 
 function TicketComposer() {
-  const [department, setDepartment] = useState<Department>('Membership')
+  const [department, setDepartment] = useState<Department>(DEPARTMENTS[0])
   const [opened, setOpened] = useState('')
   const [firstResponse, setFirstResponse] = useState('')
   const [closed, setClosed] = useState('')
