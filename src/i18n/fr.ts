@@ -4,6 +4,9 @@ export const fr = {
   site: {
     name: 'Membership · vACC France',
     tagline: 'Faire le lien entre le vACC et ses membres.',
+    internalBadge: 'Usage interne',
+    internalNote:
+      'Page réservée à l’usage interne du vACC France (staff et chefs de pôle) — elle ne publie rien directement : toute proposition passe par la relecture du Head of Membership.',
     metaDescription:
       'Le Point vACC, le tableau Contribuer et le pôle Membership du vACC France (VATSIM France) : toute l’activité du vACC, rendue visible.',
   },

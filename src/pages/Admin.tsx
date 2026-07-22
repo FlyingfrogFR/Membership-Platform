@@ -33,8 +33,12 @@ export function Admin() {
   return (
     <div>
       <header className="max-w-2xl">
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">{fr.admin.title}</h1>
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">{fr.admin.title}</h1>
+          <span className="rounded-full bg-warn-soft px-2.5 py-0.5 text-xs font-bold text-warn">{fr.site.internalBadge}</span>
+        </div>
         <p className="mt-4 text-lg leading-relaxed text-ink-soft">{fr.admin.lede}</p>
+        <p className="mt-3 rounded-xl bg-warn-soft p-3 text-sm leading-relaxed text-warn">{fr.site.internalNote}</p>
         <p className="mt-3 rounded-xl bg-accent-soft p-3 text-sm leading-relaxed text-ink-soft">{fr.admin.note}</p>
       </header>
 
