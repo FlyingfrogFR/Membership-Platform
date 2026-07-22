@@ -1,16 +1,41 @@
-import { sortByDepartmentOrder } from '../config/departments'
+import { DEPARTMENTS, sortByDepartmentOrder } from '../config/departments'
 import { fr } from '../i18n/fr'
-import type { DepartmentEntry, Edition } from './schemas'
+import type { DepartmentEntry, Edition, Need } from './schemas'
 
 export const DISCORD_MESSAGE_LIMIT = 2000
 
 // Headroom below the hard limit so the "(message i/N)" suffix always fits.
 const CHUNK_BUDGET = 1900
 
-export function formatEditionForDiscord(edition: Edition): string[] {
-  const chunks = packIntoChunks(buildBlocks(edition), CHUNK_BUDGET)
-  if (chunks.length === 1) return chunks
+function finalizeChunks(blocks: string[]): string[] {
+  const chunks = packIntoChunks(blocks, CHUNK_BUDGET)
+  if (chunks.length <= 1) return chunks
   return chunks.map((chunk, i) => `${chunk}\n\n${fr.discord.partSuffix(i + 1, chunks.length)}`)
+}
+
+export function formatEditionForDiscord(edition: Edition): string[] {
+  return finalizeChunks(buildBlocks(edition))
+}
+
+// Discord version of the Contribuer board: open needs grouped by team. The
+// optional siteOrigin adds a footer link back to the full board.
+export function formatNeedsForDiscord(needs: Need[], siteOrigin?: string): string[] {
+  const open = needs.filter((need) => need.status === 'open')
+  if (open.length === 0) return []
+  const blocks = [`**🙌 ${fr.discordNeeds.title}**\n\n${fr.discordNeeds.intro}`]
+  for (const team of DEPARTMENTS) {
+    const teamNeeds = open.filter((need) => need.department === team)
+    if (teamNeeds.length === 0) continue
+    const lines = [`**${team}**`]
+    for (const need of teamNeeds) {
+      lines.push(`- **${need.title}**${need.time_estimate ? ` · ${need.time_estimate}` : ''}`)
+      lines.push(`  ${need.description}`)
+      lines.push(`  📩 ${need.contact}`)
+    }
+    blocks.push(lines.join('\n'))
+  }
+  if (siteOrigin) blocks.push(fr.discordNeeds.footer(siteOrigin))
+  return finalizeChunks(blocks)
 }
 
 function buildBlocks(edition: Edition): string[] {

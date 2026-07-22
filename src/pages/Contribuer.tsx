@@ -19,7 +19,12 @@ export function Contribuer() {
   const [tab, setTab] = useState<Tab>('poste')
   const [department, setDepartment] = useState('all')
   const [time, setTime] = useState('all')
+  const [showAll, setShowAll] = useState(false)
 
+  const typeNeeds = needs.filter((need) => need.type === tab)
+  // Open needs by default, so the list matches the tab counter; filled/closed
+  // history stays available behind the toggle.
+  const pool = showAll ? typeNeeds : typeNeeds.filter((need) => need.status === 'open')
   const timeOptions = useMemo(
     () => [
       ...new Set(
@@ -31,11 +36,8 @@ export function Contribuer() {
     ],
     [needs, tab],
   )
-  const visible = needs.filter(
-    (need) =>
-      need.type === tab &&
-      (department === 'all' || need.department === department) &&
-      (time === 'all' || need.time_estimate === time),
+  const visible = pool.filter(
+    (need) => (department === 'all' || need.department === department) && (time === 'all' || need.time_estimate === time),
   )
 
   function switchTab(value: Tab) {
@@ -75,7 +77,7 @@ export function Contribuer() {
             id="filter-department"
             value={department}
             onChange={(event) => setDepartment(event.target.value)}
-            className="rounded-lg border border-line bg-paper px-3 py-2 text-sm"
+            className="rounded-lg border border-line bg-paper px-3 py-2 text-base sm:text-sm"
           >
             <option value="all">{fr.contribuer.filterAll}</option>
             {DEPARTMENTS.map((dept) => (
@@ -93,7 +95,7 @@ export function Contribuer() {
             id="filter-time"
             value={time}
             onChange={(event) => setTime(event.target.value)}
-            className="rounded-lg border border-line bg-paper px-3 py-2 text-sm"
+            className="rounded-lg border border-line bg-paper px-3 py-2 text-base sm:text-sm"
           >
             <option value="all">{fr.contribuer.filterAll}</option>
             {timeOptions.map((option) => (
@@ -105,12 +107,19 @@ export function Contribuer() {
         </div>
       </div>
 
+      <div className="mt-4">
+        <label className="flex items-center gap-2 text-sm text-ink-soft">
+          <input type="checkbox" checked={showAll} onChange={(event) => setShowAll(event.target.checked)} className="h-4 w-4" />
+          {fr.contribuer.showAll}
+        </label>
+      </div>
+
       <h2 className="sr-only">{tabs.find(({ value }) => value === tab)?.label}</h2>
       <p aria-live="polite" className="sr-only">
         {fr.contribuer.resultsCount(visible.length)}
       </p>
       {visible.length === 0 ? (
-        <p className="mt-8 text-ink-soft">{fr.contribuer.empty}</p>
+        <p className="mt-8 text-ink-soft">{pool.length === 0 ? fr.contribuer.emptyType : fr.contribuer.empty}</p>
       ) : (
         <ul className="mt-8 grid gap-4 sm:grid-cols-2">
           {visible.map((need) => (

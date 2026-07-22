@@ -81,6 +81,7 @@ export function editionImageSrc(slug: string, fileName: string): string {
 
 export const NEEDS_FILE_PATH = 'content/contribuer/needs.yaml'
 export const TICKET_LOG_FILE_PATH = 'content/membership/tickets-log.yaml'
+export const COORDINATION_FILE_PATH = 'content/membership/coordination.yaml'
 
 export function composeEditionFile(draft: EditionDraft): string {
   const departments = draft.departments
@@ -133,6 +134,10 @@ export function composeNeedYaml(draft: NeedDraft): string {
   item.status = draft.status
   item.posted = draft.posted
   return dump([item], DUMP_OPTIONS)
+}
+
+export function composeCoordinationYaml(month: string, received: Department[]): string {
+  return dump([{ month, received }], DUMP_OPTIONS)
 }
 
 export function composeTicketYaml(draft: TicketDraft): string {

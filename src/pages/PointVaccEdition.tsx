@@ -2,6 +2,7 @@ import { marked } from 'marked'
 import { Link, useParams } from 'react-router-dom'
 import { DepartmentSection } from '../components/DepartmentSection'
 import { DiscordExport } from '../components/DiscordExport'
+import { formatEditionForDiscord } from '../lib/discord'
 import { sortByDepartmentOrder } from '../config/departments'
 import { fr } from '../i18n/fr'
 import { getEdition, getEditions } from '../lib/content'
@@ -48,7 +49,7 @@ export function PointVaccEdition() {
         </p>
         <p className="mt-5 max-w-3xl text-lg leading-relaxed text-ink-soft">{edition.intro}</p>
         <div className="mt-6">
-          <DiscordExport edition={edition} />
+          <DiscordExport chunks={formatEditionForDiscord(edition)} />
         </div>
       </header>
       <div className="mt-10 space-y-6">

@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
 
 const variants = {
-  accent: 'bg-accent-soft text-accent-strong',
   coral: 'bg-coral-soft text-coral-strong',
   ok: 'bg-ok-soft text-ok',
   warn: 'bg-warn-soft text-warn',

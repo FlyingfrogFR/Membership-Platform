@@ -5,7 +5,7 @@ import path from 'node:path'
 import process from 'node:process'
 import { ZodError } from 'zod'
 import { loadYamlDocument, parseFrontmatter } from '../src/lib/frontmatter'
-import { editionSchema, needsFileSchema, ticketLogFileSchema } from '../src/lib/schemas'
+import { coordinationFileSchema, editionSchema, needsFileSchema, ticketLogFileSchema } from '../src/lib/schemas'
 
 const root = path.resolve(import.meta.dirname, '..')
 const editionsDir = path.join(root, 'content', 'point-vacc')
@@ -87,6 +87,21 @@ for (const file of editionFiles) {
     errors.push(...describeError(error))
   }
   report(needsFile, errors)
+}
+
+const coordinationFile = path.join(root, 'content', 'membership', 'coordination.yaml')
+if (existsSync(coordinationFile)) {
+  const errors: string[] = []
+  try {
+    const entries = coordinationFileSchema.parse(loadYamlDocument(readFileSync(coordinationFile, 'utf8')))
+    const months = entries.map((entry) => entry.month)
+    for (const month of new Set(months.filter((m, i) => months.indexOf(m) !== i))) {
+      errors.push(`month "${month}" appears more than once`)
+    }
+  } catch (error) {
+    errors.push(...describeError(error))
+  }
+  report(coordinationFile, errors)
 }
 
 if (existsSync(ticketLogFile)) {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { DISCORD_MESSAGE_LIMIT, formatEditionForDiscord } from './discord'
-import type { Edition } from './schemas'
+import { DISCORD_MESSAGE_LIMIT, formatEditionForDiscord, formatNeedsForDiscord } from './discord'
+import type { Edition, Need } from './schemas'
 
 function makeEdition(overrides: Partial<Edition> = {}): Edition {
   return {
@@ -101,5 +101,71 @@ describe('formatEditionForDiscord', () => {
     })
     const joined = formatEditionForDiscord(edition).join('\n')
     for (const item of items) expect(joined).toContain(`- ${item}`)
+  })
+})
+
+describe('formatNeedsForDiscord', () => {
+  const needs: Need[] = [
+    {
+      id: 'nav-relecture',
+      type: 'ponctuel',
+      title: 'Relecture LFPG',
+      department: 'Nav Team',
+      description: 'Relire la doc avant publication.',
+      skills: [],
+      time_estimate: '2–3 h',
+      contact: 'Ticket Membership',
+      status: 'open',
+      posted: new Date('2026-07-01'),
+    },
+    {
+      id: 'event-affiche',
+      type: 'ponctuel',
+      title: 'Affiche de rentrée',
+      department: 'Event Team',
+      description: 'Créer l’affiche.',
+      skills: [],
+      contact: 'Référent Event Team',
+      status: 'open',
+      posted: new Date('2026-07-02'),
+    },
+    {
+      id: 'doc-pourvu',
+      type: 'poste',
+      title: 'Relecteur SOP',
+      department: 'Doc Team',
+      description: 'x',
+      skills: [],
+      contact: 'x',
+      status: 'filled',
+      posted: new Date('2026-05-01'),
+    },
+  ]
+
+  it('groups open needs by team in config order with a footer link', () => {
+    const [chunk] = formatNeedsForDiscord(needs, 'https://exemple.fr')
+    expect(chunk).toContain('**Nav Team**')
+    expect(chunk).toContain('- **Relecture LFPG** · 2–3 h')
+    expect(chunk).toContain('📩 Ticket Membership')
+    expect(chunk.indexOf('**Nav Team**')).toBeLessThan(chunk.indexOf('**Event Team**'))
+    expect(chunk).toContain('https://exemple.fr/contribuer')
+  })
+
+  it('excludes filled needs and returns nothing when no need is open', () => {
+    const [chunk] = formatNeedsForDiscord(needs)
+    expect(chunk).not.toContain('Relecteur SOP')
+    expect(formatNeedsForDiscord(needs.filter((n) => n.status !== 'open'))).toEqual([])
+  })
+
+  it('stays under the Discord limit for large boards', () => {
+    const many: Need[] = Array.from({ length: 40 }, (_, i) => ({
+      ...needs[0],
+      id: `n-${i}`,
+      title: `Besoin numéro ${i}`,
+      description: 'x'.repeat(120),
+    }))
+    const chunks = formatNeedsForDiscord(many)
+    expect(chunks.length).toBeGreaterThan(1)
+    for (const chunk of chunks) expect(chunk.length).toBeLessThanOrEqual(DISCORD_MESSAGE_LIMIT)
   })
 })
