@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { ErrorList, Field, inputClass, ListInput, OutputPanel } from '../components/ComposerBits'
+import { Gate } from '../components/Gate'
 import { DEPARTMENTS, type Department } from '../config/departments'
 import { fr } from '../i18n/fr'
 import {
@@ -21,6 +22,14 @@ const today = () => new Date().toISOString().slice(0, 10)
 
 export function Proposer() {
   usePageTitle(fr.compose.title)
+  return (
+    <Gate kind="team">
+      <ProposerContent />
+    </Gate>
+  )
+}
+
+function ProposerContent() {
   const [tab, setTab] = useState<Tab>('need')
   return (
     <div>

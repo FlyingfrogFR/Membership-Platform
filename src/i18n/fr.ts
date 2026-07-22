@@ -247,15 +247,17 @@ export const fr = {
     ticketAppendHelp: 'Ajoutez ce bloc à la fin de content/membership/tickets-log.yaml :',
     errOpened: 'La date d’ouverture est requise.',
     errChronology: 'Les horodatages doivent être dans l’ordre : ouverture ≤ 1re réponse ≤ clôture.',
-    gate: {
-      title: 'Accès protégé',
-      text: 'Cette page est réservée au Head of Membership. Entrez le mot de passe pour continuer.',
-      label: 'Mot de passe',
-      submit: 'Entrer',
-      error: 'Mot de passe incorrect.',
-      honesty:
-        'Protection légère côté navigateur : elle dissuade, mais ne remplace pas une vraie authentification — les droits réels restent ceux de GitHub. L’espace connecté arrivera avec VATSIM Connect (phase 2).',
-    },
+  },
+  gate: {
+    title: 'Accès protégé',
+    adminText: 'Cette page est réservée au Head of Membership. Entrez le mot de passe pour continuer.',
+    teamText:
+      'Cette page est réservée aux référents d’équipe et au staff du vACC. Entrez le mot de passe communiqué par le Membership pour continuer.',
+    label: 'Mot de passe',
+    submit: 'Entrer',
+    error: 'Mot de passe incorrect.',
+    honesty:
+      'Protection légère côté navigateur : elle dissuade, mais ne remplace pas une vraie authentification — les droits réels restent ceux de GitHub. L’espace connecté arrivera avec VATSIM Connect (phase 2).',
   },
   notFound: {
     title: 'Page introuvable',
