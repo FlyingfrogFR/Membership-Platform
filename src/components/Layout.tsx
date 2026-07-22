@@ -8,6 +8,7 @@ const navItems = [
   { to: '/point-vacc', label: fr.nav.pointVacc, end: false },
   { to: '/contribuer', label: fr.nav.contribuer, end: false },
   { to: '/a-propos', label: fr.nav.aPropos, end: false },
+  { to: '/admin', label: fr.nav.admin, end: false },
 ]
 
 export function Layout({ children }: { children: ReactNode }) {
