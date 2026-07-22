@@ -1,18 +1,24 @@
-import { useMemo, useState, type FormEvent } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ErrorList, Field, inputClass, OutputPanel } from '../components/ComposerBits'
+import { Gate } from '../components/Gate'
 import { DEPARTMENTS, type Department } from '../config/departments'
 import { SITE } from '../config/site'
 import { fr } from '../i18n/fr'
-import { isUnlocked, rememberUnlock, sha256Hex, ADMIN_PASS_HASH } from '../lib/adminGate'
 import { composeTicketYaml, githubEditFileUrl, NEEDS_FILE_PATH, TICKET_LOG_FILE_PATH } from '../lib/compose'
 import { getEditions, getNeeds, getTicketLog } from '../lib/content'
 import { usePageTitle } from '../lib/usePageTitle'
 
 export function Admin() {
   usePageTitle(fr.admin.title)
-  const [unlocked, setUnlocked] = useState(isUnlocked)
-  if (!unlocked) return <AdminGate onUnlock={() => setUnlocked(true)} />
+  return (
+    <Gate kind="admin">
+      <AdminContent />
+    </Gate>
+  )
+}
+
+function AdminContent() {
   const editions = getEditions()
   const needs = getNeeds()
   const tickets = getTicketLog()
@@ -91,53 +97,6 @@ export function Admin() {
         </h2>
         <TicketComposer />
       </section>
-    </div>
-  )
-}
-
-function AdminGate({ onUnlock }: { onUnlock: () => void }) {
-  const t = fr.admin.gate
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState(false)
-
-  async function onSubmit(event: FormEvent) {
-    event.preventDefault()
-    if ((await sha256Hex(password)) === ADMIN_PASS_HASH) {
-      rememberUnlock()
-      onUnlock()
-    } else {
-      setError(true)
-    }
-  }
-
-  return (
-    <div className="mx-auto max-w-md py-10">
-      <h1 className="text-3xl font-extrabold tracking-tight">{t.title}</h1>
-      <p className="mt-3 leading-relaxed text-ink-soft">{t.text}</p>
-      <form onSubmit={(event) => void onSubmit(event)} className="card mt-6 p-6">
-        <Field label={t.label} htmlFor="admin-password">
-          <input
-            id="admin-password"
-            type="password"
-            autoComplete="current-password"
-            className={inputClass}
-            value={password}
-            onChange={(event) => {
-              setPassword(event.target.value)
-              setError(false)
-            }}
-          />
-        </Field>
-        {error && (
-          <p role="alert" className="mt-3 text-sm font-bold text-warn">
-            {t.error}
-          </p>
-        )}
-        <button type="submit" className="btn btn-primary mt-4">
-          {t.submit}
-        </button>
-      </form>
-      <p className="mt-4 text-xs leading-relaxed text-ink-soft">{t.honesty}</p>
     </div>
   )
 }

@@ -1,0 +1,59 @@
+import { useState, type FormEvent, type ReactNode } from 'react'
+import { fr } from '../i18n/fr'
+import { GATE_HASHES, isUnlocked, rememberUnlock, sha256Hex, type GateKind } from '../lib/gate'
+import { Field, inputClass } from './ComposerBits'
+
+export function Gate({ kind, children }: { kind: GateKind; children: ReactNode }) {
+  const [unlocked, setUnlocked] = useState(() => isUnlocked(kind))
+  if (unlocked) return <>{children}</>
+  return <GateForm kind={kind} onUnlock={() => setUnlocked(true)} />
+}
+
+function GateForm({ kind, onUnlock }: { kind: GateKind; onUnlock: () => void }) {
+  const t = fr.gate
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState(false)
+
+  async function onSubmit(event: FormEvent) {
+    event.preventDefault()
+    const hash = await sha256Hex(password)
+    const accepted = GATE_HASHES[kind]
+    if (accepted.includes(hash)) {
+      rememberUnlock(kind, hash === GATE_HASHES.admin[0])
+      onUnlock()
+    } else {
+      setError(true)
+    }
+  }
+
+  return (
+    <div className="mx-auto max-w-md py-10">
+      <h1 className="text-3xl font-extrabold tracking-tight">{t.title}</h1>
+      <p className="mt-3 leading-relaxed text-ink-soft">{kind === 'admin' ? t.adminText : t.teamText}</p>
+      <form onSubmit={(event) => void onSubmit(event)} className="card mt-6 p-6">
+        <Field label={t.label} htmlFor="gate-password">
+          <input
+            id="gate-password"
+            type="password"
+            autoComplete="current-password"
+            className={inputClass}
+            value={password}
+            onChange={(event) => {
+              setPassword(event.target.value)
+              setError(false)
+            }}
+          />
+        </Field>
+        {error && (
+          <p role="alert" className="mt-3 text-sm font-bold text-warn">
+            {t.error}
+          </p>
+        )}
+        <button type="submit" className="btn btn-primary mt-4">
+          {t.submit}
+        </button>
+      </form>
+      <p className="mt-4 text-xs leading-relaxed text-ink-soft">{t.honesty}</p>
+    </div>
+  )
+}

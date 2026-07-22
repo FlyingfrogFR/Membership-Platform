@@ -19,15 +19,17 @@ Trois façons de faire, de la plus simple à la plus directe :
 
 Dans tous les cas, le Head of Membership relit et harmonise le ton avant publication. La page **`/admin`** lui sert de tableau de bord : état du contenu, raccourcis d'édition GitHub et enregistrement des sollicitations (ces pages ne stockent rien : les droits réels restent ceux de GitHub).
 
-### Mot de passe de la page /admin (optionnel)
+### Mots de passe des pages internes
 
-Une protection légère peut être activée sur `/admin` : définissez la variable d'environnement **`VITE_ADMIN_PASS_HASH`** (Vercel → Settings → Environment Variables) avec le hachage SHA-256 du mot de passe, puis redéployez :
+`/admin` (Head of Membership) et `/proposer` (référents d'équipe) sont derrière un mot de passe simple ; le mot de passe admin ouvre aussi `/proposer`. Seuls les **hachages SHA-256** sont dans le code (`src/lib/gate.ts`) — jamais les mots de passe eux-mêmes, communiqués par le HoM.
+
+Pour changer un mot de passe : générer le nouveau hachage et remplacer la constante dans `src/lib/gate.ts`, ou surcharger sans toucher au code via les variables d'environnement Vercel `VITE_ADMIN_PASS_HASH` / `VITE_TEAM_PASS_HASH` :
 
 ```bash
-node -e "console.log(require('crypto').createHash('sha256').update('VotreMotDePasse').digest('hex'))"
+node -e "console.log(require('crypto').createHash('sha256').update('NouveauMotDePasse').digest('hex'))"
 ```
 
-Variable absente = page ouverte (badge « usage interne » seulement). **Attention** : la vérification se fait côté navigateur — c'est un rideau dissuasif, pas une vraie authentification. Les droits réels restent ceux de GitHub ; la vraie connexion arrivera avec VATSIM Connect (phase 2).
+**Attention** : la vérification se fait côté navigateur — c'est un rideau dissuasif (empêcher qui n'a rien à y faire d'y traîner), pas une vraie authentification. Les droits réels restent ceux de GitHub ; la vraie connexion arrivera avec VATSIM Connect (phase 2).
 
 ## Structure du contenu
 
