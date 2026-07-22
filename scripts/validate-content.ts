@@ -55,6 +55,17 @@ for (const file of editionFiles) {
     for (const name of new Set(names.filter((n, i) => names.indexOf(n) !== i))) {
       errors.push(`department "${name}" appears more than once`)
     }
+    // A referenced repo image that was never uploaded must fail the build here,
+    // not 404 on the live site.
+    for (const dept of edition.departments) {
+      for (const image of dept.images) {
+        if (!image.src.startsWith('/')) continue
+        const imagePath = path.join(root, 'public', decodeURIComponent(image.src))
+        if (!existsSync(imagePath)) {
+          errors.push(`${dept.name}: image "${image.src}" not found (expected at public${image.src})`)
+        }
+      }
+    }
   } catch (error) {
     errors.push(...describeError(error))
   }

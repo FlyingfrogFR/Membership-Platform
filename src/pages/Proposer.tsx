@@ -6,9 +6,12 @@ import {
   composeEditionFile,
   composeNeedYaml,
   editionFilePath,
+  editionImagesDir,
+  githubUploadDirUrl,
   NEEDS_FILE_PATH,
   slugify,
   type EditionDepartmentDraft,
+  type EditionImageDraft,
 } from '../lib/compose'
 import { usePageTitle } from '../lib/usePageTitle'
 
@@ -171,7 +174,13 @@ function NeedComposer() {
   )
 }
 
-const emptyLists = (): Omit<EditionDepartmentDraft, 'name'> => ({ done: [], in_progress: [], next: [], help_wanted: [] })
+const emptyLists = (): Omit<EditionDepartmentDraft, 'name'> => ({
+  done: [],
+  in_progress: [],
+  next: [],
+  help_wanted: [],
+  images: [],
+})
 
 function EditionComposer() {
   const t = fr.compose.edition
@@ -198,9 +207,11 @@ function EditionComposer() {
       departments[d].done.filter((s) => s.trim()).length +
       departments[d].in_progress.filter((s) => s.trim()).length +
       departments[d].next.filter((s) => s.trim()).length +
-      departments[d].help_wanted.filter((s) => s.trim()).length,
+      departments[d].help_wanted.filter((s) => s.trim()).length +
+      departments[d].images.filter((img) => img.name.trim()).length,
     0,
   )
+  const totalImages = DEPARTMENTS.reduce((sum, d) => sum + departments[d].images.filter((img) => img.name.trim()).length, 0)
 
   const errors = [
     !effectiveTitle.trim() && t.errTitle,
@@ -224,14 +235,18 @@ function EditionComposer() {
     [errors.length, effectiveTitle, slug, published, intro, body, departments],
   )
 
-  const setList = (dept: Department, key: keyof Omit<EditionDepartmentDraft, 'name'>) => (items: string[]) =>
+  const setList = (dept: Department, key: 'done' | 'in_progress' | 'next' | 'help_wanted') => (items: string[]) =>
     setDepartments((prev) => ({ ...prev, [dept]: { ...prev[dept], [key]: items } }))
+
+  const setImages = (dept: Department) => (images: EditionImageDraft[]) =>
+    setDepartments((prev) => ({ ...prev, [dept]: { ...prev[dept], images } }))
 
   const deptCount = (dept: Department) =>
     departments[dept].done.filter((s) => s.trim()).length +
     departments[dept].in_progress.filter((s) => s.trim()).length +
     departments[dept].next.filter((s) => s.trim()).length +
-    departments[dept].help_wanted.filter((s) => s.trim()).length
+    departments[dept].help_wanted.filter((s) => s.trim()).length +
+    departments[dept].images.filter((img) => img.name.trim()).length
 
   return (
     <section aria-label={t.title} className="card p-6 sm:p-8">
@@ -307,6 +322,9 @@ function EditionComposer() {
                 onChange={setList(dept, 'help_wanted')}
                 idBase={`${slugify(dept)}-help`}
               />
+              <div className="sm:col-span-2">
+                <ImagesInput dept={dept} images={departments[dept].images} onChange={setImages(dept)} />
+              </div>
             </div>
           </details>
         ))}
@@ -319,7 +337,94 @@ function EditionComposer() {
       </div>
 
       <ErrorList errors={errors} />
+      {file && totalImages > 0 && (
+        <div className="card mt-6 border-warn-soft bg-warn-soft/40 p-5">
+          <p className="text-sm font-bold">
+            {fr.compose.edition.uploadTitle(totalImages)} — {editionImagesDir(slug)}
+          </p>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-soft">{fr.compose.edition.uploadHelp}</p>
+          <a
+            href={githubUploadDirUrl(editionImagesDir(slug))}
+            target="_blank"
+            rel="noreferrer"
+            className="btn btn-secondary mt-4"
+          >
+            {fr.compose.edition.uploadCta} ↗
+          </a>
+        </div>
+      )}
       {file && <OutputPanel content={file} filePath={filePath} mode="new-file" downloadName={`${slug}.md`} />}
     </section>
+  )
+}
+
+function ImagesInput({
+  dept,
+  images,
+  onChange,
+}: {
+  dept: Department
+  images: EditionImageDraft[]
+  onChange: (images: EditionImageDraft[]) => void
+}) {
+  const t = fr.compose.edition
+  const inputId = `${slugify(dept)}-images`
+
+  function onPick(files: FileList | null) {
+    if (!files) return
+    const existing = new Set(images.map((img) => img.name))
+    const added = [...files]
+      .map((file) => file.name)
+      .filter((name) => !existing.has(name))
+      .map((name) => ({ name, caption: '' }))
+    if (added.length) onChange([...images, ...added])
+  }
+
+  return (
+    <fieldset>
+      <legend className="text-sm font-bold">{t.imagesLabel}</legend>
+      <p className="mt-0.5 text-xs text-ink-soft">{t.imagesHint}</p>
+      <div className="mt-2 space-y-2">
+        {images.map((image, index) => (
+          <div key={image.name} className="flex flex-wrap items-center gap-2">
+            <span className="max-w-56 truncate rounded-lg bg-accent-soft px-2.5 py-1.5 text-xs font-bold text-accent-strong">
+              {image.name}
+            </span>
+            <input
+              aria-label={`${t.imageCaptionPlaceholder} — ${image.name}`}
+              className={`${inputClass} min-w-40 flex-1`}
+              placeholder={t.imageCaptionPlaceholder}
+              value={image.caption}
+              onChange={(event) => onChange(images.map((img, i) => (i === index ? { ...img, caption: event.target.value } : img)))}
+            />
+            <button
+              type="button"
+              aria-label={`${t.removeImage} — ${image.name}`}
+              onClick={() => onChange(images.filter((_, i) => i !== index))}
+              className="rounded-full border border-line px-2.5 py-1 text-sm font-bold text-ink-soft transition-colors hover:border-coral-strong hover:text-coral-strong"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+      </div>
+      <label
+        htmlFor={inputId}
+        className="mt-2 inline-block cursor-pointer rounded-full border border-line bg-paper px-3.5 py-1.5 text-xs font-bold text-accent transition-colors hover:border-accent"
+      >
+        + {t.chooseImages}
+      </label>
+      <input
+        id={inputId}
+        type="file"
+        accept="image/*"
+        multiple
+        className="sr-only"
+        onChange={(event) => {
+          onPick(event.target.files)
+          event.target.value = ''
+        }}
+      />
+    </fieldset>
   )
 }

@@ -5,12 +5,18 @@ import { dump } from 'js-yaml'
 import type { Department } from '../config/departments'
 import { SITE } from '../config/site'
 
+export interface EditionImageDraft {
+  name: string // file name as it will exist in the repo (kept verbatim)
+  caption: string
+}
+
 export interface EditionDepartmentDraft {
   name: Department
   done: string[]
   in_progress: string[]
   next: string[]
   help_wanted: string[]
+  images: EditionImageDraft[]
 }
 
 export interface EditionDraft {
@@ -63,6 +69,15 @@ export function editionFilePath(slug: string): string {
   return `content/point-vacc/${slug}.md`
 }
 
+// Repo directory (and matching public URL prefix) for an edition's screenshots.
+export function editionImagesDir(slug: string): string {
+  return `public/images/point-vacc/${slug}`
+}
+
+export function editionImageSrc(slug: string, fileName: string): string {
+  return `/images/point-vacc/${slug}/${fileName}`
+}
+
 export const NEEDS_FILE_PATH = 'content/contribuer/needs.yaml'
 export const TICKET_LOG_FILE_PATH = 'content/membership/tickets-log.yaml'
 
@@ -74,10 +89,18 @@ export function composeEditionFile(draft: EditionDraft): string {
       const inProgress = cleanList(dept.in_progress)
       const next = cleanList(dept.next)
       const helpWanted = cleanList(dept.help_wanted)
+      const images = dept.images
+        .filter((image) => image.name.trim())
+        .map((image) =>
+          image.caption.trim()
+            ? { src: editionImageSrc(draft.slug, image.name.trim()), caption: image.caption.trim() }
+            : { src: editionImageSrc(draft.slug, image.name.trim()) },
+        )
       if (done.length) entry.done = done
       if (inProgress.length) entry.in_progress = inProgress
       if (next.length) entry.next = next
       if (helpWanted.length) entry.help_wanted = helpWanted
+      if (images.length) entry.images = images
       return entry
     })
     .filter((entry) => Object.keys(entry).length > 1)
@@ -135,4 +158,9 @@ export function githubNewFileUrl(path: string, content: string): string {
 
 export function githubEditFileUrl(path: string): string {
   return `${SITE.repoUrl}/edit/main/${path}`
+}
+
+// GitHub's drag-and-drop upload page; it creates the directory on commit.
+export function githubUploadDirUrl(dir: string): string {
+  return `${SITE.repoUrl}/upload/main/${dir}`
 }

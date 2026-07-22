@@ -18,8 +18,15 @@ const editionDraft: EditionDraft = {
   intro: "Un trimestre bien rempli, merci à tous d'être là.",
   body: 'Merci de votre lecture — **à bientôt**.',
   departments: [
-    { name: 'Nav Team', done: ['  Cartes LFPG publiées  ', ''], in_progress: ['Doc LFLL'], next: [], help_wanted: [] },
-    { name: 'Event Team', done: [], in_progress: [], next: [], help_wanted: [] },
+    {
+      name: 'Nav Team',
+      done: ['  Cartes LFPG publiées  ', ''],
+      in_progress: ['Doc LFLL'],
+      next: [],
+      help_wanted: [],
+      images: [{ name: 'secteurs LFMM.png', caption: 'Nouveau découpage' }, { name: 'brouillon.png', caption: '' }],
+    },
+    { name: 'Event Team', done: [], in_progress: [], next: [], help_wanted: [], images: [] },
   ],
 }
 
@@ -40,6 +47,16 @@ describe('composeEditionFile', () => {
     const file = composeEditionFile(editionDraft)
     expect(file).not.toContain('Event Team')
     expect(file).not.toContain('  Cartes')
+  })
+
+  it('references images under the edition slug and validates against the schema', () => {
+    const file = composeEditionFile(editionDraft)
+    const { data } = parseFrontmatter(file, 'generated')
+    const edition = editionSchema.parse(data)
+    expect(edition.departments[0].images).toEqual([
+      { src: '/images/point-vacc/2026-q3/secteurs LFMM.png', caption: 'Nouveau découpage' },
+      { src: '/images/point-vacc/2026-q3/brouillon.png' },
+    ])
   })
 })
 

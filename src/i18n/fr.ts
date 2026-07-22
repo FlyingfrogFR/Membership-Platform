@@ -176,10 +176,20 @@ export const fr = {
       intro: 'Introduction (mot du Head of Membership)',
       departments: 'Rubriques par équipe',
       body: 'Mot de la fin (optionnel, markdown)',
+      imagesLabel: 'Captures d’écran (optionnel)',
+      imagesHint:
+        'PNG/JPG, noms de fichiers simples de préférence, moins de 1 Mo par image. La légende sert aussi de texte alternatif.',
+      chooseImages: 'Choisir des images…',
+      imageCaptionPlaceholder: 'Ce que montre la capture…',
+      removeImage: 'Retirer l’image',
+      uploadTitle: (n: number) => (n === 1 ? '1 image à téléverser' : `${n} images à téléverser`),
+      uploadHelp:
+        'Les fichiers ne partent pas de cette page. Étape 1 : téléversez-les tels quels sur GitHub (glisser-déposer, bouton ci-dessous). Étape 2 : créez le fichier de l’édition. La validation échoue si une image référencée manque — une édition cassée ne peut pas partir en ligne.',
+      uploadCta: 'Téléverser les images sur GitHub',
       errTitle: 'Le titre de l’édition est requis.',
       errIntro: 'L’introduction est requise.',
       errPublished: 'La date de publication est requise.',
-      errNoItems: 'Ajoutez au moins une ligne dans au moins une équipe.',
+      errNoItems: 'Ajoutez au moins une ligne (ou une image) dans au moins une équipe.',
     },
     need: {
       title: 'Nouveau besoin ou poste',

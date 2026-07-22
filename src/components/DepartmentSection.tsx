@@ -32,6 +32,18 @@ export function DepartmentSection({ entry }: { entry: DepartmentEntry }) {
               </div>
             ),
         )}
+        {entry.images.length > 0 && (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {entry.images.map((image) => (
+              <figure key={image.src} className="overflow-hidden rounded-xl border border-line bg-canvas">
+                <a href={image.src} target="_blank" rel="noreferrer">
+                  <img src={image.src} alt={image.caption ?? ''} loading="lazy" className="w-full" />
+                </a>
+                {image.caption && <figcaption className="px-3 py-2 text-xs text-ink-soft">{image.caption}</figcaption>}
+              </figure>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   )
