@@ -11,12 +11,13 @@ Tout le contenu vit dans ce dépôt sous forme de fichiers (`/content`) : publie
 
 ## Proposer du contenu aujourd'hui (chefs de pôle)
 
-En attendant les formulaires de la phase 2, deux façons de faire :
+Trois façons de faire, de la plus simple à la plus directe :
 
-1. **La plus simple** : envoyez votre texte au Head of Membership (ticket Discord catégorie « Membership », ou message direct). Il le met en forme et l'intègre.
-2. **La plus directe** : ouvrez une pull request qui modifie les fichiers de `/content`. Le format exact (et des exemples complets) est décrit dans [CONTRIBUTING.md](CONTRIBUTING.md). La validation tourne automatiquement sur chaque PR : si le format n'est pas bon, la PR le signale avant publication.
+1. **Le formulaire** : la page **`/proposer`** du site génère le contenu au bon format (contribution au Point vACC ou besoin/poste) — un clic ouvre GitHub pré-rempli pour créer la proposition, ou copiez le résultat et envoyez-le au Head of Membership sur Discord.
+2. **Le message** : envoyez votre texte brut au Head of Membership (ticket Discord catégorie « Membership », ou message direct). Il le met en forme et l'intègre.
+3. **La pull request à la main** : modifiez directement les fichiers de `/content` — le format exact est décrit dans [CONTRIBUTING.md](CONTRIBUTING.md). La validation tourne sur chaque PR : si le format n'est pas bon, la PR le signale avant publication.
 
-Dans les deux cas, le Head of Membership relit et harmonise le ton avant publication.
+Dans tous les cas, le Head of Membership relit et harmonise le ton avant publication. La page **`/admin`** lui sert de tableau de bord : état du contenu, raccourcis d'édition GitHub et enregistrement des sollicitations (ces pages ne stockent rien : les droits réels restent ceux de GitHub).
 
 ## Structure du contenu
 
@@ -65,6 +66,6 @@ Sortie statique dans `dist/`, déployable telle quelle sur Vercel (config fourni
 2. **Lien Discord** : URL exacte vers la catégorie de tickets « Membership » (`src/config/site.ts`, actuellement pointé sur vatsim.fr en placeholder).
 3. **Logo/favicon définitifs** : le placeholder reprend désormais les couleurs officielles, mais un logo vACC propre reste le bienvenu (`public/favicon.svg`).
 
-## Contenu d'exemple
+## Démarrage à vide
 
-L'édition et les besoins livrés avec le dépôt sont préfixés `EXEMPLE —` : rien de fictif ne doit passer pour une vraie annonce. Les remplacer avant la mise en ligne.
+Le dépôt part **sans contenu** : pas d'édition, tableau Contribuer vide, journal des sollicitations vide — le site affiche des états vides propres en attendant les premières vraies publications (via `/proposer` ou les fichiers de `/content`).
