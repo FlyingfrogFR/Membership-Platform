@@ -1,6 +1,6 @@
 # Contribuer au contenu
 
-Ce document décrit le flux « pull request » pour proposer du contenu. Si vous préférez, envoyez simplement votre texte au Head of Membership (ticket Discord catégorie « Membership ») — il s'occupe du reste.
+**Le plus simple : la page `/proposer` du site.** Ses formulaires génèrent le contenu exactement au format attendu, avec un lien GitHub pré-rempli. Ce document décrit le format sous-jacent, pour qui préfère éditer les fichiers à la main. Et si vous préférez, envoyez simplement votre texte au Head of Membership (ticket Discord catégorie « Membership ») — il s'occupe du reste.
 
 ## Le principe
 

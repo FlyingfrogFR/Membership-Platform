@@ -54,7 +54,13 @@ export function Layout({ children }: { children: ReactNode }) {
       <footer className="border-t border-line bg-paper">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-6 text-sm text-ink-soft">
           <p>{fr.footer.disclaimer}</p>
-          <p className="flex gap-4">
+          <p className="flex flex-wrap gap-4">
+            <Link className="hover:text-accent-strong" to="/proposer">
+              {fr.footer.propose}
+            </Link>
+            <Link className="hover:text-accent-strong" to="/admin">
+              {fr.footer.admin}
+            </Link>
             <a className="hover:text-accent-strong" href={SITE.vatsimFrUrl} target="_blank" rel="noreferrer">
               {fr.footer.vatsimFr}
             </a>

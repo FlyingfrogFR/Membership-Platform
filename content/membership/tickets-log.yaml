@@ -2,76 +2,10 @@
 #
 # IMPORTANT — aucune donnée personnelle : uniquement le pôle concerné et des
 # horodatages. Pas de nom, pas de CID, pas de contenu de message. Ce journal
-# sert à produire des statistiques publiques par pôle (page Point vACC), en
-# attendant l'accord pour un lien automatique avec Discord.
+# alimente les statistiques publiques par pôle (page Point vACC).
 #
-# Rempli à la main. Validé par `npm run validate` (ids uniques, chronologie).
+# Fichier vide = aucune sollicitation enregistrée (état valide).
+# Le formulaire de la page /admin génère les entrées au bon format.
 # Champs : id (unique), department (un pôle de src/config/departments.ts),
 # opened (obligatoire), first_response (optionnel), closed (optionnel = encore
 # ouvert si absent), outcome (optionnel : resolved | redirected | no_response | other).
-# Horodatages au format ISO 8601 avec fuseau, ex. 2026-06-01T18:30:00Z.
-#
-# Les entrées dont l'id commence par « exemple- » sont des exemples livrés avec
-# la plateforme : la page affiche alors un badge EXEMPLE. Les remplacer par de
-# vraies entrées fait disparaître le badge.
-
-- id: "exemple-2026-06-01-nav"
-  department: "NAV"
-  opened: 2026-06-01T18:30:00Z
-  first_response: 2026-06-01T19:05:00Z
-  closed: 2026-06-03T20:00:00Z
-  outcome: "resolved"
-
-- id: "exemple-2026-06-04-training-atc"
-  department: "Training ATC"
-  opened: 2026-06-04T20:00:00Z
-  first_response: 2026-06-04T21:30:00Z
-  closed: 2026-06-06T18:00:00Z
-  outcome: "resolved"
-
-- id: "exemple-2026-06-07-events"
-  department: "Events"
-  opened: 2026-06-07T12:00:00Z
-  first_response: 2026-06-07T12:20:00Z
-  closed: 2026-06-07T15:00:00Z
-  outcome: "resolved"
-
-- id: "exemple-2026-06-09-digital-services"
-  department: "Digital Services"
-  opened: 2026-06-09T09:00:00Z
-  first_response: 2026-06-10T11:00:00Z
-  closed: 2026-06-12T10:00:00Z
-  outcome: "resolved"
-
-- id: "exemple-2026-06-11-membership"
-  department: "Membership"
-  opened: 2026-06-11T19:00:00Z
-  first_response: 2026-06-11T19:10:00Z
-  closed: 2026-06-11T19:45:00Z
-  outcome: "resolved"
-
-- id: "exemple-2026-06-14-nav"
-  department: "NAV"
-  opened: 2026-06-14T17:00:00Z
-  first_response: 2026-06-14T17:40:00Z
-  closed: 2026-06-16T12:00:00Z
-  outcome: "resolved"
-
-- id: "exemple-2026-06-18-documentation"
-  department: "Documentation"
-  opened: 2026-06-18T21:00:00Z
-  first_response: 2026-06-19T08:30:00Z
-  outcome: "other"
-
-- id: "exemple-2026-06-20-events"
-  department: "Events"
-  opened: 2026-06-20T20:00:00Z
-  first_response: 2026-06-20T20:15:00Z
-  closed: 2026-06-22T09:00:00Z
-  outcome: "redirected"
-
-- id: "exemple-2026-06-24-training-atc"
-  department: "Training ATC"
-  opened: 2026-06-24T18:00:00Z
-  closed: 2026-06-25T18:00:00Z
-  outcome: "no_response"

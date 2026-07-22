@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { NeedCard } from '../components/NeedCard'
 import { DEPARTMENTS } from '../config/departments'
-import { SITE } from '../config/site'
 import { fr } from '../i18n/fr'
 import { getNeeds } from '../lib/content'
 import { usePageTitle } from '../lib/usePageTitle'
@@ -126,9 +126,9 @@ export function Contribuer() {
           {fr.contribuer.proposeTitle}
         </h2>
         <p className="mt-3 max-w-2xl leading-relaxed text-ink-soft">{fr.contribuer.proposeText}</p>
-        <a href={SITE.repoUrl} target="_blank" rel="noreferrer" className="btn btn-secondary mt-5">
-          {fr.contribuer.proposeCta} ↗
-        </a>
+        <Link to="/proposer" className="btn btn-primary mt-5">
+          {fr.contribuer.proposeCta}
+        </Link>
       </section>
     </div>
   )
