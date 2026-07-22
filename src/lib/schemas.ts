@@ -12,12 +12,22 @@ const contentDate = z.preprocess(
   z.date('must be a date (YYYY-MM-DD)'),
 )
 
+// Screenshots live in the repo under public/ (served from the site root) or on
+// an https host; anything else cannot resolve on the static site.
+export const editionImageSchema = z.strictObject({
+  src: nonEmptyString.refine((s) => s.startsWith('/') || s.startsWith('https://'), {
+    message: 'src must start with "/" (repo image under public/) or "https://"',
+  }),
+  caption: nonEmptyString.optional(),
+})
+
 export const departmentEntrySchema = z.strictObject({
   name: z.enum(DEPARTMENTS),
   done: bulletList,
   in_progress: bulletList,
   next: bulletList,
   help_wanted: bulletList,
+  images: z.array(editionImageSchema).default([]),
 })
 
 export const editionSchema = z.strictObject({

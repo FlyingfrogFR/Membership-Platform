@@ -40,7 +40,19 @@ Texte de conclusion optionnel, en markdown, affiché après les sections des pô
 Règles :
 
 - `name` doit être une équipe de la liste `src/config/departments.ts` (`Nav Team`, `Doc Team`, `Event Team`, `Digital Team`, `Training Department`, `vACC Directors`, `Membership`), alignée sur le document officiel « Fonctionnement des équipes » (catégorie Membership ajoutée en complément). L'ordre d'affichage sur le site suit cette liste, pas l'ordre du fichier.
-- `done`, `in_progress`, `next`, `help_wanted` sont tous optionnels — n'indiquez que ce qui existe. Un pôle sans aucun item n'apparaît ni sur le site ni dans l'export Discord.
+- `done`, `in_progress`, `next`, `help_wanted` sont tous optionnels — n'indiquez que ce qui existe. Une équipe sans aucun item n'apparaît ni sur le site ni dans l'export Discord.
+- Chaque équipe peut joindre des **captures d'écran** :
+
+  ```yaml
+  - name: "Nav Team"
+    done:
+      - "…"
+    images:
+      - src: "/images/point-vacc/2026-q3/secteurs-lfmm.png"
+        caption: "Nouveau découpage secteurs"   # optionnel, sert aussi de texte alternatif
+  ```
+
+  Les fichiers se téléversent dans `public/images/point-vacc/<slug>/` (glisser-déposer sur GitHub — le formulaire `/proposer` fournit le lien direct). La validation échoue si une image référencée manque : téléversez les images **avant** de créer le fichier de l'édition. Les URLs `https://` sont aussi acceptées.
 - Phrases courtes, orientées résultat : elles sont affichées telles quelles en puces, sur le site comme sur Discord.
 
 ## Ajouter un besoin au tableau Contribuer

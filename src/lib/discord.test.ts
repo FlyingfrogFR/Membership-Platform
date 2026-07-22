@@ -10,8 +10,8 @@ function makeEdition(overrides: Partial<Edition> = {}): Edition {
     intro: 'Un trimestre bien rempli.',
     body: '',
     departments: [
-      { name: 'Event Team', done: ['Real Ops Paris'], in_progress: [], next: [], help_wanted: [] },
-      { name: 'Nav Team', done: ['Cartes LFPG publiées'], in_progress: ['Doc LFLL'], next: [], help_wanted: [] },
+      { name: 'Event Team', done: ['Real Ops Paris'], in_progress: [], next: [], help_wanted: [], images: [] },
+      { name: 'Nav Team', done: ['Cartes LFPG publiées'], in_progress: ['Doc LFLL'], next: [], help_wanted: [], images: [] },
     ],
     ...overrides,
   }
@@ -37,8 +37,8 @@ describe('formatEditionForDiscord', () => {
     const chunks = formatEditionForDiscord(
       makeEdition({
         departments: [
-          { name: 'Nav Team', done: ['Une seule chose'], in_progress: [], next: [], help_wanted: [] },
-          { name: 'Doc Team', done: [], in_progress: [], next: [], help_wanted: [] },
+          { name: 'Nav Team', done: ['Une seule chose'], in_progress: [], next: [], help_wanted: [], images: [] },
+          { name: 'Doc Team', done: [], in_progress: [], next: [], help_wanted: [], images: [] },
         ],
       }),
     )
@@ -61,6 +61,7 @@ describe('formatEditionForDiscord', () => {
         in_progress: [],
         next: [],
         help_wanted: [],
+        images: [],
       })),
     })
     const chunks = formatEditionForDiscord(edition)
@@ -74,7 +75,7 @@ describe('formatEditionForDiscord', () => {
   it('keeps every line of a long edition', () => {
     const items = Array.from({ length: 60 }, (_, i) => `Ligne ${i}`)
     const edition = makeEdition({
-      departments: [{ name: 'Nav Team', done: items, in_progress: [], next: [], help_wanted: [] }],
+      departments: [{ name: 'Nav Team', done: items, in_progress: [], next: [], help_wanted: [], images: [] }],
     })
     const joined = formatEditionForDiscord(edition).join('\n')
     for (const item of items) expect(joined).toContain(`- ${item}`)
