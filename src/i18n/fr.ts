@@ -218,7 +218,6 @@ export const fr = {
   admin: {
     title: 'Espace Membership',
     lede: 'Tableau de bord du Head of Membership : état du contenu, raccourcis d’édition et journal des sollicitations.',
-    note: 'Cette page n’est pas protégée par un mot de passe : elle ne fait que générer du texte et ouvrir GitHub, où les droits réels s’appliquent. L’espace connecté arrivera avec VATSIM Connect (phase 2).',
     overviewTitle: 'État du contenu',
     editions: 'Éditions publiées',
     needsOpen: 'Besoins ouverts',
@@ -256,8 +255,6 @@ export const fr = {
     label: 'Mot de passe',
     submit: 'Entrer',
     error: 'Mot de passe incorrect.',
-    honesty:
-      'Protection légère côté navigateur : elle dissuade, mais ne remplace pas une vraie authentification — les droits réels restent ceux de GitHub. L’espace connecté arrivera avec VATSIM Connect (phase 2).',
   },
   notFound: {
     title: 'Page introuvable',

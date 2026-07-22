@@ -48,7 +48,6 @@ function AdminContent() {
         </div>
         <p className="mt-4 text-lg leading-relaxed text-ink-soft">{fr.admin.lede}</p>
         <p className="mt-3 rounded-xl bg-warn-soft p-3 text-sm leading-relaxed text-warn">{fr.site.internalNote}</p>
-        <p className="mt-3 rounded-xl bg-accent-soft p-3 text-sm leading-relaxed text-ink-soft">{fr.admin.note}</p>
       </header>
 
       <section aria-labelledby="admin-overview" className="mt-10">

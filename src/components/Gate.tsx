@@ -53,7 +53,6 @@ function GateForm({ kind, onUnlock }: { kind: GateKind; onUnlock: () => void }) 
           {t.submit}
         </button>
       </form>
-      <p className="mt-4 text-xs leading-relaxed text-ink-soft">{t.honesty}</p>
     </div>
   )
 }
