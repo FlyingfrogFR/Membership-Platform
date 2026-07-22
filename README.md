@@ -19,6 +19,16 @@ Trois façons de faire, de la plus simple à la plus directe :
 
 Dans tous les cas, le Head of Membership relit et harmonise le ton avant publication. La page **`/admin`** lui sert de tableau de bord : état du contenu, raccourcis d'édition GitHub et enregistrement des sollicitations (ces pages ne stockent rien : les droits réels restent ceux de GitHub).
 
+### Mot de passe de la page /admin (optionnel)
+
+Une protection légère peut être activée sur `/admin` : définissez la variable d'environnement **`VITE_ADMIN_PASS_HASH`** (Vercel → Settings → Environment Variables) avec le hachage SHA-256 du mot de passe, puis redéployez :
+
+```bash
+node -e "console.log(require('crypto').createHash('sha256').update('VotreMotDePasse').digest('hex'))"
+```
+
+Variable absente = page ouverte (badge « usage interne » seulement). **Attention** : la vérification se fait côté navigateur — c'est un rideau dissuasif, pas une vraie authentification. Les droits réels restent ceux de GitHub ; la vraie connexion arrivera avec VATSIM Connect (phase 2).
+
 ## Structure du contenu
 
 - `content/point-vacc/<slug>.md` — une édition du Point vACC par fichier (frontmatter YAML : intro du HoM + une section par pôle : fait / en cours / à venir / coup de main recherché).
