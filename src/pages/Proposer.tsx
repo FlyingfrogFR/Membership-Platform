@@ -18,7 +18,9 @@ import { usePageTitle } from '../lib/usePageTitle'
 
 type Tab = 'edition' | 'need'
 
-const today = () => new Date().toISOString().slice(0, 10)
+// Local date, not UTC: between midnight and ~2 a.m. Paris time the UTC date is
+// still "yesterday". fr-CA formats as YYYY-MM-DD.
+const today = () => new Date().toLocaleDateString('fr-CA')
 
 export function Proposer() {
   usePageTitle(fr.compose.title)
@@ -88,6 +90,7 @@ function NeedComposer() {
     !title.trim() && t.errTitle,
     !description.trim() && t.errDescription,
     !contact.trim() && t.errContact,
+    !posted && t.errPosted,
     !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(effectiveId) && t.errId,
   ].filter((e): e is string => Boolean(e))
 
@@ -228,6 +231,7 @@ function EditionComposer() {
     !effectiveTitle.trim() && t.errTitle,
     !intro.trim() && t.errIntro,
     !published && t.errPublished,
+    (!Number.isInteger(year) || year < 2020 || year > 2100) && t.errYear,
     totalItems === 0 && t.errNoItems,
   ].filter((e): e is string => Boolean(e))
 

@@ -1,0 +1,8 @@
+# Suivi du pilier Coordination : quelles équipes ont envoyé leur point mensuel.
+# UNIQUEMENT des booléens et des dates — jamais le contenu des points, qui reste
+# privé (phase 2). Fichier vide = aucun suivi enregistré (état valide).
+# Le formulaire de la page /admin génère les entrées au bon format.
+#
+# Format :
+# - month: "2026-07"
+#   received: ["Nav Team", "Doc Team"]

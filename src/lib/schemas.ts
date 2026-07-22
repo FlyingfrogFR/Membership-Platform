@@ -40,18 +40,28 @@ export const editionSchema = z.strictObject({
   departments: z.array(departmentEntrySchema).min(1),
 })
 
-export const needSchema = z.strictObject({
-  id: kebabCase,
-  type: z.enum(['ponctuel', 'poste']),
-  title: nonEmptyString,
-  department: z.enum(DEPARTMENTS),
-  description: nonEmptyString,
-  skills: z.array(nonEmptyString).default([]),
-  time_estimate: nonEmptyString.optional(),
-  contact: nonEmptyString,
-  status: z.enum(['open', 'filled', 'closed']),
-  posted: contentDate,
-})
+export const needSchema = z
+  .strictObject({
+    id: kebabCase,
+    type: z.enum(['ponctuel', 'poste']),
+    title: nonEmptyString,
+    department: z.enum(DEPARTMENTS),
+    description: nonEmptyString,
+    skills: z.array(nonEmptyString).default([]),
+    time_estimate: nonEmptyString.optional(),
+    contact: nonEmptyString,
+    status: z.enum(['open', 'filled', 'closed']),
+    posted: contentDate,
+    // When a need is filled: the date feeds the time-to-fill KPI (unrecoverable
+    // if not captured), and filled_via is deliberately a PII-free enum — never
+    // a person's name, since /content ships in the public bundle.
+    filled_at: contentDate.optional(),
+    filled_via: z.enum(['ticket', 'discord', 'direct']).optional(),
+  })
+  .refine((need) => !need.filled_at || need.filled_at >= need.posted, {
+    path: ['filled_at'],
+    message: 'filled_at must not be before posted',
+  })
 
 // An emptied needs file (yaml null) is a legitimate "no needs right now" state.
 export const needsFileSchema = z.preprocess((value) => value ?? [], z.array(needSchema))
@@ -82,6 +92,18 @@ export const ticketLogEntrySchema = z
 export const ticketLogFileSchema = z.preprocess((value) => value ?? [], z.array(ticketLogEntrySchema))
 
 export type TicketLogEntry = z.infer<typeof ticketLogEntrySchema>
+
+// Coordination pillar tracker: which teams sent their private monthly update.
+// Booleans and dates only — the update content itself is private (Phase 2) and
+// must never enter this public repo.
+export const coordinationEntrySchema = z.strictObject({
+  month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'must be YYYY-MM'),
+  received: z.array(z.enum(DEPARTMENTS)).default([]),
+})
+
+export const coordinationFileSchema = z.preprocess((value) => value ?? [], z.array(coordinationEntrySchema))
+
+export type CoordinationEntry = z.infer<typeof coordinationEntrySchema>
 
 export type DepartmentEntry = z.infer<typeof departmentEntrySchema>
 export type EditionFrontmatter = z.infer<typeof editionSchema>

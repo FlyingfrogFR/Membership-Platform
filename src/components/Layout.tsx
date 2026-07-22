@@ -49,23 +49,23 @@ export function Layout({ children }: { children: ReactNode }) {
           </nav>
         </div>
       </header>
-      <main id="main" className="flex-1">
+      <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
         <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:py-12">{children}</div>
       </main>
       <footer className="border-t border-line bg-paper">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-6 text-sm text-ink-soft">
           <p>{fr.footer.disclaimer}</p>
-          <p className="flex flex-wrap gap-4">
-            <Link className="hover:text-accent-strong" to="/proposer">
+          <p className="flex flex-wrap gap-x-4 gap-y-1">
+            <Link className="py-1 hover:text-accent-strong" to="/proposer">
               {fr.footer.propose}
             </Link>
-            <Link className="hover:text-accent-strong" to="/admin">
+            <Link className="py-1 hover:text-accent-strong" to="/admin">
               {fr.footer.admin}
             </Link>
-            <a className="hover:text-accent-strong" href={SITE.vatsimFrUrl} target="_blank" rel="noreferrer">
+            <a className="py-1 hover:text-accent-strong" href={SITE.vatsimFrUrl} target="_blank" rel="noreferrer">
               {fr.footer.vatsimFr}
             </a>
-            <a className="hover:text-accent-strong" href={SITE.repoUrl} target="_blank" rel="noreferrer">
+            <a className="py-1 hover:text-accent-strong" href={SITE.repoUrl} target="_blank" rel="noreferrer">
               {fr.footer.source}
             </a>
           </p>

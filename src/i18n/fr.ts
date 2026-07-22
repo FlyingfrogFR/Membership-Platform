@@ -3,7 +3,6 @@
 export const fr = {
   site: {
     name: 'Membership · vACC France',
-    tagline: 'Faire le lien entre la vACC et ses membres.',
     internalBadge: 'Usage interne',
     internalNote:
       'Page réservée à l’usage interne de la vACC France (staff et référents d’équipe) — elle ne publie rien directement : toute proposition passe par la relecture du Head of Membership.',
@@ -13,6 +12,11 @@ export const fr = {
   a11y: {
     skipToContent: 'Aller au contenu',
     mainNav: 'Navigation principale',
+  },
+  common: {
+    loading: 'Chargement…',
+    copy: 'Copier',
+    copied: 'Copié !',
   },
   nav: {
     home: 'Accueil',
@@ -102,6 +106,8 @@ export const fr = {
     filterTime: 'Temps estimé',
     filterAll: 'Tous',
     empty: 'Rien ne correspond à ces filtres pour le moment — revenez bientôt, ça bouge vite.',
+    emptyType: 'Rien dans cette catégorie pour le moment — revenez bientôt, ça bouge vite.',
+    showAll: 'Afficher aussi les besoins pourvus ou clos',
     resultsCount: (n: number) =>
       n === 0 ? 'Aucun résultat' : n === 1 ? '1 résultat affiché' : `${n} résultats affichés`,
     skills: 'Compétences',
@@ -192,6 +198,7 @@ export const fr = {
       errTitle: 'Le titre de l’édition est requis.',
       errIntro: 'L’introduction est requise.',
       errPublished: 'La date de publication est requise.',
+      errYear: 'L’année doit être comprise entre 2020 et 2100.',
       errNoItems: 'Ajoutez au moins une ligne (ou une image) dans au moins une équipe.',
     },
     need: {
@@ -216,6 +223,7 @@ export const fr = {
       errDescription: 'La description est requise.',
       errContact: 'Le contact est requis.',
       errId: 'L’identifiant doit être en minuscules-et-tirets.',
+      errPosted: 'La date de publication est requise.',
     },
   },
   admin: {
@@ -249,6 +257,89 @@ export const fr = {
     ticketAppendHelp: 'Ajoutez ce bloc à la fin de content/membership/tickets-log.yaml :',
     errOpened: 'La date d’ouverture est requise.',
     errChronology: 'Les horodatages doivent être dans l’ordre : ouverture ≤ 1re réponse ≤ clôture.',
+    alerts: {
+      title: 'Alertes',
+      ok: 'Rien à signaler — tout est à jour. ✅',
+      fix: 'Corriger',
+      needAging: (title: string, team: string, days: number) => `« ${title} » (${team}) est ouvert depuis ${days} j.`,
+      missingFilledAt: (n: number) =>
+        n === 1
+          ? '1 besoin pourvu sans date de pourvoi (filled_at) — le délai de pourvoi ne pourra pas être calculé.'
+          : `${n} besoins pourvus sans date de pourvoi (filled_at) — le délai de pourvoi ne pourra pas être calculé.`,
+      ticketAging: (id: string, days: number) => `Sollicitation ${id} sans clôture depuis ${days} j.`,
+      editionOverdue: (days: number) => `Le dernier Point vACC date d’il y a ${days} j — la prochaine édition approche.`,
+      noEdition: 'Aucune édition publiée pour le moment — la première est à composer.',
+      logQuiet: (days: number) => `Le journal des sollicitations n’a rien enregistré depuis ${days} j — attention aux trous de KPI.`,
+      logEmpty: 'Le journal des sollicitations est vide — pensez à enregistrer les sollicitations reçues.',
+      sampleData: 'Des données d’exemple (préfixe « exemple- ») sont encore présentes.',
+      discordPlaceholder: 'Le lien Discord pointe encore vers vatsim.fr (placeholder à remplacer).',
+    },
+    cockpit: {
+      title: 'Point vACC — pilotage',
+      nextEdition: (label: string) => `Prochaine édition : ${label}`,
+      due: (date: string, days: number) =>
+        days >= 0 ? `Publication cible le ${date} — J−${days}.` : `Publication cible le ${date} — en retard de ${-days} j.`,
+      checklistTitle: 'Compte à rebours',
+      steps: {
+        call: 'Lancer l’appel aux référents',
+        chase: 'Relancer les équipes manquantes',
+        assemble: 'Assembler l’édition via Proposer',
+        publish: 'Publier, puis « Copier pour Discord » et poster',
+      },
+      matrixTitle: 'Participation par équipe',
+      matrixEmpty: 'La matrice se remplira dès la première édition publiée.',
+      present: 'Présente',
+      absent: 'Absente',
+      streak: (n: number) => (n === 1 ? 'absente du dernier Point' : `absente des ${n} derniers Points`),
+      relanceTitle: 'Messages de relance',
+      relanceHelp: 'Un clic copie un message prêt à coller en message privé Discord au référent de l’équipe.',
+      relanceQuarter: (team: string, label: string, date: string, origin: string) =>
+        `Salut ! 👋 Le Point vACC ${label} doit partir le ${date}, et il manque encore la rubrique **${team}**. Trois puces suffisent (fait / en cours / à venir) — ou remplis directement le formulaire : ${origin}/proposer (mot de passe équipe). Merci ! 🙏`,
+    },
+    needsExport: {
+      title: 'Contribuer — export Discord',
+      help: 'La version Discord du tableau des besoins ouverts — à poster par exemple une fois par mois pour amener les membres vers les équipes.',
+      empty: 'Aucun besoin ouvert à exporter pour le moment.',
+    },
+    coordination: {
+      title: 'Coordination — points mensuels',
+      help: 'Cochez les équipes dont le point mensuel est arrivé, puis ajoutez la ligne générée au fichier. Uniquement des cases cochées et des dates — jamais le contenu des points, qui reste privé.',
+      month: 'Mois',
+      teams: 'Points reçus ce mois-ci',
+      appendHelp: 'Ajoutez (ou complétez) ce mois à la fin de content/membership/coordination.yaml :',
+      matrixTitle: 'Suivi des 6 derniers mois',
+      receivedAria: 'Point reçu',
+      missingAria: 'Point manquant',
+      relanceMonthly: (team: string, month: string) =>
+        `Salut ! 👋 Petit rappel : le point mensuel de **${team}** pour ${month} n’est pas encore arrivé. Deux lignes suffisent (fait marquant, priorité du moment) — réponds simplement ici quand tu as un moment. Merci ! 🙏`,
+      relanceFor: (team: string) => `Relance ${team}`,
+    },
+    kpi: {
+      title: 'Indicateurs (KPI)',
+      help: 'Trimestre en cours comparé au précédent. « Copier en markdown » permet de coller le tableau dans un rapport ou une édition.',
+      copyMd: 'Copier en markdown',
+      indicator: 'Indicateur',
+      previous: 'Trim. précédent',
+      current: 'Trim. en cours',
+      rows: {
+        received: 'Sollicitations reçues',
+        resolved: 'Sollicitations traitées',
+        firstResponse: '1re réponse (médiane)',
+        needsOpened: 'Besoins publiés',
+        needsFilled: 'Besoins pourvus',
+        timeToFill: 'Délai de pourvoi (médiane)',
+        participation: 'Participation au Point vACC',
+        coordination: 'Points mensuels reçus',
+      },
+      chartsTitle: 'Tendance sur 6 mois',
+      chartsLegend: 'Barres : sollicitations reçues (bleu) et traitées (vert) par mois ; courbe : 1re réponse médiane.',
+      chartsEmpty: 'Pas encore de données — le journal des sollicitations alimentera ces courbes.',
+    },
+  },
+  discordNeeds: {
+    title: 'Contribuer — la vACC cherche des coups de main',
+    intro: 'Envie d’aider ? Voici les besoins ouverts des équipes en ce moment. Pas besoin de s’engager pour un an : tout est bon à prendre !',
+    footer: (origin: string) => `📎 Tout le tableau (filtres et détails) : ${origin}/contribuer`,
   },
   gate: {
     title: 'Accès protégé',

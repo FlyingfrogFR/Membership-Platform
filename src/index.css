@@ -10,7 +10,7 @@
   --color-accent-strong: #22568c; /* hover */
   --color-accent-soft: #e3effb; /* dorian light-blue tint — badges & soft blocks */
   --color-coral: #e8674c; /* warm coral — decorative accents (marks, dots) */
-  --color-coral-strong: #be3f24; /* coral for text & tags */
+  --color-coral-strong: #b23a20; /* coral for text & tags */
   --color-coral-soft: #fce7e0;
   --color-ink: #2a2f38; /* cool charcoal */
   --color-ink-soft: #5c636e;
@@ -85,5 +85,25 @@
 
   .rich-text strong {
     @apply text-ink;
+  }
+}
+
+/* Print: a Point vACC should print as a clean document. */
+@media print {
+  header,
+  footer,
+  nav,
+  .btn,
+  button {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .card {
+    box-shadow: none;
+    border-color: #ddd;
   }
 }

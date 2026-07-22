@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { AlertsPanel, CockpitPanel, CoordinationPanel, KpiPanel, NeedsExportPanel } from '../components/admin/AdminPanels'
 import { ErrorList, Field, inputClass, OutputPanel } from '../components/ComposerBits'
 import { Gate } from '../components/Gate'
 import { DEPARTMENTS, type Department } from '../config/departments'
@@ -19,6 +20,8 @@ export function Admin() {
 }
 
 function AdminContent() {
+  // One "now" for every panel so ages and quarters are mutually consistent.
+  const now = useMemo(() => new Date(), [])
   const editions = getEditions()
   const needs = getNeeds()
   const tickets = getTicketLog()
@@ -50,6 +53,8 @@ function AdminContent() {
         <p className="mt-3 rounded-xl bg-warn-soft p-3 text-sm leading-relaxed text-warn">{fr.site.internalNote}</p>
       </header>
 
+      <AlertsPanel now={now} />
+
       <section aria-labelledby="admin-overview" className="mt-10">
         <h2 id="admin-overview" className="text-2xl font-extrabold">
           {fr.admin.overviewTitle}
@@ -63,6 +68,11 @@ function AdminContent() {
           ))}
         </dl>
       </section>
+
+      <CockpitPanel now={now} />
+      <NeedsExportPanel />
+      <CoordinationPanel now={now} />
+      <KpiPanel now={now} />
 
       <section aria-labelledby="admin-links" className="mt-10">
         <h2 id="admin-links" className="text-2xl font-extrabold">
@@ -122,8 +132,13 @@ function TicketComposer() {
     (e): e is string => Boolean(e),
   )
 
+  // Date + time in the id: two same-day tickets for the same team must not
+  // collide (the validator enforces id uniqueness, a duplicate breaks the build).
   const id = useMemo(
-    () => (openedIso ? `${openedIso.slice(0, 10)}-${department.toLowerCase().replace(/[^a-z0-9]+/g, '-')}` : ''),
+    () =>
+      openedIso
+        ? `${openedIso.slice(0, 10)}-${openedIso.slice(11, 16).replace(':', '')}-${department.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
+        : '',
     [openedIso, department],
   )
 

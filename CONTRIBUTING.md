@@ -82,7 +82,13 @@ Ajoutez un item au tableau dans `content/contribuer/needs.yaml` :
   posted: 2026-08-01
 ```
 
-Quand un besoin est pourvu, passez son `status` à `"filled"` (ou `"closed"` s'il est abandonné) plutôt que de le supprimer : le tableau garde ainsi la trace de ce qui avance.
+Quand un besoin est pourvu, passez son `status` à `"filled"` (ou `"closed"` s'il est abandonné) plutôt que de le supprimer, et ajoutez la **date de pourvoi** — c'est elle qui alimente le KPI « délai de pourvoi » :
+
+```yaml
+  status: "filled"
+  filled_at: 2026-09-15
+  filled_via: "ticket"   # optionnel : ticket | discord | direct — jamais de nom
+```
 
 Un fichier vide (ou ne contenant que des commentaires) est accepté : le site affiche alors simplement un tableau vide.
 

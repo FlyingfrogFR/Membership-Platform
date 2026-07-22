@@ -17,7 +17,7 @@ Trois façons de faire, de la plus simple à la plus directe :
 2. **Le message** : envoyez votre texte brut au Head of Membership (ticket Discord catégorie « Membership », ou message direct). Il le met en forme et l'intègre.
 3. **La pull request à la main** : modifiez directement les fichiers de `/content` — le format exact est décrit dans [CONTRIBUTING.md](CONTRIBUTING.md). La validation tourne sur chaque PR : si le format n'est pas bon, la PR le signale avant publication.
 
-Dans tous les cas, le Head of Membership relit et harmonise le ton avant publication. La page **`/admin`** lui sert de tableau de bord : état du contenu, raccourcis d'édition GitHub et enregistrement des sollicitations (ces pages ne stockent rien : les droits réels restent ceux de GitHub).
+Dans tous les cas, le Head of Membership relit et harmonise le ton avant publication. La page **`/admin`** lui sert de tableau de bord : **alertes** (besoins qui vieillissent, journal muet, édition en retard, données d'exemple restantes), **pilotage du Point vACC** (compte à rebours de la prochaine édition, checklist datée, matrice de participation par équipe, messages de relance prêts à coller), **export Discord du tableau Contribuer**, **suivi Coordination** (points mensuels reçus par équipe + relances), **indicateurs KPI** (trimestre vs trimestre, export markdown, tendances) et enregistrement des sollicitations. Ces pages ne stockent rien : les droits réels restent ceux de GitHub.
 
 ### Mots de passe des pages internes
 
@@ -35,7 +35,8 @@ node -e "console.log(require('crypto').createHash('sha256').update('NouveauMotDe
 
 - `content/point-vacc/<slug>.md` — une édition du Point vACC par fichier (frontmatter YAML : intro du HoM + une section par pôle : fait / en cours / à venir / coup de main recherché).
 - `content/contribuer/needs.yaml` — le tableau Contribuer : un tableau d'items (`poste` ou `ponctuel`).
-- `content/membership/tickets-log.yaml` — journal manuel et **anonyme** des sollicitations Membership (pôle + horodatages, aucune donnée personnelle). Alimente les statistiques par pôle affichées sur la page Point vACC, en attendant l'accord pour un lien automatique avec Discord.
+- `content/membership/tickets-log.yaml` — journal manuel et **anonyme** des sollicitations Membership (équipe + horodatages, aucune donnée personnelle). Alimente les statistiques par équipe affichées sur la page Point vACC, en attendant l'accord pour un lien automatique avec Discord.
+- `content/membership/coordination.yaml` — suivi du pilier Coordination : quelles équipes ont envoyé leur point mensuel (**booléens et dates uniquement** — jamais le contenu des points, qui reste privé).
 
 La liste des pôles et leur ordre d'affichage sont définis à un seul endroit : `src/config/departments.ts`.
 

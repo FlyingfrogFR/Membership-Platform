@@ -14,7 +14,7 @@ export function Field({ label, htmlFor, children, hint }: { label: string; htmlF
   )
 }
 
-export const inputClass = 'w-full rounded-xl border border-line bg-paper px-3 py-2 text-sm'
+export const inputClass = 'w-full rounded-xl border border-line bg-paper px-3 py-2 text-base sm:text-sm'
 
 export function ListInput({
   label,
@@ -68,6 +68,23 @@ async function copyText(text: string): Promise<boolean> {
   } catch {
     return false
   }
+}
+
+export function CopyButton({ text, label }: { text: string; label?: string }) {
+  const [state, setState] = useState<'idle' | 'ok' | 'fail'>('idle')
+  async function onCopy() {
+    setState((await copyText(text)) ? 'ok' : 'fail')
+    window.setTimeout(() => setState('idle'), 2500)
+  }
+  return (
+    <button
+      type="button"
+      onClick={() => void onCopy()}
+      className="inline-flex items-center gap-1.5 rounded-full border border-line bg-paper px-3.5 py-1.5 text-xs font-bold text-accent transition-colors hover:border-accent"
+    >
+      {state === 'ok' ? fr.compose.copied : state === 'fail' ? fr.compose.copyFailed : (label ?? fr.compose.copy)}
+    </button>
+  )
 }
 
 export function OutputPanel({

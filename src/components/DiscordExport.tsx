@@ -1,10 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { fr } from '../i18n/fr'
-import { formatEditionForDiscord } from '../lib/discord'
-import type { Edition } from '../lib/schemas'
 
-export function DiscordExport({ edition }: { edition: Edition }) {
-  const chunks = useMemo(() => formatEditionForDiscord(edition), [edition])
+export function DiscordExport({ chunks }: { chunks: string[] }) {
   const [copied, setCopied] = useState<number | null>(null)
   const [panelOpen, setPanelOpen] = useState(false)
   const [manual, setManual] = useState(false)
