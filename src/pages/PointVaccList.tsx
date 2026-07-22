@@ -17,7 +17,12 @@ export function PointVaccList() {
         <p className="mt-4 text-lg leading-relaxed text-ink-soft">{fr.pointVacc.lede}</p>
       </header>
       {editions.length === 0 ? (
-        <p className="mt-8 text-ink-soft">{fr.pointVacc.empty}</p>
+        <div className="mt-8">
+          <p className="text-ink-soft">{fr.pointVacc.empty}</p>
+          <Link to="/proposer" className="mt-3 inline-block text-sm font-bold text-accent hover:text-accent-strong">
+            {fr.pointVacc.emptyStaffCta} →
+          </Link>
+        </div>
       ) : (
         <ul className="mt-8 space-y-4">
           {editions.map((edition) => (

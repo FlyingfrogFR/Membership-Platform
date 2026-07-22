@@ -1,3 +1,4 @@
+import { SITE } from '../config/site'
 import { fr } from '../i18n/fr'
 import { formatDate } from '../lib/format'
 import type { Need } from '../lib/schemas'
@@ -36,6 +37,16 @@ export function NeedCard({ need }: { need: Need }) {
         <p className="text-xs">
           {fr.contribuer.postedOn} {formatDate(need.posted)}
         </p>
+        {need.status === 'open' && (
+          <a
+            href={SITE.discordTicketsUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-3.5 py-1.5 text-xs font-bold text-accent-strong transition-colors hover:bg-accent hover:text-white"
+          >
+            {fr.contribuer.cardCta} ↗
+          </a>
+        )}
       </div>
     </article>
   )

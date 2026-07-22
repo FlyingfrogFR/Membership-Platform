@@ -18,9 +18,13 @@ export function Home() {
           <Link to="/contribuer" className="btn btn-primary">
             {fr.home.ctaContribuer}
           </Link>
-          {latest && (
+          {latest ? (
             <Link to={`/point-vacc/${latest.slug}`} className="btn btn-secondary">
               {fr.home.ctaLatest}
+            </Link>
+          ) : (
+            <Link to="/point-vacc" className="btn btn-secondary">
+              {fr.home.ctaDiscover}
             </Link>
           )}
         </div>
