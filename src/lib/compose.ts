@@ -12,6 +12,7 @@ export interface EditionImageDraft {
 
 export interface EditionDepartmentDraft {
   name: Department
+  notes: string
   done: string[]
   in_progress: string[]
   next: string[]
@@ -85,6 +86,7 @@ export function composeEditionFile(draft: EditionDraft): string {
   const departments = draft.departments
     .map((dept) => {
       const entry: Record<string, unknown> = { name: dept.name }
+      if (dept.notes.trim()) entry.notes = dept.notes.trim()
       const done = cleanList(dept.done)
       const inProgress = cleanList(dept.in_progress)
       const next = cleanList(dept.next)

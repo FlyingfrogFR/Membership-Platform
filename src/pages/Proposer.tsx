@@ -184,6 +184,7 @@ function NeedComposer() {
 }
 
 const emptyLists = (): Omit<EditionDepartmentDraft, 'name'> => ({
+  notes: '',
   done: [],
   in_progress: [],
   next: [],
@@ -217,7 +218,8 @@ function EditionComposer() {
       departments[d].in_progress.filter((s) => s.trim()).length +
       departments[d].next.filter((s) => s.trim()).length +
       departments[d].help_wanted.filter((s) => s.trim()).length +
-      departments[d].images.filter((img) => img.name.trim()).length,
+      departments[d].images.filter((img) => img.name.trim()).length +
+      (departments[d].notes.trim() ? 1 : 0),
     0,
   )
   const totalImages = DEPARTMENTS.reduce((sum, d) => sum + departments[d].images.filter((img) => img.name.trim()).length, 0)
@@ -250,12 +252,16 @@ function EditionComposer() {
   const setImages = (dept: Department) => (images: EditionImageDraft[]) =>
     setDepartments((prev) => ({ ...prev, [dept]: { ...prev[dept], images } }))
 
+  const setNotes = (dept: Department) => (notes: string) =>
+    setDepartments((prev) => ({ ...prev, [dept]: { ...prev[dept], notes } }))
+
   const deptCount = (dept: Department) =>
     departments[dept].done.filter((s) => s.trim()).length +
     departments[dept].in_progress.filter((s) => s.trim()).length +
     departments[dept].next.filter((s) => s.trim()).length +
     departments[dept].help_wanted.filter((s) => s.trim()).length +
-    departments[dept].images.filter((img) => img.name.trim()).length
+    departments[dept].images.filter((img) => img.name.trim()).length +
+    (departments[dept].notes.trim() ? 1 : 0)
 
   return (
     <section aria-label={t.title} className="card p-6 sm:p-8">
@@ -317,6 +323,17 @@ function EditionComposer() {
               )}
             </summary>
             <div className="mt-4 grid gap-5 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <Field label={t.notesLabel} htmlFor={`${slugify(dept)}-notes`} hint={t.notesHint}>
+                  <textarea
+                    id={`${slugify(dept)}-notes`}
+                    className={`${inputClass} min-h-20`}
+                    placeholder={t.notesPlaceholder}
+                    value={departments[dept].notes}
+                    onChange={(event) => setNotes(dept)(event.target.value)}
+                  />
+                </Field>
+              </div>
               <ListInput label={fr.edition.done} value={departments[dept].done} onChange={setList(dept, 'done')} idBase={`${slugify(dept)}-done`} />
               <ListInput
                 label={fr.edition.inProgress}

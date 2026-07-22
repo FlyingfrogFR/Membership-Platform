@@ -23,6 +23,8 @@ export const editionImageSchema = z.strictObject({
 
 export const departmentEntrySchema = z.strictObject({
   name: z.enum(DEPARTMENTS),
+  // Free-form team comment (markdown), for teams that want more than bullets.
+  notes: nonEmptyString.optional(),
   done: bulletList,
   in_progress: bulletList,
   next: bulletList,

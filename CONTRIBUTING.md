@@ -41,6 +41,16 @@ Règles :
 
 - `name` doit être une équipe de la liste `src/config/departments.ts` (`Nav Team`, `Doc Team`, `Event Team`, `Digital Team`, `Training Department`, `vACC Directors`, `Membership`), alignée sur le document officiel « Fonctionnement des équipes » (catégorie Membership ajoutée en complément). L'ordre d'affichage sur le site suit cette liste, pas l'ordre du fichier.
 - `done`, `in_progress`, `next`, `help_wanted` sont tous optionnels — n'indiquez que ce qui existe. Une équipe sans aucun item n'apparaît ni sur le site ni dans l'export Discord.
+- `notes` (optionnel) : un **commentaire libre** en markdown pour l'équipe qui veut raconter un peu plus que des puces — affiché en tête de sa rubrique, repris dans l'export Discord :
+
+  ```yaml
+  - name: "Nav Team"
+    notes: >-
+      Quelques phrases libres sur le trimestre de l'équipe,
+      en markdown si besoin.
+    done:
+      - "…"
+  ```
 - Chaque équipe peut joindre des **captures d'écran** :
 
   ```yaml

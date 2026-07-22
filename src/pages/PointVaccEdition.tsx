@@ -31,7 +31,7 @@ export function PointVaccEdition() {
   // Drop all-empty entries so the page matches the Discord export, which skips them.
   const departments = sortByDepartmentOrder(
     edition.departments.filter(
-      (d) => d.done.length + d.in_progress.length + d.next.length + d.help_wanted.length + d.images.length > 0,
+      (d) => d.done.length + d.in_progress.length + d.next.length + d.help_wanted.length + d.images.length > 0 || d.notes,
     ),
     (d) => d.name,
   )

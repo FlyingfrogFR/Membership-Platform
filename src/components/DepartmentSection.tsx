@@ -1,3 +1,4 @@
+import { marked } from 'marked'
 import { fr } from '../i18n/fr'
 import type { DepartmentEntry } from '../lib/schemas'
 
@@ -15,6 +16,11 @@ export function DepartmentSection({ entry }: { entry: DepartmentEntry }) {
       <h2 id={headingId} className="text-xl font-bold">
         {entry.name}
       </h2>
+      {entry.notes && (
+        // Team notes come from this repository and are reviewed before merge,
+        // same trust model as the edition body.
+        <div className="rich-text mt-3" dangerouslySetInnerHTML={{ __html: marked.parse(entry.notes) as string }} />
+      )}
       <div className="mt-4 space-y-5">
         {groups.map(
           (group) =>
