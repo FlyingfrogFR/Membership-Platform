@@ -52,6 +52,28 @@ describe('formatEditionForDiscord', () => {
     expect(chunks[0]).toContain('Merci à tous.')
   })
 
+  it('includes team notes under the team header', () => {
+    const chunks = formatEditionForDiscord(
+      makeEdition({
+        departments: [
+          {
+            name: 'Nav Team',
+            notes: 'Gros trimestre pour la Nav Team.',
+            done: ['Cartes publiées'],
+            in_progress: [],
+            next: [],
+            help_wanted: [],
+            images: [],
+          },
+        ],
+      }),
+    )
+    const chunk = chunks[0]
+    expect(chunk).toContain('Gros trimestre pour la Nav Team.')
+    expect(chunk.indexOf('**Nav Team**')).toBeLessThan(chunk.indexOf('Gros trimestre'))
+    expect(chunk.indexOf('Gros trimestre')).toBeLessThan(chunk.indexOf('✅ Fait :'))
+  })
+
   it('splits long editions into numbered chunks under the Discord limit', () => {
     const longItems = Array.from({ length: 30 }, (_, i) => `Élément numéro ${i} — ${'x'.repeat(80)}`)
     const edition = makeEdition({

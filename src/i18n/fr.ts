@@ -176,6 +176,9 @@ export const fr = {
       intro: 'Introduction (mot du Head of Membership)',
       departments: 'Rubriques par équipe',
       body: 'Mot de la fin (optionnel, markdown)',
+      notesLabel: 'Commentaire libre (optionnel)',
+      notesHint: 'Quelques phrases si les puces ne suffisent pas — markdown accepté. Affiché en tête de la rubrique de l’équipe.',
+      notesPlaceholder: 'Le mot de l’équipe sur ce trimestre…',
       imagesLabel: 'Captures d’écran (optionnel)',
       imagesHint:
         'PNG/JPG, noms de fichiers simples de préférence, moins de 1 Mo par image. La légende sert aussi de texte alternatif.',

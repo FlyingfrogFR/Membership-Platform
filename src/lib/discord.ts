@@ -25,6 +25,7 @@ function buildBlocks(edition: Edition): string[] {
 
 function formatDepartment(dept: DepartmentEntry): string | undefined {
   const lines = [`**${dept.name}**`]
+  if (dept.notes) lines.push(dept.notes)
   appendSection(lines, `✅ ${fr.edition.done}`, dept.done)
   appendSection(lines, `🔄 ${fr.edition.inProgress}`, dept.in_progress)
   appendSection(lines, `🔜 ${fr.edition.next}`, dept.next)
