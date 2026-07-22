@@ -39,7 +39,7 @@ Texte de conclusion optionnel, en markdown, affiché après les sections des pô
 
 Règles :
 
-- `name` doit être une équipe de la liste `src/config/departments.ts` (`Nav Team`, `Doc Team`, `Event Team`, `Digital Team`, `Training Department`, `vACC Directors`), alignée sur le document officiel « Fonctionnement des équipes ». L'ordre d'affichage sur le site suit cette liste, pas l'ordre du fichier.
+- `name` doit être une équipe de la liste `src/config/departments.ts` (`Nav Team`, `Doc Team`, `Event Team`, `Digital Team`, `Training Department`, `vACC Directors`, `Membership`), alignée sur le document officiel « Fonctionnement des équipes » (catégorie Membership ajoutée en complément). L'ordre d'affichage sur le site suit cette liste, pas l'ordre du fichier.
 - `done`, `in_progress`, `next`, `help_wanted` sont tous optionnels — n'indiquez que ce qui existe. Un pôle sans aucun item n'apparaît ni sur le site ni dans l'export Discord.
 - Phrases courtes, orientées résultat : elles sont affichées telles quelles en puces, sur le site comme sur Discord.
 
