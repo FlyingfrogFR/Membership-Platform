@@ -22,20 +22,20 @@ describe('computeTicketStats', () => {
     const stats = computeTicketStats([
       entry({
         id: 'a',
-        department: 'NAV',
+        department: 'Nav Team',
         opened: d('2026-06-01T10:00:00Z'),
         first_response: d('2026-06-01T10:30:00Z'), // 30 min
         closed: d('2026-06-01T12:00:00Z'), // 2 h
       }),
       entry({
         id: 'b',
-        department: 'NAV',
+        department: 'Nav Team',
         opened: d('2026-06-02T10:00:00Z'),
         first_response: d('2026-06-02T11:30:00Z'), // 90 min
         // still open: no closed -> excluded from resolution average
       }),
     ])
-    const nav = stats.departments.find((s) => s.department === 'NAV')!
+    const nav = stats.departments.find((s) => s.department === 'Nav Team')!
     expect(nav.received).toBe(2)
     expect(nav.handled).toBe(1)
     expect(nav.open).toBe(1)
@@ -47,13 +47,13 @@ describe('computeTicketStats', () => {
     const stats = computeTicketStats([
       entry({
         id: 'x',
-        department: 'Events',
+        department: 'Event Team',
         opened: d('2026-06-01T10:00:00Z'),
         closed: d('2026-06-01T11:00:00Z'),
         outcome: 'no_response',
       }),
     ])
-    const events = stats.departments.find((s) => s.department === 'Events')!
+    const events = stats.departments.find((s) => s.department === 'Event Team')!
     expect(events.received).toBe(1)
     expect(events.avgFirstResponseMs).toBeNull()
     expect(events.avgResolutionMs).toBe(3_600_000)
@@ -61,23 +61,23 @@ describe('computeTicketStats', () => {
 
   it('orders departments by config order and omits empty ones', () => {
     const stats = computeTicketStats([
-      entry({ id: 'a', department: 'Events', opened: d('2026-06-01T10:00:00Z') }),
-      entry({ id: 'b', department: 'NAV', opened: d('2026-06-02T10:00:00Z') }),
+      entry({ id: 'a', department: 'Event Team', opened: d('2026-06-01T10:00:00Z') }),
+      entry({ id: 'b', department: 'Nav Team', opened: d('2026-06-02T10:00:00Z') }),
     ])
-    expect(stats.departments.map((s) => s.department)).toEqual(['NAV', 'Events'])
+    expect(stats.departments.map((s) => s.department)).toEqual(['Nav Team', 'Event Team'])
   })
 
   it('computes the covered range from earliest open to latest end', () => {
     const stats = computeTicketStats([
-      entry({ id: 'a', department: 'NAV', opened: d('2026-06-01T10:00:00Z'), closed: d('2026-06-05T10:00:00Z') }),
-      entry({ id: 'b', department: 'CDM', opened: d('2026-05-20T10:00:00Z') }),
+      entry({ id: 'a', department: 'Nav Team', opened: d('2026-06-01T10:00:00Z'), closed: d('2026-06-05T10:00:00Z') }),
+      entry({ id: 'b', department: 'Digital Team', opened: d('2026-05-20T10:00:00Z') }),
     ])
     expect(stats.range?.from.toISOString()).toBe('2026-05-20T10:00:00.000Z')
     expect(stats.range?.to.toISOString()).toBe('2026-06-05T10:00:00.000Z')
   })
 
   it('flags sample data when any id starts with "exemple-"', () => {
-    expect(computeTicketStats([entry({ id: 'exemple-1', department: 'NAV', opened: d('2026-06-01T10:00:00Z') })]).isSample).toBe(true)
-    expect(computeTicketStats([entry({ id: 'real-1', department: 'NAV', opened: d('2026-06-01T10:00:00Z') })]).isSample).toBe(false)
+    expect(computeTicketStats([entry({ id: 'exemple-1', department: 'Nav Team', opened: d('2026-06-01T10:00:00Z') })]).isSample).toBe(true)
+    expect(computeTicketStats([entry({ id: 'real-1', department: 'Nav Team', opened: d('2026-06-01T10:00:00Z') })]).isSample).toBe(false)
   })
 })

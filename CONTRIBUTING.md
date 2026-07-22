@@ -20,7 +20,7 @@ published: 2026-09-30
 intro: >-
   Texte d'introduction du Head of Membership.
 departments:
-  - name: "NAV"
+  - name: "Nav Team"
     done:
       - "Chose terminée ce trimestre"
     in_progress:
@@ -29,7 +29,7 @@ departments:
       - "Chose prévue"
     help_wanted:            # optionnel
       - "Coup de main recherché"
-  - name: "Events"
+  - name: "Event Team"
     done:
       - "…"
 ---
@@ -39,7 +39,7 @@ Texte de conclusion optionnel, en markdown, affiché après les sections des pô
 
 Règles :
 
-- `name` doit être un pôle de la liste `src/config/departments.ts` (`NAV`, `Training ATC`, `Pilot Training`, `Digital Services`, `Documentation`, `CDM`, `Events`, `Membership`). L'ordre d'affichage sur le site suit cette liste, pas l'ordre du fichier.
+- `name` doit être une équipe de la liste `src/config/departments.ts` (`Nav Team`, `Doc Team`, `Event Team`, `Digital Team`, `Training Department`, `vACC Directors`), alignée sur le document officiel « Fonctionnement des équipes ». L'ordre d'affichage sur le site suit cette liste, pas l'ordre du fichier.
 - `done`, `in_progress`, `next`, `help_wanted` sont tous optionnels — n'indiquez que ce qui existe. Un pôle sans aucun item n'apparaît ni sur le site ni dans l'export Discord.
 - Phrases courtes, orientées résultat : elles sont affichées telles quelles en puces, sur le site comme sur Discord.
 
@@ -51,7 +51,7 @@ Ajoutez un item au tableau dans `content/contribuer/needs.yaml` :
 - id: "nav-relecture-lfpg"      # unique, en kebab-case
   type: "ponctuel"              # ponctuel | poste
   title: "Relecture documentation LFPG"
-  department: "NAV"             # un pôle de src/config/departments.ts
+  department: "Nav Team"        # une équipe de src/config/departments.ts
   description: "Relire et commenter la nouvelle doc avant publication."
   skills: ["Connaissances ATC"] # optionnel
   time_estimate: "2–3 h"        # optionnel mais recommandé
@@ -70,7 +70,7 @@ En attendant un lien automatique avec Discord, le suivi des sollicitations se fa
 
 ```yaml
 - id: "2026-06-01-nav"          # unique, en kebab-case
-  department: "NAV"             # un pôle de src/config/departments.ts
+  department: "Nav Team"        # une équipe de src/config/departments.ts
   opened: 2026-06-01T18:30:00Z  # obligatoire (ISO 8601 avec fuseau)
   first_response: 2026-06-01T19:05:00Z  # optionnel — sert au délai de 1re réponse
   closed: 2026-06-03T20:00:00Z          # optionnel — absent = encore ouvert

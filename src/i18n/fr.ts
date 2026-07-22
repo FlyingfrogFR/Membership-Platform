@@ -6,7 +6,7 @@ export const fr = {
     tagline: 'Faire le lien entre le vACC et ses membres.',
     internalBadge: 'Usage interne',
     internalNote:
-      'Page réservée à l’usage interne du vACC France (staff et chefs de pôle) — elle ne publie rien directement : toute proposition passe par la relecture du Head of Membership.',
+      'Page réservée à l’usage interne du vACC France (staff et référents d’équipe) — elle ne publie rien directement : toute proposition passe par la relecture du Head of Membership.',
     metaDescription:
       'Le Point vACC, le tableau Contribuer et le pôle Membership du vACC France (VATSIM France) : toute l’activité du vACC, rendue visible.',
   },
@@ -48,14 +48,14 @@ export const fr = {
   stats: {
     title: 'Statistiques du Membership',
     caption:
-      'Chiffres établis à partir du journal manuel du Membership — anonyme (pôle et horodatages uniquement, aucune donnée personnelle), en attendant l’accord pour un lien automatique avec Discord.',
+      'Chiffres établis à partir du journal manuel du Membership — anonyme (équipe et horodatages uniquement, aucune donnée personnelle), en attendant l’accord pour un lien automatique avec Discord.',
     period: (from: string, to: string) => `Période couverte : du ${from} au ${to}.`,
     sample: 'EXEMPLE',
     empty: 'Aucune sollicitation enregistrée pour le moment.',
     total: 'Total',
     na: '—',
     col: {
-      department: 'Pôle',
+      department: 'Équipe',
       received: 'Reçues',
       handled: 'Traitées',
       open: 'En cours',
@@ -65,9 +65,9 @@ export const fr = {
   },
   pointVacc: {
     title: 'Point vACC',
-    lede: 'Tous les trimestres, un tour d’horizon de ce que chaque pôle a fait, fait et prépare — pour ne plus avoir besoin de suivre dix canaux Discord pour savoir où va le vACC.',
+    lede: 'Tous les trimestres, un tour d’horizon de ce que chaque équipe a fait, fait et prépare — pour ne plus avoir besoin de suivre dix canaux Discord pour savoir où va le vACC.',
     empty: 'Aucune édition pour le moment — la première arrive bientôt.',
-    emptyStaffCta: 'Chefs de pôle : composer la première édition',
+    emptyStaffCta: 'Référents d’équipe : composer la première édition',
     publishedOn: 'Publié le',
     readEdition: 'Lire l’édition',
     backToArchive: 'Toutes les éditions',
@@ -95,10 +95,10 @@ export const fr = {
   },
   contribuer: {
     title: 'Contribuer',
-    lede: 'Envie de donner un coup de main ? Voici les postes ouverts et les besoins ponctuels des pôles du vACC. Pas besoin de s’engager pour un an : tout est bon à prendre.',
+    lede: 'Envie de donner un coup de main ? Voici les postes ouverts et les besoins ponctuels des équipes du vACC. Pas besoin de s’engager pour un an : tout est bon à prendre.',
     tabPostes: 'Postes ouverts',
     tabPonctuels: 'Besoins ponctuels',
-    filterDepartment: 'Pôle',
+    filterDepartment: 'Équipe',
     filterTime: 'Temps estimé',
     filterAll: 'Tous',
     empty: 'Rien ne correspond à ces filtres pour le moment — revenez bientôt, ça bouge vite.',
@@ -111,9 +111,9 @@ export const fr = {
     status: { open: 'Ouvert', filled: 'Pourvu', closed: 'Clos' } as const,
     type: { poste: 'Poste', ponctuel: 'Ponctuel' } as const,
     cardCta: 'Contacter sur Discord',
-    proposeTitle: 'Un besoin dans votre pôle ?',
+    proposeTitle: 'Un besoin dans votre équipe ?',
     proposeText:
-      'Chefs de pôle : remplissez le formulaire — il génère le bon format tout seul — ou envoyez simplement votre besoin au Head of Membership sur Discord.',
+      'Référents d’équipe : remplissez le formulaire — il génère le bon format tout seul — ou envoyez simplement votre besoin au Head of Membership sur Discord.',
     proposeCta: 'Remplir le formulaire',
   },
   aPropos: {
@@ -126,7 +126,7 @@ export const fr = {
     pillars: [
       {
         title: 'Visibilité',
-        text: 'Un Point vACC trimestriel : ce que chaque pôle a fait, fait et prépare, relié à la feuille de route présentée en Town Hall.',
+        text: 'Un Point vACC trimestriel : ce que chaque équipe a fait, fait et prépare, relié à la feuille de route présentée en Town Hall.',
       },
       {
         title: 'Contact',
@@ -138,7 +138,7 @@ export const fr = {
       },
       {
         title: 'Coordination',
-        text: 'Un point mensuel asynchrone avec les chefs de pôle, collecté en privé, pour garder tout le monde aligné entre deux Points vACC.',
+        text: 'Un point mensuel asynchrone avec les référents d’équipe, collecté en privé, pour garder tout le monde aligné entre deux Points vACC.',
       },
     ],
     contactTitle: 'Le joindre',
@@ -148,7 +148,7 @@ export const fr = {
   },
   compose: {
     title: 'Proposer du contenu',
-    lede: 'Chefs de pôle : remplissez, cliquez, c’est prêt. Ces formulaires génèrent le contenu au bon format — à envoyer sur GitHub en un clic, ou à copier-coller au Head of Membership sur Discord.',
+    lede: 'Référents d’équipe : remplissez, cliquez, c’est prêt. Ces formulaires génèrent le contenu au bon format — à envoyer sur GitHub en un clic, ou à copier-coller au Head of Membership sur Discord.',
     tabEdition: 'Point vACC du trimestre',
     tabNeed: 'Besoin ou poste',
     itemPlaceholder: 'Une phrase courte, orientée résultat…',
@@ -168,18 +168,18 @@ export const fr = {
     errorsHeading: 'À compléter avant envoi :',
     edition: {
       title: 'Contribution au Point vACC',
-      help: 'Remplissez uniquement les rubriques de votre pôle — les rubriques vides n’apparaissent pas dans l’édition.',
+      help: 'Remplissez uniquement les rubriques de votre équipe — les rubriques vides n’apparaissent pas dans l’édition.',
       quarter: 'Trimestre',
       year: 'Année',
       editionTitle: 'Titre de l’édition',
       published: 'Date de publication',
       intro: 'Introduction (mot du Head of Membership)',
-      departments: 'Rubriques par pôle',
+      departments: 'Rubriques par équipe',
       body: 'Mot de la fin (optionnel, markdown)',
       errTitle: 'Le titre de l’édition est requis.',
       errIntro: 'L’introduction est requise.',
       errPublished: 'La date de publication est requise.',
-      errNoItems: 'Ajoutez au moins une ligne dans au moins un pôle.',
+      errNoItems: 'Ajoutez au moins une ligne dans au moins une équipe.',
     },
     need: {
       title: 'Nouveau besoin ou poste',
@@ -187,7 +187,7 @@ export const fr = {
       type: 'Type',
       needTitle: 'Titre',
       titlePlaceholder: 'Ex. : Relecture de la documentation LFPG',
-      department: 'Pôle',
+      department: 'Équipe',
       description: 'Description',
       descriptionPlaceholder: 'Ce qu’il y a à faire, pour qui, et pourquoi ça aide.',
       skills: 'Compétences utiles (optionnel)',
@@ -221,8 +221,8 @@ export const fr = {
     quickEditLog: 'Modifier le journal des sollicitations',
     quickRepo: 'Ouvrir le dépôt GitHub',
     ticketTitle: 'Enregistrer une sollicitation',
-    ticketHelp: 'Anonyme : pôle et horodatages uniquement — jamais de nom, de CID ni de contenu de message.',
-    ticketDepartment: 'Pôle concerné',
+    ticketHelp: 'Anonyme : équipe et horodatages uniquement — jamais de nom, de CID ni de contenu de message.',
+    ticketDepartment: 'Équipe concernée',
     ticketOpened: 'Ouverture du ticket',
     ticketFirstResponse: 'Première réponse (optionnel)',
     ticketClosed: 'Clôture (optionnel)',

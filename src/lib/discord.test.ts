@@ -10,8 +10,8 @@ function makeEdition(overrides: Partial<Edition> = {}): Edition {
     intro: 'Un trimestre bien rempli.',
     body: '',
     departments: [
-      { name: 'Events', done: ['Real Ops Paris'], in_progress: [], next: [], help_wanted: [] },
-      { name: 'NAV', done: ['Cartes LFPG publiées'], in_progress: ['Doc LFLL'], next: [], help_wanted: [] },
+      { name: 'Event Team', done: ['Real Ops Paris'], in_progress: [], next: [], help_wanted: [] },
+      { name: 'Nav Team', done: ['Cartes LFPG publiées'], in_progress: ['Doc LFLL'], next: [], help_wanted: [] },
     ],
     ...overrides,
   }
@@ -23,28 +23,28 @@ describe('formatEditionForDiscord', () => {
     expect(chunks).toHaveLength(1)
     expect(chunks[0]).not.toContain('(message')
     expect(chunks[0]).toContain('**📍 Point vACC — T2 2026**')
-    expect(chunks[0]).toContain('**NAV**')
+    expect(chunks[0]).toContain('**Nav Team**')
     expect(chunks[0]).toContain('✅ Fait :')
     expect(chunks[0]).toContain('- Cartes LFPG publiées')
   })
 
   it('orders departments by the configured display order, not file order', () => {
     const [chunk] = formatEditionForDiscord(makeEdition())
-    expect(chunk.indexOf('**NAV**')).toBeLessThan(chunk.indexOf('**Events**'))
+    expect(chunk.indexOf('**Nav Team**')).toBeLessThan(chunk.indexOf('**Event Team**'))
   })
 
   it('omits empty sections and empty departments', () => {
     const chunks = formatEditionForDiscord(
       makeEdition({
         departments: [
-          { name: 'NAV', done: ['Une seule chose'], in_progress: [], next: [], help_wanted: [] },
-          { name: 'CDM', done: [], in_progress: [], next: [], help_wanted: [] },
+          { name: 'Nav Team', done: ['Une seule chose'], in_progress: [], next: [], help_wanted: [] },
+          { name: 'Doc Team', done: [], in_progress: [], next: [], help_wanted: [] },
         ],
       }),
     )
     expect(chunks[0]).not.toContain('🔜')
     expect(chunks[0]).not.toContain('🙋')
-    expect(chunks[0]).not.toContain('**CDM**')
+    expect(chunks[0]).not.toContain('**Doc Team**')
   })
 
   it('includes the markdown body when present', () => {
@@ -55,7 +55,7 @@ describe('formatEditionForDiscord', () => {
   it('splits long editions into numbered chunks under the Discord limit', () => {
     const longItems = Array.from({ length: 30 }, (_, i) => `Élément numéro ${i} — ${'x'.repeat(80)}`)
     const edition = makeEdition({
-      departments: (['NAV', 'Training ATC', 'Pilot Training', 'Digital Services'] as const).map((name) => ({
+      departments: (['Nav Team', 'Doc Team', 'Event Team', 'Digital Team'] as const).map((name) => ({
         name,
         done: longItems,
         in_progress: [],
@@ -74,7 +74,7 @@ describe('formatEditionForDiscord', () => {
   it('keeps every line of a long edition', () => {
     const items = Array.from({ length: 60 }, (_, i) => `Ligne ${i}`)
     const edition = makeEdition({
-      departments: [{ name: 'NAV', done: items, in_progress: [], next: [], help_wanted: [] }],
+      departments: [{ name: 'Nav Team', done: items, in_progress: [], next: [], help_wanted: [] }],
     })
     const joined = formatEditionForDiscord(edition).join('\n')
     for (const item of items) expect(joined).toContain(`- ${item}`)
