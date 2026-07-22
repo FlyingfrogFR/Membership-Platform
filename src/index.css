@@ -1,31 +1,48 @@
 @import 'tailwindcss';
 
-/* Design tokens mapped from the vACC France official palette (vatsim.fr):
-   reflexblue #0055A4, primary sky #5A95F4, secondary coral #FF5D46, dark navy
-   #0B1A31, dorian #E4F2FC, success #31D0AA, warning #FFC107. Interactive and
-   text tokens are darkened from the raw brand color where it fails WCAG AA
-   contrast; the raw sky and coral are kept for decorative (non-text) use only.
-   This is the single place to adjust the theme. */
+/* Friendly community theme for the vACC Membership platform — a soft
+   light-blue ground (vACC dorian family), a friendly sky-blue primary with a
+   warm coral accent, generously rounded shapes and soft shadows, set in Nunito
+   (a rounded sans, self-hosted via Fontsource so the site stays static). All
+   colour pairings are WCAG-AA checked. Single source of truth for the theme. */
 @theme {
-  --color-accent: #0055a4; /* reflexblue — links, primary buttons, active states */
-  --color-accent-strong: #003f7d; /* hover */
-  --color-accent-soft: #e4f2fc; /* dorian — badges, soft blocks */
-  --color-accent-sky: #5a95f4; /* vACC primary — decorative only (fails AA as text) */
-  --color-secondary: #ff5d46; /* vACC coral — decorative accents only */
-  --color-ink: #0b1a31; /* vACC dark navy — headings and body text */
-  --color-ink-soft: #48566b;
-  --color-paper: #ffffff;
-  --color-canvas: #f3f8fd; /* light blue page background */
-  --color-line: #d9e5f1;
-  --color-ok: #0c7a62; /* accessible teal derived from success */
-  --color-ok-soft: #e3f7f1;
-  --color-warn: #8c5a00; /* accessible amber derived from warning */
-  --color-warn-soft: #fff4d6;
+  --color-accent: #2a6cb0; /* friendly vACC sky-blue — buttons, links, active states */
+  --color-accent-strong: #22568c; /* hover */
+  --color-accent-soft: #e3effb; /* dorian light-blue tint — badges & soft blocks */
+  --color-coral: #e8674c; /* warm coral — decorative accents (marks, dots) */
+  --color-coral-strong: #be3f24; /* coral for text & tags */
+  --color-coral-soft: #fce7e0;
+  --color-ink: #2a2f38; /* cool charcoal */
+  --color-ink-soft: #5c636e;
+  --color-paper: #ffffff; /* cards */
+  --color-canvas: #f4f8fd; /* soft light-blue ground (dorian family) */
+  --color-line: #e1e8f0; /* soft cool hairline */
+  --color-ok: #237a55; /* friendly green */
+  --color-ok-soft: #e2f4ec;
+  --color-warn: #8a5c12; /* warm amber */
+  --color-warn-soft: #fbefd6;
+
+  --font-sans: 'Nunito Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
+
+  --shadow-card: 0 1px 2px rgba(51, 48, 58, 0.04), 0 14px 30px -18px rgba(51, 48, 58, 0.18);
 }
 
 @layer base {
+  html {
+    font-family: var(--font-sans);
+  }
+
   body {
     @apply bg-canvas text-ink antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    color: var(--color-ink);
   }
 
   :focus-visible {
@@ -35,7 +52,7 @@
 
 @layer components {
   .btn {
-    @apply inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors;
+    @apply inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold transition-colors;
   }
 
   .btn-primary {
@@ -43,15 +60,15 @@
   }
 
   .btn-secondary {
-    @apply border border-line bg-paper text-ink hover:border-accent hover:text-accent-strong;
+    @apply border border-line bg-white text-ink hover:border-accent hover:text-accent;
   }
 
   .card {
-    @apply rounded-2xl border border-line bg-paper;
+    @apply rounded-2xl border border-line bg-paper shadow-card;
   }
 
   .eyebrow {
-    @apply text-xs font-semibold tracking-widest text-accent uppercase;
+    @apply text-xs font-extrabold tracking-wider text-accent uppercase;
   }
 
   .rich-text p {

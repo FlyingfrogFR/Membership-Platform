@@ -1,6 +1,14 @@
 import { loadYamlDocument, parseFrontmatter } from './frontmatter'
-import { editionSchema, needsFileSchema, type Edition, type Need } from './schemas'
+import {
+  editionSchema,
+  needsFileSchema,
+  ticketLogFileSchema,
+  type Edition,
+  type Need,
+  type TicketLogEntry,
+} from './schemas'
 import needsRaw from '../../content/contribuer/needs.yaml?raw'
+import ticketLogRaw from '../../content/membership/tickets-log.yaml?raw'
 
 const editionFiles = import.meta.glob('/content/point-vacc/*.md', {
   query: '?raw',
@@ -12,6 +20,7 @@ const STATUS_ORDER: Record<Need['status'], number> = { open: 0, filled: 1, close
 
 let editionsCache: Edition[] | undefined
 let needsCache: Need[] | undefined
+let ticketLogCache: TicketLogEntry[] | undefined
 
 export function getEditions(): Edition[] {
   if (!editionsCache) {
@@ -38,4 +47,13 @@ export function getNeeds(): Need[] {
       )
   }
   return needsCache
+}
+
+export function getTicketLog(): TicketLogEntry[] {
+  if (!ticketLogCache) {
+    ticketLogCache = ticketLogFileSchema
+      .parse(loadYamlDocument(ticketLogRaw))
+      .sort((a, b) => a.opened.getTime() - b.opened.getTime())
+  }
+  return ticketLogCache
 }

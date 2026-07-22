@@ -22,6 +22,7 @@ Dans les deux cas, le Head of Membership relit et harmonise le ton avant publica
 
 - `content/point-vacc/<slug>.md` — une édition du Point vACC par fichier (frontmatter YAML : intro du HoM + une section par pôle : fait / en cours / à venir / coup de main recherché).
 - `content/contribuer/needs.yaml` — le tableau Contribuer : un tableau d'items (`poste` ou `ponctuel`).
+- `content/membership/tickets-log.yaml` — journal manuel et **anonyme** des sollicitations Membership (pôle + horodatages, aucune donnée personnelle). Alimente les statistiques par pôle affichées sur la page Point vACC, en attendant l'accord pour un lien automatique avec Discord.
 
 La liste des pôles et leur ordre d'affichage sont définis à un seul endroit : `src/config/departments.ts`.
 
@@ -54,8 +55,8 @@ Sortie statique dans `dist/`, déployable telle quelle sur Vercel (config fourni
 ## Décisions (tranchées par Pierre)
 
 1. **Liste des pôles** : confirmée telle quelle — NAV, Training ATC, Pilot Training, Digital Services, Documentation, CDM, Events, Membership, dans cet ordre (`src/config/departments.ts`).
-2. **Thème** : palette officielle du vACC (vatsim.fr) appliquée aux tokens de `src/index.css` (reflexblue `#0055A4`, dorian `#E4F2FC`, navy `#0B1A31`…), assombrie là où le contraste WCAG l'exige.
-3. **Fusion à terme dans vatsim.fr** : c'est l'objectif à long terme. L'architecture est donc gardée « portable » (logique dans `src/lib`, composants présentationnels autonomes, thème et i18n centralisés). À noter : vatsim.fr tourne sous **Angular + Tailwind**, alors que cette plateforme est en **React + Vite + Tailwind** (stack habituelle de Pierre, cf. brief §8) — une fusion réelle impliquera soit d'embarquer ce build, soit de porter les composants ; les tokens de thème sont d'ores et déjà alignés.
+2. **Thème** : identité chaleureuse et communautaire, dans les tons du vACC — fond bleu clair (famille dorian), primaire **bleu ciel** et accent **corail**, formes bien arrondies et ombres douces, en **Nunito** (sans-serif ronde, auto-hébergée via Fontsource : le site reste statique). Centralisé dans `src/index.css` (import de la police dans `src/main.tsx`), contrastes vérifiés WCAG AA.
+3. **Fusion à terme dans vatsim.fr** : c'est l'objectif à long terme. L'architecture est donc gardée « portable » (logique dans `src/lib`, composants présentationnels autonomes, thème et i18n centralisés). À noter : vatsim.fr tourne sous **Angular + Tailwind**, alors que cette plateforme est en **React + Vite + Tailwind** (stack habituelle de Pierre, cf. brief §8) — une fusion réelle impliquera soit d'embarquer ce build, soit de porter les composants ; le thème étant centralisé dans un seul fichier, il reste réalignable sur la charte de vatsim.fr si la fusion l'exige.
 4. **VATSIM Connect (phase 2)** : reporté à l'ouverture de la phase 2 (qui demande les identifiants OAuth2 sera décidé à ce moment-là).
 
 ## Questions encore ouvertes

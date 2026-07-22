@@ -44,6 +44,33 @@ export const needSchema = z.strictObject({
 // An emptied needs file (yaml null) is a legitimate "no needs right now" state.
 export const needsFileSchema = z.preprocess((value) => value ?? [], z.array(needSchema))
 
+// Manual, anonymous Membership ticket log: department + timestamps only, no PII.
+export const ticketLogEntrySchema = z
+  .strictObject({
+    id: kebabCase,
+    department: z.enum(DEPARTMENTS),
+    opened: contentDate,
+    first_response: contentDate.optional(),
+    closed: contentDate.optional(),
+    outcome: z.enum(['resolved', 'redirected', 'no_response', 'other']).optional(),
+  })
+  .refine((e) => !e.first_response || e.first_response >= e.opened, {
+    path: ['first_response'],
+    message: 'first_response must not be before opened',
+  })
+  .refine((e) => !e.closed || e.closed >= e.opened, {
+    path: ['closed'],
+    message: 'closed must not be before opened',
+  })
+  .refine((e) => !(e.first_response && e.closed) || e.closed >= e.first_response, {
+    path: ['closed'],
+    message: 'closed must not be before first_response',
+  })
+
+export const ticketLogFileSchema = z.preprocess((value) => value ?? [], z.array(ticketLogEntrySchema))
+
+export type TicketLogEntry = z.infer<typeof ticketLogEntrySchema>
+
 export type DepartmentEntry = z.infer<typeof departmentEntrySchema>
 export type EditionFrontmatter = z.infer<typeof editionSchema>
 export type Need = z.infer<typeof needSchema>

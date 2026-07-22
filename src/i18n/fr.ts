@@ -38,6 +38,24 @@ export const fr = {
       'Une question, une idée, un souci ? Le plus simple : un ticket sur le Discord du vACC, catégorie « Membership ». On vous répond vite, et ça reste entre nous si besoin.',
     contactCta: 'Rejoindre le Discord du vACC',
   },
+  stats: {
+    title: 'Statistiques du Membership',
+    caption:
+      'Chiffres établis à partir du journal manuel du Membership — anonyme (pôle et horodatages uniquement, aucune donnée personnelle), en attendant l’accord pour un lien automatique avec Discord.',
+    period: (from: string, to: string) => `Période couverte : du ${from} au ${to}.`,
+    sample: 'EXEMPLE',
+    empty: 'Aucune sollicitation enregistrée pour le moment.',
+    total: 'Total',
+    na: '—',
+    col: {
+      department: 'Pôle',
+      received: 'Reçues',
+      handled: 'Traitées',
+      open: 'En cours',
+      firstResponse: '1re réponse (moy.)',
+      resolution: 'Résolution (moy.)',
+    },
+  },
   pointVacc: {
     title: 'Point vACC',
     lede: 'Tous les trimestres, un tour d’horizon de ce que chaque pôle a fait, fait et prépare — pour ne plus avoir besoin de suivre dix canaux Discord pour savoir où va le vACC.',

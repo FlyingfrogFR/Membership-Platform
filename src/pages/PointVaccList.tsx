@@ -1,12 +1,15 @@
 import { Link } from 'react-router-dom'
+import { MembershipStats } from '../components/MembershipStats'
 import { fr } from '../i18n/fr'
-import { getEditions } from '../lib/content'
+import { getEditions, getTicketLog } from '../lib/content'
 import { excerpt, formatDate } from '../lib/format'
+import { computeTicketStats } from '../lib/ticketStats'
 import { usePageTitle } from '../lib/usePageTitle'
 
 export function PointVaccList() {
   usePageTitle(fr.pointVacc.title)
   const editions = getEditions()
+  const stats = computeTicketStats(getTicketLog())
   return (
     <div>
       <header className="max-w-2xl">
@@ -40,6 +43,10 @@ export function PointVaccList() {
           ))}
         </ul>
       )}
+
+      <div className="mt-12">
+        <MembershipStats stats={stats} />
+      </div>
     </div>
   )
 }

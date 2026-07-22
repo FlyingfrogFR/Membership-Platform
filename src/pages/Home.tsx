@@ -59,7 +59,7 @@ export function Home() {
       </section>
 
       <section aria-labelledby="contact-title" className="rounded-2xl bg-accent-soft p-6 sm:p-8">
-        <h2 id="contact-title" className="text-2xl font-bold">
+        <h2 id="contact-title" className="text-2xl font-extrabold">
           {fr.home.contactTitle}
         </h2>
         <p className="mt-3 max-w-2xl leading-relaxed text-ink-soft">{fr.home.contactText}</p>
