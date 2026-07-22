@@ -3,12 +3,12 @@
 export const fr = {
   site: {
     name: 'Membership · vACC France',
-    tagline: 'Faire le lien entre le vACC et ses membres.',
+    tagline: 'Faire le lien entre la vACC et ses membres.',
     internalBadge: 'Usage interne',
     internalNote:
-      'Page réservée à l’usage interne du vACC France (staff et référents d’équipe) — elle ne publie rien directement : toute proposition passe par la relecture du Head of Membership.',
+      'Page réservée à l’usage interne de la vACC France (staff et référents d’équipe) — elle ne publie rien directement : toute proposition passe par la relecture du Head of Membership.',
     metaDescription:
-      'Le Point vACC, le tableau Contribuer et le pôle Membership du vACC France (VATSIM France) : toute l’activité du vACC, rendue visible.',
+      'Le Point vACC, le tableau Contribuer et le pôle Membership de la vACC France (VATSIM France) : toute l’activité de la vACC, rendue visible.',
   },
   a11y: {
     skipToContent: 'Aller au contenu',
@@ -22,7 +22,7 @@ export const fr = {
     admin: 'Admin',
   },
   footer: {
-    disclaimer: 'Plateforme du pôle Membership du vACC France — VATSIM France.',
+    disclaimer: 'Plateforme du pôle Membership de la vACC France — VATSIM France.',
     vatsimFr: 'vatsim.fr',
     source: 'Code source',
     propose: 'Proposer du contenu',
@@ -30,9 +30,9 @@ export const fr = {
   },
   home: {
     eyebrow: 'VATSIM France · pôle Membership',
-    heroTitle: 'Faire le lien entre le vACC et ses membres',
+    heroTitle: 'Faire le lien entre la vACC et ses membres',
     heroText:
-      'L’activité ne manque pas au vACC France : espace aérien, formation, événements, outils… mais elle est éparpillée. Ce site la rend visible, et vous aide à y prendre part — tout est bon à prendre, même deux heures de votre temps.',
+      'L’activité ne manque pas à la vACC France : espace aérien, formation, événements, outils… mais elle est éparpillée. Ce site la rend visible, et vous aide à y prendre part — tout est bon à prendre, même deux heures de votre temps.',
     ctaContribuer: 'Donner un coup de main',
     ctaLatest: 'Lire le dernier Point vACC',
     ctaDiscover: 'Découvrir le Point vACC',
@@ -42,8 +42,8 @@ export const fr = {
     allEditions: 'Toutes les éditions',
     contactTitle: 'Contacter le Membership',
     contactText:
-      'Une question, une idée, un souci ? Le plus simple : un ticket sur le Discord du vACC, catégorie « Membership ». On vous répond vite, et ça reste entre nous si besoin.',
-    contactCta: 'Rejoindre le Discord du vACC',
+      'Une question, une idée, un souci ? Le plus simple : un ticket sur le Discord de la vACC, catégorie « Membership ». On vous répond vite, et ça reste entre nous si besoin.',
+    contactCta: 'Rejoindre le Discord de la vACC',
   },
   stats: {
     title: 'Statistiques du Membership',
@@ -65,7 +65,7 @@ export const fr = {
   },
   pointVacc: {
     title: 'Point vACC',
-    lede: 'Tous les trimestres, un tour d’horizon de ce que chaque équipe a fait, fait et prépare — pour ne plus avoir besoin de suivre dix canaux Discord pour savoir où va le vACC.',
+    lede: 'Tous les trimestres, un tour d’horizon de ce que chaque équipe a fait, fait et prépare — pour ne plus avoir besoin de suivre dix canaux Discord pour savoir où va la vACC.',
     empty: 'Aucune édition pour le moment — la première arrive bientôt.',
     emptyStaffCta: 'Référents d’équipe : composer la première édition',
     publishedOn: 'Publié le',
@@ -95,7 +95,7 @@ export const fr = {
   },
   contribuer: {
     title: 'Contribuer',
-    lede: 'Envie de donner un coup de main ? Voici les postes ouverts et les besoins ponctuels des équipes du vACC. Pas besoin de s’engager pour un an : tout est bon à prendre.',
+    lede: 'Envie de donner un coup de main ? Voici les postes ouverts et les besoins ponctuels des équipes de la vACC. Pas besoin de s’engager pour un an : tout est bon à prendre.',
     tabPostes: 'Postes ouverts',
     tabPonctuels: 'Besoins ponctuels',
     filterDepartment: 'Équipe',
@@ -118,7 +118,7 @@ export const fr = {
   },
   aPropos: {
     title: 'À propos du Membership',
-    lede: 'Le pôle Membership ne crée pas l’activité du vACC — elle existe déjà, et elle est riche. Son rôle : la rendre visible, la coordonner, et la traduire pour les membres.',
+    lede: 'Le pôle Membership ne crée pas l’activité de la vACC — elle existe déjà, et elle est riche. Son rôle : la rendre visible, la coordonner, et la traduire pour les membres.',
     mandateTitle: 'Le mandat',
     mandateText:
       'Le Head of Membership est nommé pour un mandat d’environ un an. Sa feuille de route tient en quatre piliers, présentés ci-dessous — et ce site est l’outil qui les porte.',
@@ -143,8 +143,8 @@ export const fr = {
     ],
     contactTitle: 'Le joindre',
     contactText:
-      'Un ticket sur le Discord du vACC, catégorie « Membership », reste le canal officiel — pour une question, une idée, un désaccord à désamorcer ou juste dire bonjour.',
-    contactCta: 'Rejoindre le Discord du vACC',
+      'Un ticket sur le Discord de la vACC, catégorie « Membership », reste le canal officiel — pour une question, une idée, un désaccord à désamorcer ou juste dire bonjour.',
+    contactCta: 'Rejoindre le Discord de la vACC',
   },
   compose: {
     title: 'Proposer du contenu',
@@ -251,7 +251,7 @@ export const fr = {
     title: 'Accès protégé',
     adminText: 'Cette page est réservée au Head of Membership. Entrez le mot de passe pour continuer.',
     teamText:
-      'Cette page est réservée aux référents d’équipe et au staff du vACC. Entrez le mot de passe communiqué par le Membership pour continuer.',
+      'Cette page est réservée aux référents d’équipe et au staff de la vACC. Entrez le mot de passe communiqué par le Membership pour continuer.',
     label: 'Mot de passe',
     submit: 'Entrer',
     error: 'Mot de passe incorrect.',
