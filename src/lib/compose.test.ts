@@ -2,14 +2,17 @@ import { load } from 'js-yaml'
 import { describe, expect, it } from 'vitest'
 import {
   composeEditionFile,
+  composeEditionFromSections,
   composeNeedYaml,
+  composeSectionYaml,
   composeTicketYaml,
+  editionSectionDraftPath,
   githubNewFileUrl,
   slugify,
   type EditionDraft,
 } from './compose'
 import { parseFrontmatter } from './frontmatter'
-import { editionSchema, needSchema, ticketLogEntrySchema } from './schemas'
+import { editionSchema, editionSectionFileSchema, needSchema, ticketLogEntrySchema, type DepartmentEntry } from './schemas'
 
 const editionDraft: EditionDraft = {
   title: 'Point vACC — T3 2026',
@@ -67,6 +70,78 @@ describe('composeEditionFile', () => {
       { src: '/images/point-vacc/2026-q3/secteurs LFMM.png', caption: 'Nouveau découpage' },
       { src: '/images/point-vacc/2026-q3/brouillon.png' },
     ])
+  })
+})
+
+describe('composeSectionYaml', () => {
+  it('round-trips one team section through the draft file schema', () => {
+    const yaml = composeSectionYaml('2026-q3', {
+      name: 'Nav Team',
+      notes: '  Un mot du trimestre.  ',
+      done: [' Cartes LFPG ', ''],
+      in_progress: [],
+      next: ['Doc LFLL'],
+      help_wanted: [],
+      images: [{ name: 'secteurs.png', caption: 'Découpage' }, { name: 'brut.png', caption: '' }],
+    })
+    const section = editionSectionFileSchema.parse(load(yaml))
+    expect(section.name).toBe('Nav Team')
+    expect(section.notes).toBe('Un mot du trimestre.')
+    expect(section.done).toEqual(['Cartes LFPG'])
+    expect(section.in_progress).toEqual([])
+    expect(section.images).toEqual([
+      { src: '/images/point-vacc/2026-q3/secteurs.png', caption: 'Découpage' },
+      { src: '/images/point-vacc/2026-q3/brut.png' },
+    ])
+    expect(yaml).not.toContain('help_wanted')
+  })
+
+  it('builds the draft path from the edition slug and team name', () => {
+    expect(editionSectionDraftPath('2026-q3', 'Nav Team')).toBe('content/point-vacc/drafts/2026-q3/nav-team.yaml')
+    expect(editionSectionDraftPath('2026-q4', 'Training Department')).toBe(
+      'content/point-vacc/drafts/2026-q4/training-department.yaml',
+    )
+  })
+})
+
+describe('composeEditionFromSections', () => {
+  const sections: DepartmentEntry[] = [
+    {
+      name: 'Nav Team',
+      notes: 'Le mot de la Nav Team.',
+      done: ['Cartes LFPG publiées'],
+      in_progress: [],
+      next: [],
+      help_wanted: [],
+      images: [{ src: 'https://exemple.org/capture.png', caption: 'Externe' }, { src: '/images/point-vacc/2026-q3/a.png' }],
+    },
+    { name: 'Event Team', done: [], in_progress: [], next: [], help_wanted: [], images: [] },
+  ]
+
+  it('assembles received sections into a valid edition file', () => {
+    const file = composeEditionFromSections(
+      { title: 'Point vACC — T3 2026', slug: '2026-q3', published: '2026-09-30', intro: 'Intro.', body: 'Fin.' },
+      sections,
+    )
+    const { data, body } = parseFrontmatter(file, 'generated')
+    const edition = editionSchema.parse(data)
+    expect(edition.slug).toBe('2026-q3')
+    expect(edition.departments).toHaveLength(1)
+    expect(edition.departments[0].name).toBe('Nav Team')
+    // Sections keep their srcs verbatim — including https ones.
+    expect(edition.departments[0].images).toEqual([
+      { src: 'https://exemple.org/capture.png', caption: 'Externe' },
+      { src: '/images/point-vacc/2026-q3/a.png' },
+    ])
+    expect(body).toBe('Fin.')
+  })
+
+  it('omits the body block when empty', () => {
+    const file = composeEditionFromSections(
+      { title: 'T', slug: '2026-q3', published: '2026-09-30', intro: 'I', body: '   ' },
+      sections,
+    )
+    expect(file.trimEnd().endsWith('---')).toBe(true)
   })
 })
 

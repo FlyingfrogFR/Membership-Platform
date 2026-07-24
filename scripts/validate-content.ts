@@ -4,8 +4,15 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import { ZodError } from 'zod'
+import { slugify } from '../src/lib/compose'
 import { loadYamlDocument, parseFrontmatter } from '../src/lib/frontmatter'
-import { coordinationFileSchema, editionSchema, needsFileSchema, ticketLogFileSchema } from '../src/lib/schemas'
+import {
+  coordinationFileSchema,
+  editionSchema,
+  editionSectionFileSchema,
+  needsFileSchema,
+  ticketLogFileSchema,
+} from '../src/lib/schemas'
 
 const root = path.resolve(import.meta.dirname, '..')
 const editionsDir = path.join(root, 'content', 'point-vacc')
@@ -70,6 +77,45 @@ for (const file of editionFiles) {
     errors.push(...describeError(error))
   }
   report(fullPath, errors)
+}
+
+// Per-team draft sections: one YAML object per file, named after the team,
+// grouped under the target edition's slug. Same image rule as editions.
+const draftsRoot = path.join(editionsDir, 'drafts')
+if (existsSync(draftsRoot)) {
+  const slugDirs = readdirSync(draftsRoot, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort()
+  for (const slugDir of slugDirs) {
+    const dirErrors: string[] = []
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slugDir)) {
+      dirErrors.push(`draft directory "${slugDir}" must be a kebab-case edition slug (e.g. 2026-q3)`)
+      report(path.join(draftsRoot, slugDir), dirErrors)
+      continue
+    }
+    const files = readdirSync(path.join(draftsRoot, slugDir)).filter((name) => name.endsWith('.yaml')).sort()
+    if (files.length === 0) report(path.join(draftsRoot, slugDir), ['no .yaml draft section in this directory'])
+    for (const file of files) {
+      const fullPath = path.join(draftsRoot, slugDir, file)
+      const errors: string[] = []
+      try {
+        const section = editionSectionFileSchema.parse(loadYamlDocument(readFileSync(fullPath, 'utf8')))
+        const expected = `${slugify(section.name)}.yaml`
+        if (file !== expected) errors.push(`file name should be "${expected}" for team "${section.name}"`)
+        for (const image of section.images) {
+          if (!image.src.startsWith('/')) continue
+          const imagePath = path.join(root, 'public', decodeURIComponent(image.src))
+          if (!existsSync(imagePath)) {
+            errors.push(`image "${image.src}" not found (expected at public${image.src}) — upload images before merging the draft`)
+          }
+        }
+      } catch (error) {
+        errors.push(...describeError(error))
+      }
+      report(fullPath, errors)
+    }
+  }
 }
 
 {

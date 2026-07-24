@@ -153,6 +153,22 @@ export function OutputPanel({
   )
 }
 
+// Autosave status line for composers: reassures that typing is never lost on
+// this device, flags a restored draft, and offers a clean restart.
+export function DraftBar({ restored, onReset }: { restored: boolean; onReset: () => void }) {
+  return (
+    <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-soft">
+      <span>
+        {restored && <strong className="font-bold text-accent-strong">{fr.compose.draft.restored} </strong>}
+        {fr.compose.draft.autosave}
+      </span>
+      <button type="button" onClick={onReset} className="font-bold text-coral-strong hover:underline">
+        {fr.compose.draft.reset}
+      </button>
+    </p>
+  )
+}
+
 export function ErrorList({ errors }: { errors: string[] }) {
   if (errors.length === 0) return null
   return (

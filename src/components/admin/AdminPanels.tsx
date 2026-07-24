@@ -1,16 +1,36 @@
 import { useMemo, useState } from 'react'
-import { CopyButton, Field, inputClass, OutputPanel } from '../ComposerBits'
+import { CopyButton, DraftBar, ErrorList, Field, inputClass, OutputPanel } from '../ComposerBits'
 import { DiscordExport } from '../DiscordExport'
 import { DEPARTMENTS, type Department } from '../../config/departments'
+import { SITE } from '../../config/site'
 import { fr } from '../../i18n/fr'
 import { checklistFor, computeCadence, participationMatrix } from '../../lib/cadence'
-import { composeCoordinationYaml, COORDINATION_FILE_PATH } from '../../lib/compose'
-import { getCoordination, getEditions, getNeeds, getTicketLog } from '../../lib/content'
-import { lastMonthKeys, monthKey, monthLabel, parseQuarterSlug, prevQuarter, quarterLabel, quarterOf, quarterSlug } from '../../lib/dates'
+import {
+  composeCoordinationYaml,
+  composeEditionFromSections,
+  COORDINATION_FILE_PATH,
+  editionDraftsDir,
+  editionFilePath,
+} from '../../lib/compose'
+import { getCoordination, getDraftSections, getEditionDrafts, getEditions, getNeeds, getTicketLog } from '../../lib/content'
+import {
+  lastMonthKeys,
+  monthKey,
+  monthLabel,
+  parseQuarterSlug,
+  prevQuarter,
+  quarterEnd,
+  quarterLabel,
+  quarterOf,
+  quarterSlug,
+  type Quarter,
+} from '../../lib/dates'
 import { formatNeedsForDiscord } from '../../lib/discord'
+import { asBool, asInt, asRecord, asString } from '../../lib/draft'
 import { formatDate, formatDuration } from '../../lib/format'
 import { computeHealthAlerts, type AlertSeverity } from '../../lib/health'
 import { COORDINATION_TEAMS, kpisForQuarter, monthlyTicketSeries, type QuarterKpis } from '../../lib/kpi'
+import { useDraft } from '../../lib/useDraft'
 
 const severityDot: Record<AlertSeverity, string> = {
   danger: 'bg-coral-strong',
@@ -20,7 +40,7 @@ const severityDot: Record<AlertSeverity, string> = {
 
 export function AlertsPanel({ now }: { now: Date }) {
   const t = fr.admin.alerts
-  const alerts = useMemo(() => computeHealthAlerts(now, getEditions(), getNeeds(), getTicketLog()), [now])
+  const alerts = useMemo(() => computeHealthAlerts(now, getEditions(), getNeeds(), getTicketLog(), getEditionDrafts()), [now])
   return (
     <section aria-labelledby="admin-alerts" className="mt-10">
       <h2 id="admin-alerts" className="text-2xl font-extrabold">
@@ -190,6 +210,186 @@ export function CockpitPanel({ now }: { now: Date }) {
             text={fr.admin.cockpit.relanceQuarter(team, label, formatDate(cadence.dueDate), origin)}
           />
         ))}
+      </div>
+    </section>
+  )
+}
+
+interface AssembleDraftState {
+  quarter: number
+  year: number
+  title: string
+  titleTouched: boolean
+  published: string
+  publishedTouched: boolean
+  intro: string
+  body: string
+}
+
+const ASSEMBLE_DRAFT_KEY = 'membership-draft-assemble-v1'
+
+function isoDay(date: Date): string {
+  return date.toISOString().slice(0, 10)
+}
+
+export function AssemblePanel({ now }: { now: Date }) {
+  const t = fr.admin.assemble
+  const editions = getEditions()
+  const cadence = useMemo(() => computeCadence(now, editions), [now, editions])
+  const draft = useDraft<AssembleDraftState>(
+    ASSEMBLE_DRAFT_KEY,
+    () => ({
+      quarter: cadence.next.q,
+      year: cadence.next.year,
+      title: '',
+      titleTouched: false,
+      published: '',
+      publishedTouched: false,
+      intro: '',
+      body: '',
+    }),
+    (stored, initial) => {
+      const s = asRecord(stored)
+      return {
+        quarter: asInt(s.quarter, initial.quarter),
+        year: asInt(s.year, initial.year),
+        title: asString(s.title),
+        titleTouched: asBool(s.titleTouched),
+        published: asString(s.published),
+        publishedTouched: asBool(s.publishedTouched),
+        intro: asString(s.intro),
+        body: asString(s.body),
+      }
+    },
+  )
+  const d = draft.value
+  const patch = (partial: Partial<AssembleDraftState>) => draft.set((prev) => ({ ...prev, ...partial }))
+
+  const yearValid = Number.isInteger(d.year) && d.year >= 2020 && d.year <= 2100
+  const target: Quarter = { year: d.year, q: d.quarter as Quarter['q'] }
+  const slug = `${d.year}-q${d.quarter}`
+  const label = quarterLabel(target)
+  const sections = getDraftSections(slug)
+  const receivedNames = sections.map((section) => section.name)
+  const missing = DEPARTMENTS.filter((team) => !receivedNames.includes(team))
+  const alreadyPublished = editions.some((edition) => edition.slug === slug)
+
+  const effectiveTitle = d.titleTouched ? d.title : `Point vACC — ${label}`
+  const effectivePublished = d.publishedTouched ? d.published : yearValid ? isoDay(quarterEnd(target)) : ''
+
+  const errors = [
+    !yearValid && fr.compose.edition.errYear,
+    sections.length === 0 && t.errNoSections,
+    alreadyPublished && t.alreadyPublished(label),
+    !effectiveTitle.trim() && t.errTitle,
+    !effectivePublished && t.errPublished,
+    !d.intro.trim() && t.errIntro,
+  ].filter((e): e is string => Boolean(e))
+
+  const file =
+    errors.length === 0
+      ? composeEditionFromSections(
+          { title: effectiveTitle, slug, published: effectivePublished, intro: d.intro, body: d.body },
+          sections,
+        )
+      : ''
+
+  return (
+    <section aria-labelledby="admin-assemble" className="mt-10">
+      <h2 id="admin-assemble" className="text-2xl font-extrabold">
+        {t.title}
+      </h2>
+      <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-soft">{t.help}</p>
+      <DraftBar restored={draft.restored} onReset={draft.reset} />
+
+      <div className="card mt-4 p-6">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field label={fr.compose.edition.quarter} htmlFor="as-quarter">
+            <select id="as-quarter" className={inputClass} value={d.quarter} onChange={(e) => patch({ quarter: Number(e.target.value) })}>
+              {[1, 2, 3, 4].map((q) => (
+                <option key={q} value={q}>
+                  T{q}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label={fr.compose.edition.year} htmlFor="as-year">
+            <input
+              id="as-year"
+              type="number"
+              min={2020}
+              max={2100}
+              className={inputClass}
+              value={d.year}
+              onChange={(e) => patch({ year: Number(e.target.value) })}
+            />
+          </Field>
+          <Field label={t.editionTitle} htmlFor="as-title">
+            <input id="as-title" className={inputClass} value={effectiveTitle} onChange={(e) => patch({ title: e.target.value, titleTouched: true })} />
+          </Field>
+          <Field label={t.published} htmlFor="as-published">
+            <input
+              id="as-published"
+              type="date"
+              className={inputClass}
+              value={effectivePublished}
+              onChange={(e) => patch({ published: e.target.value, publishedTouched: true })}
+            />
+          </Field>
+          <div className="sm:col-span-2">
+            <Field label={t.intro} htmlFor="as-intro">
+              <textarea id="as-intro" className={`${inputClass} min-h-24`} value={d.intro} onChange={(e) => patch({ intro: e.target.value })} />
+            </Field>
+          </div>
+          <div className="sm:col-span-2">
+            <Field label={t.body} htmlFor="as-body">
+              <textarea id="as-body" className={`${inputClass} min-h-20`} value={d.body} onChange={(e) => patch({ body: e.target.value })} />
+            </Field>
+          </div>
+        </div>
+
+        <h3 className="mt-6 text-sm font-extrabold">{t.received}</h3>
+        {sections.length === 0 ? (
+          <p className="mt-2 text-sm text-ink-soft">{t.none(label)}</p>
+        ) : (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {receivedNames.map((team) => (
+              <span key={team} className="rounded-full bg-ok-soft px-2.5 py-0.5 text-xs font-bold text-ok">
+                ✓ {team}
+              </span>
+            ))}
+          </div>
+        )}
+        {sections.length > 0 && missing.length > 0 && (
+          <>
+            <h3 className="mt-4 text-sm font-extrabold">{t.missing}</h3>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {missing.map((team) => (
+                <span key={team} className="rounded-full border border-line bg-canvas px-2.5 py-0.5 text-xs font-bold text-ink-soft">
+                  — {team}
+                </span>
+              ))}
+            </div>
+          </>
+        )}
+
+        <ErrorList errors={errors} />
+        {file && <OutputPanel content={file} filePath={editionFilePath(slug)} mode="new-file" downloadName={`${slug}.md`} />}
+
+        {sections.length > 0 && (
+          <div className="card mt-6 border-warn-soft bg-warn-soft/40 p-5">
+            <p className="text-sm font-bold">{t.cleanupTitle}</p>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-soft">{t.cleanupText}</p>
+            <a
+              href={`${SITE.repoUrl}/tree/main/${editionDraftsDir(slug)}`}
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-secondary mt-4"
+            >
+              {t.cleanupCta} ↗
+            </a>
+          </div>
+        )}
       </div>
     </section>
   )

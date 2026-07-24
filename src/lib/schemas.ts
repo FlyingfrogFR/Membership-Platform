@@ -32,6 +32,10 @@ export const departmentEntrySchema = z.strictObject({
   images: z.array(editionImageSchema).default([]),
 })
 
+// A per-team draft section file (content/point-vacc/drafts/<slug>/<team>.yaml)
+// holds exactly one department entry; the HoM assembles them into an edition.
+export const editionSectionFileSchema = departmentEntrySchema
+
 export const editionSchema = z.strictObject({
   title: nonEmptyString,
   slug: kebabCase,

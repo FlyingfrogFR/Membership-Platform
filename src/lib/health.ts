@@ -3,7 +3,7 @@
 // pillars. Ages are computed against the caller's "now", never at build time.
 import { SITE } from '../config/site'
 import { fr } from '../i18n/fr'
-import { githubEditFileUrl, NEEDS_FILE_PATH, TICKET_LOG_FILE_PATH } from './compose'
+import { editionDraftsDir, githubEditFileUrl, NEEDS_FILE_PATH, TICKET_LOG_FILE_PATH } from './compose'
 import { daysBetween } from './dates'
 import type { Edition, Need, TicketLogEntry } from './schemas'
 
@@ -28,6 +28,7 @@ export function computeHealthAlerts(
   editions: Edition[],
   needs: Need[],
   tickets: TicketLogEntry[],
+  editionDrafts: { slug: string }[] = [],
 ): HealthAlert[] {
   const alerts: HealthAlert[] = []
   const t = fr.admin.alerts
@@ -74,6 +75,20 @@ export function computeHealthAlerts(
 
   const hasSamples = [...needs.map((n) => n.id), ...tickets.map((tk) => tk.id)].some((id) => id.startsWith('exemple-'))
   if (hasSamples) alerts.push({ severity: 'warn', text: t.sampleData })
+
+  // Draft sections whose edition already shipped are forgotten leftovers.
+  const publishedSlugs = new Set(editions.map((edition) => edition.slug))
+  const leftoverCounts = new Map<string, number>()
+  for (const draft of editionDrafts) {
+    if (publishedSlugs.has(draft.slug)) leftoverCounts.set(draft.slug, (leftoverCounts.get(draft.slug) ?? 0) + 1)
+  }
+  for (const [slug, count] of [...leftoverCounts.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+    alerts.push({
+      severity: 'warn',
+      text: t.draftsLeftover(slug, count),
+      href: `${SITE.repoUrl}/tree/main/${editionDraftsDir(slug)}`,
+    })
+  }
 
   if (SITE.discordTicketsUrl.includes('vatsim.fr')) {
     alerts.push({ severity: 'info', text: t.discordPlaceholder, href: githubEditFileUrl('src/config/site.ts') })
