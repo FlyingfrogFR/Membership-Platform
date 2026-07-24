@@ -19,18 +19,6 @@ Trois façons de faire, de la plus simple à la plus directe :
 
 Dans tous les cas, le Head of Membership relit et harmonise le ton avant publication. La page **`/admin`** lui sert de tableau de bord : **alertes** (besoins qui vieillissent, journal muet, édition en retard, données d'exemple restantes), **pilotage du Point vACC** (compte à rebours de la prochaine édition, checklist datée, matrice de participation par équipe, messages de relance prêts à coller), **export Discord du tableau Contribuer**, **suivi Coordination** (points mensuels reçus par équipe + relances), **indicateurs KPI** (trimestre vs trimestre, export markdown, tendances) et enregistrement des sollicitations. Ces pages ne stockent rien : les droits réels restent ceux de GitHub.
 
-### Mots de passe des pages internes
-
-`/admin` (Head of Membership) et `/proposer` (référents d'équipe) sont derrière un mot de passe simple ; le mot de passe admin ouvre aussi `/proposer`. Seuls les **hachages SHA-256** sont dans le code (`src/lib/gate.ts`) — jamais les mots de passe eux-mêmes, communiqués par le HoM.
-
-Pour changer un mot de passe : générer le nouveau hachage et remplacer la constante dans `src/lib/gate.ts`, ou surcharger sans toucher au code via les variables d'environnement Vercel `VITE_ADMIN_PASS_HASH` / `VITE_TEAM_PASS_HASH` :
-
-```bash
-node -e "console.log(require('crypto').createHash('sha256').update('NouveauMotDePasse').digest('hex'))"
-```
-
-**Attention** : la vérification se fait côté navigateur — c'est un rideau dissuasif (empêcher qui n'a rien à y faire d'y traîner), pas une vraie authentification. Les droits réels restent ceux de GitHub ; la vraie connexion arrivera avec VATSIM Connect (phase 2).
-
 ## Structure du contenu
 
 - `content/point-vacc/<slug>.md` — une édition du Point vACC par fichier (frontmatter YAML : intro du HoM + une section par pôle : fait / en cours / à venir / coup de main recherché).
