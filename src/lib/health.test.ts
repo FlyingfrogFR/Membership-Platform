@@ -56,4 +56,23 @@ describe('computeHealthAlerts', () => {
     expect(alerts.some((a) => a.text.includes('Aucune édition'))).toBe(true)
     expect(alerts.some((a) => a.text.includes('vatsim.fr'))).toBe(true)
   })
+
+  it('flags leftover draft sections only for already-published editions', () => {
+    const edition = {
+      title: 'Point vACC — T2 2026',
+      slug: '2026-q2',
+      published: new Date('2026-06-30'),
+      intro: 'x',
+      departments: [{ name: 'Nav Team' as const, done: ['x'], in_progress: [], next: [], help_wanted: [], images: [] }],
+      body: '',
+    }
+    const drafts = [{ slug: '2026-q2' }, { slug: '2026-q2' }, { slug: '2026-q3' }]
+    const alerts = computeHealthAlerts(NOW, [edition], [], [ticket({ id: 't', opened: NOW })], drafts)
+    const leftover = alerts.find((a) => a.text.includes('brouillons de rubrique'))
+    expect(leftover).toBeDefined()
+    expect(leftover!.text).toContain('2026-q2')
+    expect(leftover!.href).toContain('content/point-vacc/drafts/2026-q2')
+    // Drafts for the upcoming (unpublished) edition are normal, not leftovers.
+    expect(alerts.every((a) => !a.text.includes('2026-q3'))).toBe(true)
+  })
 })

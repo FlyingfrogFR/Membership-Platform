@@ -55,8 +55,14 @@ declare module 'virtual:vacc-content' {
     received: string[]
   }
 
+  interface SerializedEditionDraft {
+    slug: string
+    section: SerializedDepartmentEntry
+  }
+
   const content: {
     editions: SerializedEdition[]
+    editionDrafts: SerializedEditionDraft[]
     needs: SerializedNeed[]
     tickets: SerializedTicket[]
     coordination: SerializedCoordinationEntry[]

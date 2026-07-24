@@ -1,19 +1,21 @@
-import { useMemo, useState } from 'react'
-import { ErrorList, Field, inputClass, ListInput, OutputPanel } from '../components/ComposerBits'
+import { useMemo } from 'react'
+import { DraftBar, ErrorList, Field, inputClass, ListInput, OutputPanel } from '../components/ComposerBits'
 import { Gate } from '../components/Gate'
 import { DEPARTMENTS, type Department } from '../config/departments'
 import { fr } from '../i18n/fr'
 import {
-  composeEditionFile,
   composeNeedYaml,
-  editionFilePath,
+  composeSectionYaml,
   editionImagesDir,
+  editionSectionDraftPath,
   githubUploadDirUrl,
   NEEDS_FILE_PATH,
   slugify,
   type EditionDepartmentDraft,
   type EditionImageDraft,
 } from '../lib/compose'
+import { asBool, asEnum, asInt, asRecord, asString, asStringList } from '../lib/draft'
+import { useDraft } from '../lib/useDraft'
 import { usePageTitle } from '../lib/usePageTitle'
 
 type Tab = 'edition' | 'need'
@@ -32,7 +34,9 @@ export function Proposer() {
 }
 
 function ProposerContent() {
-  const [tab, setTab] = useState<Tab>('need')
+  const tab = useDraft<Tab>('membership-tab-proposer-v1', () => 'need', (stored, initial) =>
+    asEnum(stored, ['need', 'edition'] as const, initial),
+  )
   return (
     <div>
       <header className="max-w-2xl">
@@ -54,10 +58,10 @@ function ProposerContent() {
           <button
             key={value}
             type="button"
-            onClick={() => setTab(value)}
-            aria-pressed={tab === value}
+            onClick={() => tab.set(() => value)}
+            aria-pressed={tab.value === value}
             className={`flex-1 rounded-full px-4 py-1.5 text-sm font-bold transition-colors ${
-              tab === value ? 'bg-accent text-white' : 'text-ink-soft hover:text-ink'
+              tab.value === value ? 'bg-accent text-white' : 'text-ink-soft hover:text-ink'
             }`}
           >
             {label}
@@ -65,62 +69,99 @@ function ProposerContent() {
         ))}
       </div>
 
-      <div className="mt-8">{tab === 'need' ? <NeedComposer /> : <EditionComposer />}</div>
+      <div className="mt-8">{tab.value === 'need' ? <NeedComposer /> : <EditionComposer />}</div>
     </div>
   )
 }
 
+interface NeedDraftState {
+  type: 'ponctuel' | 'poste'
+  title: string
+  department: Department
+  description: string
+  skills: string[]
+  timeEstimate: string
+  contact: string
+  posted: string
+  idTouched: boolean
+  id: string
+}
+
+const NEED_DRAFT_KEY = 'membership-draft-need-v1'
+
+function initialNeedDraft(): NeedDraftState {
+  return {
+    type: 'ponctuel',
+    title: '',
+    department: DEPARTMENTS[0],
+    description: '',
+    skills: [],
+    timeEstimate: '',
+    contact: '',
+    posted: today(),
+    idTouched: false,
+    id: '',
+  }
+}
+
+function reviveNeedDraft(stored: unknown, initial: NeedDraftState): NeedDraftState {
+  const s = asRecord(stored)
+  return {
+    type: asEnum(s.type, ['ponctuel', 'poste'] as const, initial.type),
+    title: asString(s.title),
+    department: asEnum(s.department, DEPARTMENTS, initial.department),
+    description: asString(s.description),
+    skills: asStringList(s.skills),
+    timeEstimate: asString(s.timeEstimate),
+    contact: asString(s.contact),
+    posted: asString(s.posted, initial.posted),
+    idTouched: asBool(s.idTouched),
+    id: asString(s.id),
+  }
+}
+
 function NeedComposer() {
   const t = fr.compose.need
-  const [type, setType] = useState<'ponctuel' | 'poste'>('ponctuel')
-  const [title, setTitle] = useState('')
-  const [department, setDepartment] = useState<Department>(DEPARTMENTS[0])
-  const [description, setDescription] = useState('')
-  const [skills, setSkills] = useState<string[]>([])
-  const [timeEstimate, setTimeEstimate] = useState('')
-  const [contact, setContact] = useState('')
-  const [posted, setPosted] = useState(today)
-  const [idTouched, setIdTouched] = useState(false)
-  const [id, setId] = useState('')
+  const draft = useDraft(NEED_DRAFT_KEY, initialNeedDraft, reviveNeedDraft)
+  const d = draft.value
+  const patch = (partial: Partial<NeedDraftState>) => draft.set((prev) => ({ ...prev, ...partial }))
 
-  const autoId = useMemo(() => slugify(`${department} ${title}`), [department, title])
-  const effectiveId = idTouched ? id : autoId
+  const autoId = useMemo(() => slugify(`${d.department} ${d.title}`), [d.department, d.title])
+  const effectiveId = d.idTouched ? d.id : autoId
 
   const errors = [
-    !title.trim() && t.errTitle,
-    !description.trim() && t.errDescription,
-    !contact.trim() && t.errContact,
-    !posted && t.errPosted,
+    !d.title.trim() && t.errTitle,
+    !d.description.trim() && t.errDescription,
+    !d.contact.trim() && t.errContact,
+    !d.posted && t.errPosted,
     !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(effectiveId) && t.errId,
   ].filter((e): e is string => Boolean(e))
 
-  const yaml = useMemo(
-    () =>
-      errors.length === 0
-        ? composeNeedYaml({
-            id: effectiveId,
-            type,
-            title,
-            department,
-            description,
-            skills,
-            time_estimate: timeEstimate,
-            contact,
-            status: 'open',
-            posted,
-          })
-        : '',
-    [errors.length, effectiveId, type, title, department, description, skills, timeEstimate, contact, posted],
-  )
+  const yaml =
+    errors.length === 0
+      ? composeNeedYaml({
+          id: effectiveId,
+          type: d.type,
+          title: d.title,
+          department: d.department,
+          description: d.description,
+          skills: d.skills,
+          time_estimate: d.timeEstimate,
+          contact: d.contact,
+          status: 'open',
+          posted: d.posted,
+        })
+      : ''
 
   return (
     <section aria-label={t.title} className="card p-6 sm:p-8">
       <h2 className="text-xl font-extrabold">{t.title}</h2>
       <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-soft">{t.help}</p>
+      <DraftBar restored={draft.restored} onReset={draft.reset} />
 
       <div className="mt-6 grid gap-5 sm:grid-cols-2">
         <Field label={t.type} htmlFor="need-type">
-          <select id="need-type" className={inputClass} value={type} onChange={(e) => setType(e.target.value as typeof type)}>
+          <select id="need-type" className={inputClass} value={d.type} onChange={(e) => patch({ type: e.target.value as NeedDraftState['type'] })}>
             <option value="ponctuel">{fr.contribuer.type.ponctuel}</option>
             <option value="poste">{fr.contribuer.type.poste}</option>
           </select>
@@ -129,8 +170,8 @@ function NeedComposer() {
           <select
             id="need-department"
             className={inputClass}
-            value={department}
-            onChange={(e) => setDepartment(e.target.value as Department)}
+            value={d.department}
+            onChange={(e) => patch({ department: e.target.value as Department })}
           >
             {DEPARTMENTS.map((dept) => (
               <option key={dept} value={dept}>
@@ -141,7 +182,7 @@ function NeedComposer() {
         </Field>
         <div className="sm:col-span-2">
           <Field label={t.needTitle} htmlFor="need-title">
-            <input id="need-title" className={inputClass} placeholder={t.titlePlaceholder} value={title} onChange={(e) => setTitle(e.target.value)} />
+            <input id="need-title" className={inputClass} placeholder={t.titlePlaceholder} value={d.title} onChange={(e) => patch({ title: e.target.value })} />
           </Field>
         </div>
         <div className="sm:col-span-2">
@@ -150,32 +191,29 @@ function NeedComposer() {
               id="need-description"
               className={`${inputClass} min-h-24`}
               placeholder={t.descriptionPlaceholder}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={d.description}
+              onChange={(e) => patch({ description: e.target.value })}
             />
           </Field>
         </div>
         <div className="sm:col-span-2">
-          <ListInput label={t.skills} value={skills} onChange={setSkills} idBase="need-skill" />
+          <ListInput label={t.skills} value={d.skills} onChange={(skills) => patch({ skills })} idBase="need-skill" />
         </div>
         <Field label={t.time} htmlFor="need-time">
-          <input id="need-time" className={inputClass} placeholder={t.timePlaceholder} value={timeEstimate} onChange={(e) => setTimeEstimate(e.target.value)} />
+          <input id="need-time" className={inputClass} placeholder={t.timePlaceholder} value={d.timeEstimate} onChange={(e) => patch({ timeEstimate: e.target.value })} />
         </Field>
         <Field label={t.contact} htmlFor="need-contact">
-          <input id="need-contact" className={inputClass} placeholder={t.contactPlaceholder} value={contact} onChange={(e) => setContact(e.target.value)} />
+          <input id="need-contact" className={inputClass} placeholder={t.contactPlaceholder} value={d.contact} onChange={(e) => patch({ contact: e.target.value })} />
         </Field>
         <Field label={t.posted} htmlFor="need-posted">
-          <input id="need-posted" type="date" className={inputClass} value={posted} onChange={(e) => setPosted(e.target.value)} />
+          <input id="need-posted" type="date" className={inputClass} value={d.posted} onChange={(e) => patch({ posted: e.target.value })} />
         </Field>
         <Field label={t.id} htmlFor="need-id" hint={t.idHelp}>
           <input
             id="need-id"
             className={inputClass}
             value={effectiveId}
-            onChange={(e) => {
-              setIdTouched(true)
-              setId(e.target.value)
-            }}
+            onChange={(e) => patch({ idTouched: true, id: e.target.value })}
           />
         </Field>
       </div>
@@ -186,7 +224,17 @@ function NeedComposer() {
   )
 }
 
-const emptyLists = (): Omit<EditionDepartmentDraft, 'name'> => ({
+type SectionState = Omit<EditionDepartmentDraft, 'name'>
+
+interface EditionDraftState {
+  quarter: number
+  year: number
+  departments: Record<Department, SectionState>
+}
+
+const EDITION_DRAFT_KEY = 'membership-draft-edition-v1'
+
+const emptyLists = (): SectionState => ({
   notes: '',
   done: [],
   in_progress: [],
@@ -195,86 +243,83 @@ const emptyLists = (): Omit<EditionDepartmentDraft, 'name'> => ({
   images: [],
 })
 
+function initialEditionDraft(): EditionDraftState {
+  const now = new Date()
+  return {
+    quarter: Math.floor(now.getUTCMonth() / 3) + 1,
+    year: now.getUTCFullYear(),
+    departments: Object.fromEntries(DEPARTMENTS.map((dept) => [dept, emptyLists()])) as Record<Department, SectionState>,
+  }
+}
+
+function reviveImages(stored: unknown): EditionImageDraft[] {
+  if (!Array.isArray(stored)) return []
+  return stored.flatMap((item) => {
+    const image = asRecord(item)
+    const name = asString(image.name)
+    return name ? [{ name, caption: asString(image.caption) }] : []
+  })
+}
+
+function reviveSection(stored: unknown): SectionState {
+  const s = asRecord(stored)
+  return {
+    notes: asString(s.notes),
+    done: asStringList(s.done),
+    in_progress: asStringList(s.in_progress),
+    next: asStringList(s.next),
+    help_wanted: asStringList(s.help_wanted),
+    images: reviveImages(s.images),
+  }
+}
+
+function reviveEditionDraft(stored: unknown, initial: EditionDraftState): EditionDraftState {
+  const s = asRecord(stored)
+  const sections = asRecord(s.departments)
+  return {
+    quarter: asInt(s.quarter, initial.quarter),
+    year: asInt(s.year, initial.year),
+    departments: Object.fromEntries(
+      DEPARTMENTS.map((dept) => [dept, dept in sections ? reviveSection(sections[dept]) : emptyLists()]),
+    ) as Record<Department, SectionState>,
+  }
+}
+
+function sectionCount(section: SectionState): number {
+  return (
+    section.done.filter((s) => s.trim()).length +
+    section.in_progress.filter((s) => s.trim()).length +
+    section.next.filter((s) => s.trim()).length +
+    section.help_wanted.filter((s) => s.trim()).length +
+    section.images.filter((img) => img.name.trim()).length +
+    (section.notes.trim() ? 1 : 0)
+  )
+}
+
 function EditionComposer() {
   const t = fr.compose.edition
-  const now = new Date()
-  const [quarter, setQuarter] = useState(Math.floor(now.getUTCMonth() / 3) + 1)
-  const [year, setYear] = useState(now.getUTCFullYear())
-  const [title, setTitle] = useState('')
-  const [titleTouched, setTitleTouched] = useState(false)
-  const [published, setPublished] = useState(today)
-  const [intro, setIntro] = useState('')
-  const [body, setBody] = useState('')
-  const [departments, setDepartments] = useState<Record<Department, Omit<EditionDepartmentDraft, 'name'>>>(
-    () => Object.fromEntries(DEPARTMENTS.map((d) => [d, emptyLists()])) as Record<Department, Omit<EditionDepartmentDraft, 'name'>>,
-  )
+  const draft = useDraft(EDITION_DRAFT_KEY, initialEditionDraft, reviveEditionDraft)
+  const { quarter, year, departments } = draft.value
 
-  const autoTitle = `Point vACC — T${quarter} ${year}`
-  const effectiveTitle = titleTouched ? title : autoTitle
   const slug = `${year}-q${quarter}`
-  const filePath = editionFilePath(slug)
+  const yearValid = Number.isInteger(year) && year >= 2020 && year <= 2100
+  const errors = [!yearValid && t.errYear].filter((e): e is string => Boolean(e))
 
-  const totalItems = DEPARTMENTS.reduce(
-    (sum, d) =>
-      sum +
-      departments[d].done.filter((s) => s.trim()).length +
-      departments[d].in_progress.filter((s) => s.trim()).length +
-      departments[d].next.filter((s) => s.trim()).length +
-      departments[d].help_wanted.filter((s) => s.trim()).length +
-      departments[d].images.filter((img) => img.name.trim()).length +
-      (departments[d].notes.trim() ? 1 : 0),
-    0,
-  )
-  const totalImages = DEPARTMENTS.reduce((sum, d) => sum + departments[d].images.filter((img) => img.name.trim()).length, 0)
-
-  const errors = [
-    !effectiveTitle.trim() && t.errTitle,
-    !intro.trim() && t.errIntro,
-    !published && t.errPublished,
-    (!Number.isInteger(year) || year < 2020 || year > 2100) && t.errYear,
-    totalItems === 0 && t.errNoItems,
-  ].filter((e): e is string => Boolean(e))
-
-  const file = useMemo(
-    () =>
-      errors.length === 0
-        ? composeEditionFile({
-            title: effectiveTitle,
-            slug,
-            published,
-            intro,
-            body,
-            departments: DEPARTMENTS.map((name) => ({ name, ...departments[name] })),
-          })
-        : '',
-    [errors.length, effectiveTitle, slug, published, intro, body, departments],
-  )
-
-  const setList = (dept: Department, key: 'done' | 'in_progress' | 'next' | 'help_wanted') => (items: string[]) =>
-    setDepartments((prev) => ({ ...prev, [dept]: { ...prev[dept], [key]: items } }))
-
-  const setImages = (dept: Department) => (images: EditionImageDraft[]) =>
-    setDepartments((prev) => ({ ...prev, [dept]: { ...prev[dept], images } }))
-
-  const setNotes = (dept: Department) => (notes: string) =>
-    setDepartments((prev) => ({ ...prev, [dept]: { ...prev[dept], notes } }))
-
-  const deptCount = (dept: Department) =>
-    departments[dept].done.filter((s) => s.trim()).length +
-    departments[dept].in_progress.filter((s) => s.trim()).length +
-    departments[dept].next.filter((s) => s.trim()).length +
-    departments[dept].help_wanted.filter((s) => s.trim()).length +
-    departments[dept].images.filter((img) => img.name.trim()).length +
-    (departments[dept].notes.trim() ? 1 : 0)
+  const patchSection = (dept: Department, partial: Partial<SectionState>) =>
+    draft.set((prev) => ({
+      ...prev,
+      departments: { ...prev.departments, [dept]: { ...prev.departments[dept], ...partial } },
+    }))
 
   return (
     <section aria-label={t.title} className="card p-6 sm:p-8">
       <h2 className="text-xl font-extrabold">{t.title}</h2>
       <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-soft">{t.help}</p>
+      <DraftBar restored={draft.restored} onReset={draft.reset} />
 
       <div className="mt-6 grid gap-5 sm:grid-cols-2">
         <Field label={t.quarter} htmlFor="ed-quarter">
-          <select id="ed-quarter" className={inputClass} value={quarter} onChange={(e) => setQuarter(Number(e.target.value))}>
+          <select id="ed-quarter" className={inputClass} value={quarter} onChange={(e) => draft.set((prev) => ({ ...prev, quarter: Number(e.target.value) }))}>
             {[1, 2, 3, 4].map((q) => (
               <option key={q} value={q}>
                 T{q}
@@ -290,100 +335,90 @@ function EditionComposer() {
             max={2100}
             className={inputClass}
             value={year}
-            onChange={(e) => setYear(Number(e.target.value))}
+            onChange={(e) => draft.set((prev) => ({ ...prev, year: Number(e.target.value) }))}
           />
-        </Field>
-        <Field label={t.editionTitle} htmlFor="ed-title">
-          <input
-            id="ed-title"
-            className={inputClass}
-            value={effectiveTitle}
-            onChange={(e) => {
-              setTitleTouched(true)
-              setTitle(e.target.value)
-            }}
-          />
-        </Field>
-        <Field label={t.published} htmlFor="ed-published">
-          <input id="ed-published" type="date" className={inputClass} value={published} onChange={(e) => setPublished(e.target.value)} />
-        </Field>
-        <div className="sm:col-span-2">
-          <Field label={t.intro} htmlFor="ed-intro">
-            <textarea id="ed-intro" className={`${inputClass} min-h-24`} value={intro} onChange={(e) => setIntro(e.target.value)} />
-          </Field>
-        </div>
-      </div>
-
-      <h3 className="mt-8 text-lg font-extrabold">{t.departments}</h3>
-      <div className="mt-3 space-y-3">
-        {DEPARTMENTS.map((dept) => (
-          <details key={dept} className="rounded-xl border border-line bg-canvas p-4">
-            <summary className="cursor-pointer text-sm font-bold">
-              {dept}
-              {deptCount(dept) > 0 && (
-                <span className="ml-2 rounded-full bg-accent-soft px-2 py-0.5 text-xs font-bold text-accent-strong">
-                  {deptCount(dept)}
-                </span>
-              )}
-            </summary>
-            <div className="mt-4 grid gap-5 sm:grid-cols-2">
-              <div className="sm:col-span-2">
-                <Field label={t.notesLabel} htmlFor={`${slugify(dept)}-notes`} hint={t.notesHint}>
-                  <textarea
-                    id={`${slugify(dept)}-notes`}
-                    className={`${inputClass} min-h-20`}
-                    placeholder={t.notesPlaceholder}
-                    value={departments[dept].notes}
-                    onChange={(event) => setNotes(dept)(event.target.value)}
-                  />
-                </Field>
-              </div>
-              <ListInput label={fr.edition.done} value={departments[dept].done} onChange={setList(dept, 'done')} idBase={`${slugify(dept)}-done`} />
-              <ListInput
-                label={fr.edition.inProgress}
-                value={departments[dept].in_progress}
-                onChange={setList(dept, 'in_progress')}
-                idBase={`${slugify(dept)}-progress`}
-              />
-              <ListInput label={fr.edition.next} value={departments[dept].next} onChange={setList(dept, 'next')} idBase={`${slugify(dept)}-next`} />
-              <ListInput
-                label={fr.edition.helpWanted}
-                value={departments[dept].help_wanted}
-                onChange={setList(dept, 'help_wanted')}
-                idBase={`${slugify(dept)}-help`}
-              />
-              <div className="sm:col-span-2">
-                <ImagesInput dept={dept} images={departments[dept].images} onChange={setImages(dept)} />
-              </div>
-            </div>
-          </details>
-        ))}
-      </div>
-
-      <div className="mt-6">
-        <Field label={t.body} htmlFor="ed-body">
-          <textarea id="ed-body" className={`${inputClass} min-h-20`} value={body} onChange={(e) => setBody(e.target.value)} />
         </Field>
       </div>
 
       <ErrorList errors={errors} />
-      {file && totalImages > 0 && (
-        <div className="card mt-6 border-warn-soft bg-warn-soft/40 p-5">
-          <p className="text-sm font-bold">
-            {fr.compose.edition.uploadTitle(totalImages)} — {editionImagesDir(slug)}
-          </p>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-soft">{fr.compose.edition.uploadHelp}</p>
-          <a
-            href={githubUploadDirUrl(editionImagesDir(slug))}
-            target="_blank"
-            rel="noreferrer"
-            className="btn btn-secondary mt-4"
-          >
-            {fr.compose.edition.uploadCta} ↗
-          </a>
-        </div>
-      )}
-      {file && <OutputPanel content={file} filePath={filePath} mode="new-file" downloadName={`${slug}.md`} />}
+
+      <h3 className="mt-8 text-lg font-extrabold">{t.departments}</h3>
+      <div className="mt-3 space-y-3">
+        {DEPARTMENTS.map((dept) => {
+          const section = departments[dept]
+          const count = sectionCount(section)
+          const imageCount = section.images.filter((img) => img.name.trim()).length
+          return (
+            <details key={dept} className="rounded-xl border border-line bg-canvas p-4">
+              <summary className="cursor-pointer text-sm font-bold">
+                {dept}
+                {count > 0 && (
+                  <span className="ml-2 rounded-full bg-accent-soft px-2 py-0.5 text-xs font-bold text-accent-strong">
+                    {count}
+                  </span>
+                )}
+              </summary>
+              <div className="mt-4 grid gap-5 sm:grid-cols-2">
+                <div className="sm:col-span-2">
+                  <Field label={t.notesLabel} htmlFor={`${slugify(dept)}-notes`} hint={t.notesHint}>
+                    <textarea
+                      id={`${slugify(dept)}-notes`}
+                      className={`${inputClass} min-h-20`}
+                      placeholder={t.notesPlaceholder}
+                      value={section.notes}
+                      onChange={(event) => patchSection(dept, { notes: event.target.value })}
+                    />
+                  </Field>
+                </div>
+                <ListInput label={fr.edition.done} value={section.done} onChange={(done) => patchSection(dept, { done })} idBase={`${slugify(dept)}-done`} />
+                <ListInput
+                  label={fr.edition.inProgress}
+                  value={section.in_progress}
+                  onChange={(in_progress) => patchSection(dept, { in_progress })}
+                  idBase={`${slugify(dept)}-progress`}
+                />
+                <ListInput label={fr.edition.next} value={section.next} onChange={(next) => patchSection(dept, { next })} idBase={`${slugify(dept)}-next`} />
+                <ListInput
+                  label={fr.edition.helpWanted}
+                  value={section.help_wanted}
+                  onChange={(help_wanted) => patchSection(dept, { help_wanted })}
+                  idBase={`${slugify(dept)}-help`}
+                />
+                <div className="sm:col-span-2">
+                  <ImagesInput dept={dept} images={section.images} onChange={(images) => patchSection(dept, { images })} />
+                </div>
+              </div>
+
+              {count === 0 ? (
+                <p className="mt-4 text-xs text-ink-soft">{t.sectionEmptyHint}</p>
+              ) : (
+                yearValid && (
+                  <div className="mt-5">
+                    {imageCount > 0 && (
+                      <div className="card mb-4 border-warn-soft bg-warn-soft/40 p-5">
+                        <p className="text-sm font-bold">
+                          {t.uploadTitle(imageCount)} — {editionImagesDir(slug)}
+                        </p>
+                        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-soft">{t.uploadHelp}</p>
+                        <a href={githubUploadDirUrl(editionImagesDir(slug))} target="_blank" rel="noreferrer" className="btn btn-secondary mt-4">
+                          {t.uploadCta} ↗
+                        </a>
+                      </div>
+                    )}
+                    <h4 className="text-sm font-extrabold">{t.sectionSendTitle(dept)}</h4>
+                    <OutputPanel
+                      content={composeSectionYaml(slug, { name: dept, ...section })}
+                      filePath={editionSectionDraftPath(slug, dept)}
+                      mode="new-file"
+                      downloadName={`${slugify(dept)}.yaml`}
+                    />
+                  </div>
+                )
+              )}
+            </details>
+          )
+        })}
+      </div>
     </section>
   )
 }

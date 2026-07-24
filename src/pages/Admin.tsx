@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AlertsPanel, CockpitPanel, CoordinationPanel, KpiPanel, NeedsExportPanel } from '../components/admin/AdminPanels'
+import { AlertsPanel, AssemblePanel, CockpitPanel, CoordinationPanel, KpiPanel, NeedsExportPanel } from '../components/admin/AdminPanels'
 import { ErrorList, Field, inputClass, OutputPanel } from '../components/ComposerBits'
 import { Gate } from '../components/Gate'
 import { DEPARTMENTS, type Department } from '../config/departments'
@@ -70,6 +70,7 @@ function AdminContent() {
       </section>
 
       <CockpitPanel now={now} />
+      <AssemblePanel now={now} />
       <NeedsExportPanel />
       <CoordinationPanel now={now} />
       <KpiPanel now={now} />

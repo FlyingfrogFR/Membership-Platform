@@ -8,9 +8,36 @@
 - Chaque PR est validée automatiquement (`npm run validate`) : schéma du frontmatter et du YAML, unicité des slugs et des ids. Une PR au mauvais format est bloquée avant publication.
 - Le Head of Membership relit chaque proposition et peut ajuster le ton pour garder une voix cohérente.
 
+## Envoyer la rubrique de son équipe (Point vACC)
+
+C'est la voie normale pour un référent : chaque équipe envoie **sa** rubrique, sans attendre les autres — le Head of Membership assemble ensuite l'édition complète depuis l'Espace Membership. Le formulaire `/proposer` génère ce fichier tout seul ; à la main, créez `content/point-vacc/drafts/<slug>/<équipe>.yaml` :
+
+- `<slug>` est l'édition visée (ex. `2026-q3`) ;
+- le nom du fichier est le nom de l'équipe en minuscules-tirets (ex. `nav-team.yaml`, `training-department.yaml`) — la validation le vérifie ;
+- le fichier contient **une seule rubrique**, au même format qu'une section d'édition :
+
+```yaml
+name: "Nav Team"
+notes: >-            # optionnel : commentaire libre en markdown
+  Le mot de l'équipe sur le trimestre.
+done:
+  - "Chose terminée ce trimestre"
+in_progress:
+  - "Chose en cours"
+next:
+  - "Chose prévue"
+help_wanted:         # optionnel
+  - "Coup de main recherché"
+images:              # optionnel — mêmes règles que pour une édition
+  - src: "/images/point-vacc/2026-q3/capture.png"
+    caption: "Ce que montre la capture"
+```
+
+Les images se téléversent dans `public/images/point-vacc/<slug>/` **avant** de fusionner le brouillon (la validation échoue si une image référencée manque). Après publication de l'édition, les brouillons du trimestre se suppriment — l'Espace Membership le rappelle.
+
 ## Ajouter ou modifier une édition du Point vACC
 
-Créez `content/point-vacc/<slug>.md` — le nom du fichier **doit** être égal au slug (minuscules, chiffres, tirets). Exemple complet :
+L'édition complète est normalement **assemblée par le Head of Membership** à partir des rubriques reçues (outil « Assembler le Point vACC » de l'Espace Membership). Pour l'écrire ou la retoucher à la main : créez `content/point-vacc/<slug>.md` — le nom du fichier **doit** être égal au slug (minuscules, chiffres, tirets). Exemple complet :
 
 ```markdown
 ---
@@ -34,7 +61,7 @@ departments:
       - "…"
 ---
 
-Texte de conclusion optionnel, en markdown, affiché après les sections des pôles.
+Texte de conclusion optionnel, en markdown, affiché après les sections des équipes.
 ```
 
 Règles :
@@ -94,7 +121,7 @@ Un fichier vide (ou ne contenant que des commentaires) est accepté : le site af
 
 ## Journal des sollicitations Membership (statistiques)
 
-En attendant un lien automatique avec Discord, le suivi des sollicitations se fait **à la main** dans `content/membership/tickets-log.yaml`. Ce fichier ne contient **aucune donnée personnelle** : uniquement le pôle concerné et des horodatages. Il alimente le bloc « Statistiques du Membership » de la page Point vACC.
+En attendant un lien automatique avec Discord, le suivi des sollicitations se fait **à la main** dans `content/membership/tickets-log.yaml`. Ce fichier ne contient **aucune donnée personnelle** : uniquement l'équipe concernée et des horodatages. Il alimente le bloc « Statistiques du Membership » de la page Point vACC.
 
 ```yaml
 - id: "2026-06-01-nav"          # unique, en kebab-case

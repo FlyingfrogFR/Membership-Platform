@@ -2,8 +2,8 @@
 // Vite plugin; this module only revives ISO date strings into Date objects and
 // applies display ordering. See src/content-data.d.ts for the wire shape.
 import content from 'virtual:vacc-content'
-import type { Department } from '../config/departments'
-import type { CoordinationEntry, Edition, Need, TicketLogEntry } from './schemas'
+import { sortByDepartmentOrder, type Department } from '../config/departments'
+import type { CoordinationEntry, DepartmentEntry, Edition, Need, TicketLogEntry } from './schemas'
 
 const STATUS_ORDER: Record<Need['status'], number> = { open: 0, filled: 1, closed: 2 }
 
@@ -38,6 +38,16 @@ const coordination: CoordinationEntry[] = content.coordination
   .map((entry) => ({ ...entry, received: entry.received as Department[] }))
   .sort((a, b) => b.month.localeCompare(a.month))
 
+export interface EditionSectionDraft {
+  slug: string
+  section: DepartmentEntry
+}
+
+const editionDrafts: EditionSectionDraft[] = content.editionDrafts.map((draft) => ({
+  slug: draft.slug,
+  section: { ...draft.section, name: draft.section.name as Department },
+}))
+
 export function getEditions(): Edition[] {
   return editions
 }
@@ -56,4 +66,16 @@ export function getTicketLog(): TicketLogEntry[] {
 
 export function getCoordination(): CoordinationEntry[] {
   return coordination
+}
+
+export function getEditionDrafts(): EditionSectionDraft[] {
+  return editionDrafts
+}
+
+// Sections received for one edition, in official team display order.
+export function getDraftSections(slug: string): DepartmentEntry[] {
+  return sortByDepartmentOrder(
+    editionDrafts.filter((draft) => draft.slug === slug).map((draft) => draft.section),
+    (section) => section.name,
+  )
 }

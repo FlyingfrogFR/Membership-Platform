@@ -6,7 +6,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { fr } from './src/i18n/fr'
 import { loadYamlDocument, parseFrontmatter } from './src/lib/frontmatter'
-import { coordinationFileSchema, editionSchema, needsFileSchema, ticketLogFileSchema } from './src/lib/schemas'
+import { coordinationFileSchema, editionSchema, editionSectionFileSchema, needsFileSchema, ticketLogFileSchema } from './src/lib/schemas'
 
 // Parses and validates everything under /content at BUILD time and serves it to
 // the app as plain JSON via a virtual module. The browser therefore never ships
@@ -26,6 +26,23 @@ function vaccContent(): Plugin {
         return { ...editionSchema.parse(data), body }
       },
     )
+    const draftsRoot = path.join(editionsDir, 'drafts')
+    const editionDrafts = (
+      existsSync(draftsRoot)
+        ? readdirSync(draftsRoot, { withFileTypes: true })
+            .filter((entry) => entry.isDirectory())
+            .map((entry) => entry.name)
+            .sort()
+        : []
+    ).flatMap((slug) =>
+      readdirSync(path.join(draftsRoot, slug))
+        .filter((file) => file.endsWith('.yaml'))
+        .sort()
+        .map((file) => ({
+          slug,
+          section: editionSectionFileSchema.parse(loadYamlDocument(readFileSync(path.join(draftsRoot, slug, file), 'utf8'))),
+        })),
+    )
     const needs = needsFileSchema.parse(loadYamlDocument(readFileSync(path.join(root, 'content/contribuer/needs.yaml'), 'utf8')))
     const tickets = ticketLogFileSchema.parse(
       loadYamlDocument(readFileSync(path.join(root, 'content/membership/tickets-log.yaml'), 'utf8')),
@@ -34,7 +51,7 @@ function vaccContent(): Plugin {
     const coordination = existsSync(coordinationFile)
       ? coordinationFileSchema.parse(loadYamlDocument(readFileSync(coordinationFile, 'utf8')))
       : []
-    return `export default ${JSON.stringify({ editions, needs, tickets, coordination })}`
+    return `export default ${JSON.stringify({ editions, editionDrafts, needs, tickets, coordination })}`
   }
 
   return {

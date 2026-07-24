@@ -172,16 +172,19 @@ export const fr = {
       'Un compte GitHub suffit : le contenu est copié automatiquement, l’éditeur s’ouvre (pré-rempli quand c’est possible — sinon collez), puis « Propose changes » crée la proposition que le Membership relit et publie.',
     discordAlt: 'Pas de compte GitHub ? Copiez le résultat et envoyez-le au Membership sur Discord — ça marche aussi très bien.',
     errorsHeading: 'À compléter avant envoi :',
+    draft: {
+      autosave: 'Vos saisies sont enregistrées automatiquement sur cet appareil — vous pouvez fermer la page et revenir plus tard.',
+      restored: 'Brouillon précédent restauré.',
+      reset: 'Repartir de zéro',
+    },
     edition: {
       title: 'Contribution au Point vACC',
-      help: 'Remplissez uniquement les rubriques de votre équipe — les rubriques vides n’apparaissent pas dans l’édition.',
+      help: 'Chaque équipe remplit sa rubrique et l’envoie séparément — le Head of Membership assemble ensuite l’édition complète. Ouvrez votre équipe : dès que sa rubrique contient quelque chose, le bloc d’envoi apparaît dessous.',
       quarter: 'Trimestre',
       year: 'Année',
-      editionTitle: 'Titre de l’édition',
-      published: 'Date de publication',
-      intro: 'Introduction (mot du Head of Membership)',
       departments: 'Rubriques par équipe',
-      body: 'Mot de la fin (optionnel, markdown)',
+      sectionSendTitle: (team: string) => `Envoyer la rubrique ${team}`,
+      sectionEmptyHint: 'Ajoutez au moins une ligne, une image ou un commentaire pour pouvoir envoyer cette rubrique.',
       notesLabel: 'Commentaire libre (optionnel)',
       notesHint: 'Quelques phrases si les puces ne suffisent pas — markdown accepté. Affiché en tête de la rubrique de l’équipe.',
       notesPlaceholder: 'Le mot de l’équipe sur ce trimestre…',
@@ -193,13 +196,9 @@ export const fr = {
       removeImage: 'Retirer l’image',
       uploadTitle: (n: number) => (n === 1 ? '1 image à téléverser' : `${n} images à téléverser`),
       uploadHelp:
-        'Les fichiers ne partent pas de cette page. Étape 1 : téléversez-les tels quels sur GitHub (glisser-déposer, bouton ci-dessous). Étape 2 : créez le fichier de l’édition. La validation échoue si une image référencée manque — une édition cassée ne peut pas partir en ligne.',
+        'Les fichiers ne partent pas de cette page. Étape 1 : téléversez-les tels quels sur GitHub (glisser-déposer, bouton ci-dessous). Étape 2 : créez le fichier de la rubrique. La validation échoue si une image référencée manque — une rubrique cassée ne peut pas partir en ligne.',
       uploadCta: 'Téléverser les images sur GitHub',
-      errTitle: 'Le titre de l’édition est requis.',
-      errIntro: 'L’introduction est requise.',
-      errPublished: 'La date de publication est requise.',
       errYear: 'L’année doit être comprise entre 2020 et 2100.',
-      errNoItems: 'Ajoutez au moins une ligne (ou une image) dans au moins une équipe.',
     },
     need: {
       title: 'Nouveau besoin ou poste',
@@ -235,7 +234,7 @@ export const fr = {
     needsOther: 'Pourvus / clos',
     tickets: 'Sollicitations enregistrées',
     quickTitle: 'Raccourcis',
-    quickNewEdition: 'Composer une édition',
+    quickNewEdition: 'Composer une rubrique du Point vACC',
     quickNewNeed: 'Composer un besoin ou un poste',
     quickEditNeeds: 'Modifier le tableau Contribuer (needs.yaml)',
     quickEditLog: 'Modifier le journal des sollicitations',
@@ -273,6 +272,10 @@ export const fr = {
       logEmpty: 'Le journal des sollicitations est vide — pensez à enregistrer les sollicitations reçues.',
       sampleData: 'Des données d’exemple (préfixe « exemple- ») sont encore présentes.',
       discordPlaceholder: 'Le lien Discord pointe encore vers vatsim.fr (placeholder à remplacer).',
+      draftsLeftover: (slug: string, n: number) =>
+        n === 1
+          ? `1 brouillon de rubrique traîne encore pour l’édition ${slug}, déjà publiée — à supprimer.`
+          : `${n} brouillons de rubrique traînent encore pour l’édition ${slug}, déjà publiée — à supprimer.`,
     },
     cockpit: {
       title: 'Point vACC — pilotage',
@@ -283,7 +286,7 @@ export const fr = {
       steps: {
         call: 'Lancer l’appel aux référents',
         chase: 'Relancer les équipes manquantes',
-        assemble: 'Assembler l’édition via Proposer',
+        assemble: 'Assembler l’édition (outil ci-dessous)',
         publish: 'Publier, puis « Copier pour Discord » et poster',
       },
       matrixTitle: 'Participation par équipe',
@@ -295,6 +298,26 @@ export const fr = {
       relanceHelp: 'Un clic copie un message prêt à coller en message privé Discord au référent de l’équipe.',
       relanceQuarter: (team: string, label: string, date: string, origin: string) =>
         `Salut ! 👋 Le Point vACC ${label} doit partir le ${date}, et il manque encore la rubrique **${team}**. Trois puces suffisent (fait / en cours / à venir) — ou remplis directement le formulaire : ${origin}/proposer (mot de passe équipe). Merci ! 🙏`,
+    },
+    assemble: {
+      title: 'Assembler le Point vACC',
+      help: 'Les rubriques envoyées par les équipes via « Proposer du contenu » apparaissent ici une fois leurs propositions fusionnées sur GitHub. Une rubrique arrivée par Discord ? Créez-la vous-même via le formulaire. Complétez l’introduction, puis générez le fichier de l’édition.',
+      received: 'Rubriques reçues',
+      missing: 'Rubriques manquantes',
+      none: (label: string) => `Aucune rubrique reçue pour ${label} pour le moment.`,
+      editionTitle: 'Titre de l’édition',
+      published: 'Date de publication',
+      intro: 'Introduction (mot du Head of Membership)',
+      body: 'Mot de la fin (optionnel, markdown)',
+      errTitle: 'Le titre de l’édition est requis.',
+      errIntro: 'L’introduction est requise.',
+      errPublished: 'La date de publication est requise.',
+      errNoSections: 'Aucune rubrique reçue pour cette édition — le fichier serait vide.',
+      alreadyPublished: (label: string) => `L’édition ${label} est déjà publiée — vérifiez le trimestre sélectionné.`,
+      cleanupTitle: 'Après publication',
+      cleanupText:
+        'Supprimez les fichiers de brouillon de cette édition pour garder le dépôt propre — une alerte le rappellera sinon.',
+      cleanupCta: 'Ouvrir le dossier des brouillons',
     },
     needsExport: {
       title: 'Contribuer — export Discord',

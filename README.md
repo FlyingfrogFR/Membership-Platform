@@ -5,23 +5,24 @@ Plateforme du pôle Membership de la vACC France (VATSIM France). Un site public
 1. **Visibilité** — le **Point vACC**, un digest trimestriel de l'avancement de chaque pôle.
 2. **Contact** — une porte d'entrée clairement identifiée (les tickets restent sur Discord, catégorie « Membership »).
 3. **Contribution** — le tableau **Contribuer** : postes ouverts et besoins ponctuels, toujours à jour.
-4. **Coordination** — des points mensuels asynchrones avec les chefs de pôle (phase 2, privé).
+4. **Coordination** — des points mensuels asynchrones avec les référents d'équipe (phase 2, privé).
 
 Tout le contenu vit dans ce dépôt sous forme de fichiers (`/content`) : publier = fusionner sur `main`. Pas de base de données, pas de serveur.
 
-## Proposer du contenu aujourd'hui (chefs de pôle)
+## Proposer du contenu aujourd'hui (référents d'équipe)
 
 Trois façons de faire, de la plus simple à la plus directe :
 
-1. **Le formulaire** : la page **`/proposer`** du site génère le contenu au bon format (contribution au Point vACC ou besoin/poste) — un clic ouvre GitHub pré-rempli pour créer la proposition, ou copiez le résultat et envoyez-le au Head of Membership sur Discord.
+1. **Le formulaire** : la page **`/proposer`** du site génère le contenu au bon format — un clic ouvre GitHub pré-rempli pour créer la proposition, ou copiez le résultat et envoyez-le au Head of Membership sur Discord. Pour le Point vACC, **chaque équipe envoie sa rubrique séparément** (un petit fichier de brouillon sous `content/point-vacc/drafts/`) sans attendre les autres ; le Head of Membership assemble ensuite l'édition complète. Les saisies sont **enregistrées automatiquement dans le navigateur** : on peut fermer la page et reprendre plus tard.
 2. **Le message** : envoyez votre texte brut au Head of Membership (ticket Discord catégorie « Membership », ou message direct). Il le met en forme et l'intègre.
 3. **La pull request à la main** : modifiez directement les fichiers de `/content` — le format exact est décrit dans [CONTRIBUTING.md](CONTRIBUTING.md). La validation tourne sur chaque PR : si le format n'est pas bon, la PR le signale avant publication.
 
-Dans tous les cas, le Head of Membership relit et harmonise le ton avant publication. La page **`/admin`** lui sert de tableau de bord : **alertes** (besoins qui vieillissent, journal muet, édition en retard, données d'exemple restantes), **pilotage du Point vACC** (compte à rebours de la prochaine édition, checklist datée, matrice de participation par équipe, messages de relance prêts à coller), **export Discord du tableau Contribuer**, **suivi Coordination** (points mensuels reçus par équipe + relances), **indicateurs KPI** (trimestre vs trimestre, export markdown, tendances) et enregistrement des sollicitations. Ces pages ne stockent rien : les droits réels restent ceux de GitHub.
+Dans tous les cas, le Head of Membership relit et harmonise le ton avant publication. La page **`/admin`** lui sert de tableau de bord : **alertes** (besoins qui vieillissent, journal muet, édition en retard, brouillons oubliés, données d'exemple restantes), **pilotage du Point vACC** (compte à rebours de la prochaine édition, checklist datée, matrice de participation par équipe, messages de relance prêts à coller), **assemblage de l'édition** à partir des rubriques reçues, **export Discord du tableau Contribuer**, **suivi Coordination** (points mensuels reçus par équipe + relances), **indicateurs KPI** (trimestre vs trimestre, export markdown, tendances) et enregistrement des sollicitations. Ces pages ne stockent rien : les droits réels restent ceux de GitHub.
 
 ## Structure du contenu
 
-- `content/point-vacc/<slug>.md` — une édition du Point vACC par fichier (frontmatter YAML : intro du HoM + une section par pôle : fait / en cours / à venir / coup de main recherché).
+- `content/point-vacc/<slug>.md` — une édition du Point vACC par fichier (frontmatter YAML : intro du HoM + une section par équipe : fait / en cours / à venir / coup de main recherché).
+- `content/point-vacc/drafts/<slug>/<équipe>.yaml` — les rubriques envoyées par les équipes pour une édition à venir, en attente d'assemblage par le HoM (à supprimer après publication — une alerte de l'Espace Membership le rappelle).
 - `content/contribuer/needs.yaml` — le tableau Contribuer : un tableau d'items (`poste` ou `ponctuel`).
 - `content/membership/tickets-log.yaml` — journal manuel et **anonyme** des sollicitations Membership (équipe + horodatages, aucune donnée personnelle). Alimente les statistiques par équipe affichées sur la page Point vACC, en attendant l'accord pour un lien automatique avec Discord.
 - `content/membership/coordination.yaml` — suivi du pilier Coordination : quelles équipes ont envoyé leur point mensuel (**booléens et dates uniquement** — jamais le contenu des points, qui reste privé).
