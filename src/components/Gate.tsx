@@ -1,6 +1,8 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
+import { oidcConfig, ssoEnabled } from '../config/auth'
 import { fr } from '../i18n/fr'
 import { GATE_HASHES, isUnlocked, rememberUnlock, sha256Hex, type GateKind } from '../lib/gate'
+import { beginLogin } from '../lib/oidc'
 import { Field, inputClass } from './ComposerBits'
 
 export function Gate({ kind, children }: { kind: GateKind; children: ReactNode }) {
@@ -23,6 +25,7 @@ function GateForm({ kind, onUnlock }: { kind: GateKind; onUnlock: () => void }) 
   const t = fr.gate
   const [password, setPassword] = useState('')
   const [error, setError] = useState(false)
+  const [ssoError, setSsoError] = useState(false)
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault()
@@ -36,10 +39,34 @@ function GateForm({ kind, onUnlock }: { kind: GateKind; onUnlock: () => void }) 
     }
   }
 
+  async function onSso() {
+    try {
+      const url = await beginLogin(oidcConfig(), window.location.pathname)
+      window.location.assign(url)
+    } catch {
+      setSsoError(true)
+    }
+  }
+
   return (
     <div className="mx-auto max-w-md py-10">
       <h1 className="text-3xl font-extrabold tracking-tight">{t.title}</h1>
       <p className="mt-3 leading-relaxed text-ink-soft">{kind === 'admin' ? t.adminText : t.teamText}</p>
+      {ssoEnabled() && (
+        <div className="mt-6">
+          <button type="button" onClick={() => void onSso()} className="btn btn-primary w-full">
+            {t.sso}
+          </button>
+          {ssoError && (
+            <p role="alert" className="mt-3 text-sm font-bold text-warn">
+              {t.ssoError}
+            </p>
+          )}
+          <p aria-hidden="true" className="mt-4 text-center text-xs font-bold text-ink-soft/70 uppercase">
+            {t.or}
+          </p>
+        </div>
+      )}
       <form onSubmit={(event) => void onSubmit(event)} className="card mt-6 p-6">
         {/* Hidden username so password managers can key the entry correctly. */}
         <input type="text" name="username" autoComplete="username" defaultValue={kind} hidden tabIndex={-1} aria-hidden="true" />

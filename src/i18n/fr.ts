@@ -372,6 +372,17 @@ export const fr = {
     label: 'Mot de passe',
     submit: 'Entrer',
     error: 'Mot de passe incorrect.',
+    sso: 'Se connecter avec VATSIM France',
+    ssoError: 'Connexion VATSIM France indisponible pour le moment — utilisez le mot de passe ci-dessous.',
+    or: 'ou',
+  },
+  auth: {
+    title: 'Connexion',
+    working: 'Connexion en cours…',
+    noRole:
+      'Votre compte VATSIM France est bien connecté, mais aucun accès Membership ne lui est encore associé. Demandez au Head of Membership de vous faire ajouter l’accès référent.',
+    error: (detail: string) => `La connexion a échoué (${detail}). Réessayez, ou utilisez le mot de passe.`,
+    back: 'Retour à l’accueil',
   },
   notFound: {
     title: 'Page introuvable',

@@ -19,6 +19,18 @@ Trois façons de faire, de la plus simple à la plus directe :
 
 Dans tous les cas, le Head of Membership relit et harmonise le ton avant publication. La page **`/admin`** lui sert de tableau de bord : **alertes** (besoins qui vieillissent, journal muet, édition en retard, brouillons oubliés, données d'exemple restantes), **pilotage du Point vACC** (compte à rebours de la prochaine édition, checklist datée, matrice de participation par équipe, messages de relance prêts à coller), **assemblage de l'édition** à partir des rubriques reçues, **export Discord du tableau Contribuer**, **suivi Coordination** (points mensuels reçus par équipe + relances), **indicateurs KPI** (trimestre vs trimestre, export markdown, tendances) et enregistrement des sollicitations. Ces pages ne stockent rien : les droits réels restent ceux de GitHub.
 
+## Connexion VATSIM France (SSO)
+
+Le site sait s'authentifier auprès du broker d'identité de la vACC (`auth.vatsim.fr`, OpenID Connect). Le site étant 100 % statique, il agit comme **client public avec PKCE** : aucun secret, nulle part. Le bouton « Se connecter avec VATSIM France » n'apparaît sur les pages internes que lorsque le client est configuré :
+
+1. Demander à la Digital Team un client OIDC **public** (PKCE S256) dans le realm `frenchvacc_prod`, avec :
+   - redirect URI : `https://<domaine du site>/auth/callback` (+ `http://localhost:5173/auth/callback` pour le dev) ;
+   - web origins (CORS) : l'origine du site (nécessaire pour l'échange de code depuis le navigateur) ;
+   - deux rôles, à assigner aux bonnes personnes : `membership-admin` (Espace Membership + formulaires) et `membership-referent` (formulaires `/proposer`). Rôles de realm ou de client : les deux sont lus.
+2. Renseigner sur Vercel : `VITE_OIDC_CLIENT_ID` (et `VITE_OIDC_ISSUER` si le realm change — défaut : `https://auth.vatsim.fr/realms/frenchvacc_prod`).
+
+À la connexion, le site lit les rôles dans les jetons et déverrouille les pages correspondantes pour la session ; les jetons ne sont pas conservés. Le mot de passe reste disponible en secours (référent sans compte, indisponibilité du broker). Comme pour le reste du site, les droits d'écriture réels restent ceux de GitHub.
+
 ## Structure du contenu
 
 - `content/point-vacc/<slug>.md` — une édition du Point vACC par fichier (frontmatter YAML : intro du HoM + une section par équipe : fait / en cours / à venir / coup de main recherché).
