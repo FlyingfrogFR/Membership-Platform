@@ -15,6 +15,8 @@ export interface OidcConfig {
 export interface LoginResult {
   roles: string[]
   returnTo: string
+  accessToken?: string
+  expiresInSeconds?: number
 }
 
 interface Discovery {
@@ -27,6 +29,30 @@ const VERIFIER_KEY = 'membership-oidc-verifier'
 const STATE_KEY = 'membership-oidc-state'
 const NONCE_KEY = 'membership-oidc-nonce'
 const RETURN_KEY = 'membership-oidc-return'
+const TOKEN_KEY = 'membership-sso-access'
+
+// The access token is kept only for calling our own /api functions during the
+// session; it expires on its own (typically minutes) and never leaves the tab.
+export function storeSsoToken(token: string, expiresInSeconds: number | undefined): void {
+  try {
+    sessionStorage.setItem(TOKEN_KEY, JSON.stringify({ token, exp: Date.now() + 1000 * (expiresInSeconds ?? 300) }))
+  } catch {
+    // Private mode: direct submission will just ask to reconnect.
+  }
+}
+
+export function getSsoToken(): string | null {
+  try {
+    const raw = sessionStorage.getItem(TOKEN_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as { token?: unknown; exp?: unknown }
+    if (typeof parsed.token !== 'string' || typeof parsed.exp !== 'number') return null
+    // 10s of slack so a token never expires mid-request.
+    return parsed.exp - 10_000 > Date.now() ? parsed.token : null
+  } catch {
+    return null
+  }
+}
 
 function base64UrlEncode(bytes: Uint8Array): string {
   let binary = ''
@@ -153,7 +179,7 @@ export async function completeLogin(config: OidcConfig, params: URLSearchParams)
     }),
   })
   if (!response.ok) throw new Error(`token exchange failed (HTTP ${response.status})`)
-  const tokens = (await response.json()) as { access_token?: string; id_token?: string }
+  const tokens = (await response.json()) as { access_token?: string; id_token?: string; expires_in?: number }
   if (!tokens.id_token) throw new Error('missing id_token')
 
   const idClaims = decodeJwtPayload(tokens.id_token)
@@ -166,5 +192,10 @@ export async function completeLogin(config: OidcConfig, params: URLSearchParams)
 
   const accessClaims = tokens.access_token ? decodeJwtPayload(tokens.access_token) : {}
   const roles = [...new Set([...rolesFromClaims(accessClaims, config.clientId), ...rolesFromClaims(idClaims, config.clientId)])]
-  return { roles, returnTo }
+  return {
+    roles,
+    returnTo,
+    accessToken: tokens.access_token,
+    expiresInSeconds: typeof tokens.expires_in === 'number' ? tokens.expires_in : undefined,
+  }
 }

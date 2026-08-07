@@ -71,11 +71,34 @@ function vaccContent(): Plugin {
   }
 }
 
+// Local stand-in for the Vercel functions so the direct-submit UX can be
+// exercised in dev/e2e without GitHub or the SSO (VITE_MOCK_API=1).
+function mockApi(): Plugin {
+  return {
+    name: 'mock-api',
+    configureServer(server) {
+      if (!process.env.VITE_MOCK_API) return
+      for (const route of ['/api/submit-section', '/api/submit-need']) {
+        server.middlewares.use(route, (req, res) => {
+          res.setHeader('Content-Type', 'application/json')
+          if (req.method !== 'POST') {
+            res.statusCode = 405
+            res.end(JSON.stringify({ error: 'method' }))
+            return
+          }
+          res.end(JSON.stringify({ prUrl: 'https://github.com/FlyingfrogFR/Membership-Platform/pull/999' }))
+        })
+      }
+    },
+  }
+}
+
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
     vaccContent(),
+    mockApi(),
     {
       // Keeps the static HTML shell's user-facing strings in src/i18n/fr.ts.
       name: 'inject-i18n-meta',
@@ -86,6 +109,6 @@ export default defineConfig({
   ],
   test: {
     environment: 'node',
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.ts', 'api/**/*.test.ts'],
   },
 })
