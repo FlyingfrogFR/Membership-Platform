@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { DraftBar, ErrorList, Field, inputClass, ListInput, OutputPanel } from '../components/ComposerBits'
+import { DirectSend, DraftBar, ErrorList, Field, inputClass, ListInput, OutputPanel } from '../components/ComposerBits'
 import { Gate } from '../components/Gate'
 import { DEPARTMENTS, type Department } from '../config/departments'
 import { fr } from '../i18n/fr'
@@ -219,7 +219,25 @@ function NeedComposer() {
       </div>
 
       <ErrorList errors={errors} />
-      {yaml && <OutputPanel content={yaml} filePath={NEEDS_FILE_PATH} mode="append" appendHelp={t.appendHelp} />}
+      {yaml && (
+        <>
+          <DirectSend
+            endpoint="/api/submit-need"
+            payload={{
+              id: effectiveId,
+              type: d.type,
+              title: d.title.trim(),
+              department: d.department,
+              description: d.description.trim(),
+              skills: d.skills.filter((skill) => skill.trim()),
+              time_estimate: d.timeEstimate.trim(),
+              contact: d.contact.trim(),
+              posted: d.posted,
+            }}
+          />
+          <OutputPanel content={yaml} filePath={NEEDS_FILE_PATH} mode="append" appendHelp={t.appendHelp} />
+        </>
+      )}
     </section>
   )
 }
@@ -406,6 +424,21 @@ function EditionComposer() {
                       </div>
                     )}
                     <h4 className="text-sm font-extrabold">{t.sectionSendTitle(dept)}</h4>
+                    <DirectSend
+                      endpoint="/api/submit-section"
+                      payload={{
+                        slug,
+                        section: {
+                          name: dept,
+                          notes: section.notes,
+                          done: section.done.filter((line) => line.trim()),
+                          in_progress: section.in_progress.filter((line) => line.trim()),
+                          next: section.next.filter((line) => line.trim()),
+                          help_wanted: section.help_wanted.filter((line) => line.trim()),
+                          images: section.images.filter((img) => img.name.trim()),
+                        },
+                      }}
+                    />
                     <OutputPanel
                       content={composeSectionYaml(slug, { name: dept, ...section })}
                       filePath={editionSectionDraftPath(slug, dept)}

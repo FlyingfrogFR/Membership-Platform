@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { AUTH, oidcConfig } from '../config/auth'
 import { fr } from '../i18n/fr'
 import { rememberUnlock } from '../lib/gate'
-import { completeLogin, type LoginResult } from '../lib/oidc'
+import { completeLogin, storeSsoToken, type LoginResult } from '../lib/oidc'
 import { usePageTitle } from '../lib/usePageTitle'
 
 // The authorization code is single-use and the state is consumed on first
@@ -22,6 +22,9 @@ export function AuthCallback() {
     exchange ??= completeLogin(oidcConfig(), new URLSearchParams(window.location.search))
     exchange
       .then((result) => {
+        if (result.accessToken) storeSsoToken(result.accessToken, result.expiresInSeconds)
+        // Any successful VATSIM France login grants member-level access.
+        rememberUnlock('member', false)
         if (result.roles.includes(AUTH.roles.admin)) {
           rememberUnlock('admin', true)
         } else if (result.roles.includes(AUTH.roles.referent)) {

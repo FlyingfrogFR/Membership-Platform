@@ -29,7 +29,21 @@ Le site sait s'authentifier auprès du broker d'identité de la vACC (`auth.vats
    - deux rôles, à assigner aux bonnes personnes : `membership-admin` (Espace Membership + formulaires) et `membership-referent` (formulaires `/proposer`). Rôles de realm ou de client : les deux sont lus.
 2. Renseigner sur Vercel : `VITE_OIDC_CLIENT_ID` (et `VITE_OIDC_ISSUER` si le realm change — défaut : `https://auth.vatsim.fr/realms/frenchvacc_prod`).
 
-À la connexion, le site lit les rôles dans les jetons et déverrouille les pages correspondantes pour la session ; les jetons ne sont pas conservés. Le mot de passe reste disponible en secours (référent sans compte, indisponibilité du broker). Comme pour le reste du site, les droits d'écriture réels restent ceux de GitHub.
+À la connexion, le site lit les rôles dans les jetons et déverrouille les pages correspondantes pour la session. Le mot de passe reste disponible en secours (référent sans compte, indisponibilité du broker). Un troisième niveau `member` existe côté code (tout compte VATSIM France connecté, sans rôle) — aucune page ne l'utilise encore.
+
+### Envoi direct depuis les formulaires (fonctions serverless)
+
+En complément du SSO, deux fonctions Vercel (`api/submit-section.ts`, `api/submit-need.ts`) permettent aux référents connectés d'envoyer leur rubrique ou un besoin **en un clic, sans compte GitHub** : la fonction vérifie cryptographiquement le jeton VATSIM France (signature JWKS, émetteur, rôle Membership), compose le fichier au bon format et **ouvre elle-même la pull request** que le Head of Membership relit — puis prévient sur Discord si un webhook est configuré. Rien n'est stocké côté serveur : le dépôt reste la seule source de vérité.
+
+Variables d'environnement Vercel :
+
+- `GITHUB_BOT_TOKEN` (**requis**) : un fine-grained PAT limité à ce dépôt, permissions *Contents: Read and write* et *Pull requests: Read and write* ;
+- `VITE_DIRECT_SUBMIT=1` (**requis**) : affiche les boutons « Envoyer directement au Membership » (le SSO doit aussi être configuré) ;
+- `GITHUB_REPO` (optionnel, défaut : ce dépôt) ;
+- `DISCORD_WEBHOOK_URL` (optionnel) : webhook d'un canal staff à prévenir à chaque envoi ;
+- `OIDC_ISSUER` / `OIDC_CLIENT_ID` (optionnels, défaut : les valeurs `VITE_…`).
+
+Sans ces variables, les fonctions répondent 503, les boutons n'apparaissent pas, et le site reste 100 % statique.
 
 ## Structure du contenu
 
@@ -58,7 +72,7 @@ npm run preview    # sert le build de production en local
 
 ## Architecture
 
-- **React + Vite + TypeScript + Tailwind CSS**, sortie 100 % statique.
+- **React + Vite + TypeScript + Tailwind CSS**, sortie 100 % statique — plus deux fonctions serverless optionnelles (`/api`) pour l'envoi direct, inactives tant que leurs variables d'environnement ne sont pas posées.
 - Le contenu est chargé **au build** depuis `/content` (frontmatter YAML + `js-yaml`), validé par des schémas Zod partagés entre l'app et le script de validation (`src/lib/schemas.ts`).
 - La logique métier (parsing, export Discord, formats) vit dans `src/lib`, les composants sont autonomes, les couleurs dans un seul fichier de thème (`src/index.css`) et toutes les chaînes d'interface dans `src/i18n/fr.ts` — pour pouvoir, à terme, intégrer ces pages à vatsim.fr sans tout réécrire.
 - Export Discord : sur chaque édition, « Copier pour Discord » produit une version markdown Discord de l'édition, découpée en messages numérotés sous la limite des 2000 caractères.

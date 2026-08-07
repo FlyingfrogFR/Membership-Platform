@@ -172,6 +172,15 @@ export const fr = {
       'Un compte GitHub suffit : le contenu est copié automatiquement, l’éditeur s’ouvre (pré-rempli quand c’est possible — sinon collez), puis « Propose changes » crée la proposition que le Membership relit et publie.',
     discordAlt: 'Pas de compte GitHub ? Copiez le résultat et envoyez-le au Membership sur Discord — ça marche aussi très bien.',
     errorsHeading: 'À compléter avant envoi :',
+    direct: {
+      send: 'Envoyer directement au Membership',
+      sending: 'Envoi en cours…',
+      sentTitle: 'Envoyé ! Le Membership relit et publie.',
+      viewPr: 'Suivre la proposition sur GitHub',
+      expired: 'Session VATSIM France expirée ou absente — reconnectez-vous pour envoyer en un clic.',
+      reconnect: 'Se reconnecter',
+      error: (detail: string) => `L’envoi direct a échoué (${detail}). Réessayez, ou utilisez les boutons ci-dessous.`,
+    },
     draft: {
       autosave: 'Vos saisies sont enregistrées automatiquement sur cet appareil — vous pouvez fermer la page et revenir plus tard.',
       restored: 'Brouillon précédent restauré.',
@@ -372,6 +381,8 @@ export const fr = {
     label: 'Mot de passe',
     submit: 'Entrer',
     error: 'Mot de passe incorrect.',
+    memberText:
+      'Cette page est réservée aux membres de la vACC France. Connectez-vous avec votre compte VATSIM France pour continuer.',
     sso: 'Se connecter avec VATSIM France',
     ssoError: 'Connexion VATSIM France indisponible pour le moment — utilisez le mot de passe ci-dessous.',
     or: 'ou',

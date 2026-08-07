@@ -1,6 +1,8 @@
 import { useState, type ReactNode } from 'react'
+import { directSubmitEnabled, oidcConfig } from '../config/auth'
 import { fr } from '../i18n/fr'
 import { githubEditFileUrl, githubNewFileUrl } from '../lib/compose'
+import { beginLogin, getSsoToken } from '../lib/oidc'
 
 export function Field({ label, htmlFor, children, hint }: { label: string; htmlFor: string; children: ReactNode; hint?: string }) {
   return (
@@ -149,6 +151,97 @@ export function OutputPanel({
       </p>
       <p className="mt-3 max-w-2xl text-xs leading-relaxed text-ink-soft">{fr.compose.githubHelp}</p>
       <p className="mt-1 max-w-2xl text-xs leading-relaxed text-ink-soft">{fr.compose.discordAlt}</p>
+    </div>
+  )
+}
+
+// One-click submission through the serverless functions: the function opens
+// the GitHub proposal itself (no GitHub account needed) and pings the HoM on
+// Discord. Renders nothing until VITE_DIRECT_SUBMIT + the SSO are configured.
+export function DirectSend({ endpoint, payload }: { endpoint: string; payload: unknown }) {
+  const t = fr.compose.direct
+  const [state, setState] = useState<'idle' | 'sending' | 'done' | 'expired' | 'error'>('idle')
+  const [prUrl, setPrUrl] = useState('')
+  const [detail, setDetail] = useState('')
+
+  if (!directSubmitEnabled()) return null
+
+  async function onSend() {
+    const token = getSsoToken()
+    if (!token) {
+      setState('expired')
+      return
+    }
+    setState('sending')
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(payload),
+      })
+      if (response.status === 401) {
+        setState('expired')
+        return
+      }
+      if (!response.ok) {
+        const body = (await response.json().catch(() => ({}))) as { error?: string }
+        setDetail(body.error ?? `HTTP ${response.status}`)
+        setState('error')
+        return
+      }
+      const body = (await response.json()) as { prUrl?: string }
+      setPrUrl(body.prUrl ?? '')
+      setState('done')
+    } catch {
+      setDetail('réseau')
+      setState('error')
+    }
+  }
+
+  async function onReconnect() {
+    try {
+      const url = await beginLogin(oidcConfig(), window.location.pathname)
+      window.location.assign(url)
+    } catch {
+      setDetail('SSO')
+      setState('error')
+    }
+  }
+
+  if (state === 'done') {
+    return (
+      <div className="mt-6 rounded-xl bg-ok-soft p-4 text-sm" role="status">
+        <p className="font-bold text-ok">{t.sentTitle}</p>
+        {prUrl && (
+          <a href={prUrl} target="_blank" rel="noreferrer" className="mt-1 inline-block font-bold text-accent hover:text-accent-strong">
+            {t.viewPr} ↗
+          </a>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <div className="mt-6">
+      {state === 'expired' ? (
+        <div className="rounded-xl bg-warn-soft p-4 text-sm">
+          <p className="text-warn">{t.expired}</p>
+          <button type="button" onClick={() => void onReconnect()} className="btn btn-secondary mt-3">
+            {t.reconnect}
+          </button>
+        </div>
+      ) : (
+        <>
+          <button type="button" onClick={() => void onSend()} disabled={state === 'sending'} className="btn btn-primary">
+            {state === 'sending' ? t.sending : t.send}
+          </button>
+          {state === 'error' && (
+            <p role="alert" className="mt-3 text-sm font-bold text-warn">
+              {t.error(detail)}
+            </p>
+          )}
+        </>
+      )}
     </div>
   )
 }

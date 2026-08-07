@@ -51,7 +51,9 @@ function GateForm({ kind, onUnlock }: { kind: GateKind; onUnlock: () => void }) 
   return (
     <div className="mx-auto max-w-md py-10">
       <h1 className="text-3xl font-extrabold tracking-tight">{t.title}</h1>
-      <p className="mt-3 leading-relaxed text-ink-soft">{kind === 'admin' ? t.adminText : t.teamText}</p>
+      <p className="mt-3 leading-relaxed text-ink-soft">
+        {kind === 'admin' ? t.adminText : kind === 'team' ? t.teamText : t.memberText}
+      </p>
       {ssoEnabled() && (
         <div className="mt-6">
           <button type="button" onClick={() => void onSso()} className="btn btn-primary w-full">

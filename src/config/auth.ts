@@ -7,16 +7,25 @@
 // To activate: ask the Digital Team for a public client (PKCE S256) with
 // redirect URI <origin>/auth/callback, then set VITE_OIDC_CLIENT_ID in Vercel.
 // The two roles below are read from the tokens (realm or client roles).
+import { ROLE_ADMIN, ROLE_REFERENT } from './roles'
+
 export const AUTH = {
   issuer: (import.meta.env.VITE_OIDC_ISSUER as string | undefined) || 'https://auth.vatsim.fr/realms/frenchvacc_prod',
   clientId: (import.meta.env.VITE_OIDC_CLIENT_ID as string | undefined) || '',
   scope: 'openid profile',
   redirectPath: '/auth/callback',
-  roles: { admin: 'membership-admin', referent: 'membership-referent' },
+  roles: { admin: ROLE_ADMIN, referent: ROLE_REFERENT },
 } as const
 
 export function ssoEnabled(): boolean {
   return AUTH.clientId !== ''
+}
+
+// One-click submission through the serverless functions (/api/submit-*).
+// Needs the SSO (Bearer token) plus the server-side env vars documented in
+// the README; VITE_DIRECT_SUBMIT=1 turns the buttons on once both exist.
+export function directSubmitEnabled(): boolean {
+  return ssoEnabled() && (import.meta.env.VITE_DIRECT_SUBMIT as string | undefined) === '1'
 }
 
 export function oidcConfig() {
