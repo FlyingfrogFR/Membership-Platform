@@ -13,6 +13,7 @@ import { PointVaccList } from './pages/PointVaccList'
 const PointVaccEdition = lazy(() => import('./pages/PointVaccEdition').then((m) => ({ default: m.PointVaccEdition })))
 const Proposer = lazy(() => import('./pages/Proposer').then((m) => ({ default: m.Proposer })))
 const Admin = lazy(() => import('./pages/Admin').then((m) => ({ default: m.Admin })))
+const AuthCallback = lazy(() => import('./pages/AuthCallback').then((m) => ({ default: m.AuthCallback })))
 
 function RouteChange() {
   const { pathname } = useLocation()
@@ -44,6 +45,7 @@ export default function App() {
             <Route path="/a-propos" element={<APropos />} />
             <Route path="/proposer" element={<Proposer />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
