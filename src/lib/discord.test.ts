@@ -10,8 +10,8 @@ function makeEdition(overrides: Partial<Edition> = {}): Edition {
     intro: 'Un trimestre bien rempli.',
     body: '',
     departments: [
-      { name: 'Event Team', done: ['Real Ops Paris'], in_progress: [], next: [], help_wanted: [], images: [] },
-      { name: 'Nav Team', done: ['Cartes LFPG publiées'], in_progress: ['Doc LFLL'], next: [], help_wanted: [], images: [] },
+      { name: 'Events', done: ['Real Ops Paris'], in_progress: [], next: [], help_wanted: [], images: [] },
+      { name: 'Ops & Nav', done: ['Cartes LFPG publiées'], in_progress: ['Doc LFLL'], next: [], help_wanted: [], images: [] },
     ],
     ...overrides,
   }
@@ -23,28 +23,28 @@ describe('formatEditionForDiscord', () => {
     expect(chunks).toHaveLength(1)
     expect(chunks[0]).not.toContain('(message')
     expect(chunks[0]).toContain('**📍 Point vACC — T2 2026**')
-    expect(chunks[0]).toContain('**Nav Team**')
+    expect(chunks[0]).toContain('**Ops & Nav**')
     expect(chunks[0]).toContain('✅ Fait :')
     expect(chunks[0]).toContain('- Cartes LFPG publiées')
   })
 
   it('orders departments by the configured display order, not file order', () => {
     const [chunk] = formatEditionForDiscord(makeEdition())
-    expect(chunk.indexOf('**Nav Team**')).toBeLessThan(chunk.indexOf('**Event Team**'))
+    expect(chunk.indexOf('**Ops & Nav**')).toBeLessThan(chunk.indexOf('**Events**'))
   })
 
   it('omits empty sections and empty departments', () => {
     const chunks = formatEditionForDiscord(
       makeEdition({
         departments: [
-          { name: 'Nav Team', done: ['Une seule chose'], in_progress: [], next: [], help_wanted: [], images: [] },
-          { name: 'Doc Team', done: [], in_progress: [], next: [], help_wanted: [], images: [] },
+          { name: 'Ops & Nav', done: ['Une seule chose'], in_progress: [], next: [], help_wanted: [], images: [] },
+          { name: 'Training Department', done: [], in_progress: [], next: [], help_wanted: [], images: [] },
         ],
       }),
     )
     expect(chunks[0]).not.toContain('🔜')
     expect(chunks[0]).not.toContain('🙋')
-    expect(chunks[0]).not.toContain('**Doc Team**')
+    expect(chunks[0]).not.toContain('**Training Department**')
   })
 
   it('includes the markdown body when present', () => {
@@ -57,8 +57,8 @@ describe('formatEditionForDiscord', () => {
       makeEdition({
         departments: [
           {
-            name: 'Nav Team',
-            notes: 'Gros trimestre pour la Nav Team.',
+            name: 'Ops & Nav',
+            notes: 'Gros trimestre pour Ops & Nav.',
             done: ['Cartes publiées'],
             in_progress: [],
             next: [],
@@ -69,15 +69,15 @@ describe('formatEditionForDiscord', () => {
       }),
     )
     const chunk = chunks[0]
-    expect(chunk).toContain('Gros trimestre pour la Nav Team.')
-    expect(chunk.indexOf('**Nav Team**')).toBeLessThan(chunk.indexOf('Gros trimestre'))
+    expect(chunk).toContain('Gros trimestre pour Ops & Nav.')
+    expect(chunk.indexOf('**Ops & Nav**')).toBeLessThan(chunk.indexOf('Gros trimestre'))
     expect(chunk.indexOf('Gros trimestre')).toBeLessThan(chunk.indexOf('✅ Fait :'))
   })
 
   it('splits long editions into numbered chunks under the Discord limit', () => {
     const longItems = Array.from({ length: 30 }, (_, i) => `Élément numéro ${i} — ${'x'.repeat(80)}`)
     const edition = makeEdition({
-      departments: (['Nav Team', 'Doc Team', 'Event Team', 'Digital Team'] as const).map((name) => ({
+      departments: (['Ops & Nav', 'Training Department', 'Events', 'Digital'] as const).map((name) => ({
         name,
         done: longItems,
         in_progress: [],
@@ -97,7 +97,7 @@ describe('formatEditionForDiscord', () => {
   it('keeps every line of a long edition', () => {
     const items = Array.from({ length: 60 }, (_, i) => `Ligne ${i}`)
     const edition = makeEdition({
-      departments: [{ name: 'Nav Team', done: items, in_progress: [], next: [], help_wanted: [], images: [] }],
+      departments: [{ name: 'Ops & Nav', done: items, in_progress: [], next: [], help_wanted: [], images: [] }],
     })
     const joined = formatEditionForDiscord(edition).join('\n')
     for (const item of items) expect(joined).toContain(`- ${item}`)
@@ -110,7 +110,7 @@ describe('formatNeedsForDiscord', () => {
       id: 'nav-relecture',
       type: 'ponctuel',
       title: 'Relecture LFPG',
-      department: 'Nav Team',
+      department: 'Ops & Nav',
       description: 'Relire la doc avant publication.',
       skills: [],
       time_estimate: '2–3 h',
@@ -122,10 +122,10 @@ describe('formatNeedsForDiscord', () => {
       id: 'event-affiche',
       type: 'ponctuel',
       title: 'Affiche de rentrée',
-      department: 'Event Team',
+      department: 'Events',
       description: 'Créer l’affiche.',
       skills: [],
-      contact: 'Référent Event Team',
+      contact: 'Référent Events',
       status: 'open',
       posted: new Date('2026-07-02'),
     },
@@ -133,7 +133,7 @@ describe('formatNeedsForDiscord', () => {
       id: 'doc-pourvu',
       type: 'poste',
       title: 'Relecteur SOP',
-      department: 'Doc Team',
+      department: 'Training Department',
       description: 'x',
       skills: [],
       contact: 'x',
@@ -144,10 +144,10 @@ describe('formatNeedsForDiscord', () => {
 
   it('groups open needs by team in config order with a footer link', () => {
     const [chunk] = formatNeedsForDiscord(needs, 'https://exemple.fr')
-    expect(chunk).toContain('**Nav Team**')
+    expect(chunk).toContain('**Ops & Nav**')
     expect(chunk).toContain('- **Relecture LFPG** · 2–3 h')
     expect(chunk).toContain('📩 Ticket Membership')
-    expect(chunk.indexOf('**Nav Team**')).toBeLessThan(chunk.indexOf('**Event Team**'))
+    expect(chunk.indexOf('**Ops & Nav**')).toBeLessThan(chunk.indexOf('**Events**'))
     expect(chunk).toContain('https://exemple.fr/contribuer')
   })
 

@@ -1,16 +1,17 @@
 // Single source of truth for the team list and its display order, aligned with
-// the official vACC document "Fonctionnement des équipes". CDM/CPDLC tooling
-// sits under the Digital Team and ATC training under the Training Department —
-// they are not separate teams. "Membership" is not in that document: it is
-// added here at the HoM's request so Membership-addressed tickets and content
-// can be categorized. Update only when the official document changes.
+// the official page « Organisation et rôles dans la vACC » (doc.vatsim.fr,
+// section Général). Ops & Nav covers both operations (LOAs, SOPs, controller
+// documentation) and navigation (sector files, external tools such as CDM or
+// vSID); Digital owns the web platforms, infrastructure and internal tools
+// (CoFrance v2, Ramp Agent…); Membership is part of the official organization
+// (quarterly visibility, Discord tickets, member conflict resolution). Update
+// only when the official page changes.
 export const DEPARTMENTS = [
-  'Nav Team',
-  'Doc Team',
-  'Event Team',
-  'Digital Team',
-  'Training Department',
   'vACC Directors',
+  'Ops & Nav',
+  'Training Department',
+  'Digital',
+  'Events',
   'Membership',
 ] as const
 

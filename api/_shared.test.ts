@@ -52,7 +52,7 @@ function post(payload: unknown, token = 'valid'): Request {
 
 const validSection = {
   slug: '2026-q3',
-  section: { name: 'Nav Team', notes: '', done: ['Cartes LFPG publiées'], in_progress: [], next: [], help_wanted: [], images: [] },
+  section: { name: 'Ops & Nav', notes: '', done: ['Cartes LFPG publiées'], in_progress: [], next: [], help_wanted: [], images: [] },
 }
 
 describe('auth guard', () => {
@@ -83,18 +83,18 @@ describe('auth guard', () => {
 
 describe('handleSectionSubmit', () => {
   it('opens a PR with the composed section at the draft path', async () => {
-    const { deps, calls } = fakeDeps({ existingFile: { sha: 'abc123', text: 'name: Nav Team\n' } })
+    const { deps, calls } = fakeDeps({ existingFile: { sha: 'abc123', text: 'name: Ops & Nav\n' } })
     const response = await handleSectionSubmit(post(validSection), deps)
     expect(response.status).toBe(200)
     expect(((await response.json()) as { prUrl: string }).prUrl).toContain('/pull/1')
     const pr = calls.openPr[0]
-    expect(pr.path).toBe('content/point-vacc/drafts/2026-q3/nav-team.yaml')
-    expect(pr.branch).toMatch(/^proposer-2026-q3-nav-team-/)
-    expect(pr.content).toContain('name: Nav Team')
+    expect(pr.path).toBe('content/point-vacc/drafts/2026-q3/ops-nav.yaml')
+    expect(pr.branch).toMatch(/^proposer-2026-q3-ops-nav-/)
+    expect(pr.content).toContain('name: Ops & Nav')
     expect(pr.content).toContain('Cartes LFPG publiées')
     // Updating an already-sent rubrique forwards the existing blob sha.
     expect(pr.sha).toBe('abc123')
-    expect(calls.notify[0]).toContain('Nav Team')
+    expect(calls.notify[0]).toContain('Ops & Nav')
     expect(calls.notify[0]).toContain('/pull/1')
   })
 
@@ -115,7 +115,7 @@ const validNeed = {
   id: 'nav-relecture-lfpg',
   type: 'ponctuel',
   title: 'Relecture LFPG',
-  department: 'Nav Team',
+  department: 'Ops & Nav',
   description: 'Relire la doc.',
   skills: [],
   time_estimate: '2–3 h',

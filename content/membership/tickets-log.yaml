@@ -1,11 +1,11 @@
 # Journal manuel et ANONYME des sollicitations Membership traitées sur Discord.
 #
-# IMPORTANT — aucune donnée personnelle : uniquement le pôle concerné et des
+# IMPORTANT — aucune donnée personnelle : uniquement l'équipe concernée et des
 # horodatages. Pas de nom, pas de CID, pas de contenu de message. Ce journal
-# alimente les statistiques publiques par pôle (page Point vACC).
+# alimente les statistiques publiques par équipe (page Point vACC).
 #
 # Fichier vide = aucune sollicitation enregistrée (état valide).
 # Le formulaire de la page /admin génère les entrées au bon format.
-# Champs : id (unique), department (un pôle de src/config/departments.ts),
+# Champs : id (unique), department (une équipe de src/config/departments.ts),
 # opened (obligatoire), first_response (optionnel), closed (optionnel = encore
 # ouvert si absent), outcome (optionnel : resolved | redirected | no_response | other).

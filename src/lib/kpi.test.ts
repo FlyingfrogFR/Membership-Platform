@@ -12,7 +12,7 @@ function need(over: Partial<Need> & Pick<Need, 'id' | 'posted'>): Need {
   return {
     type: 'ponctuel',
     title: 'x',
-    department: 'Nav Team',
+    department: 'Ops & Nav',
     description: 'x',
     skills: [],
     contact: 'x',
@@ -57,8 +57,8 @@ describe('kpisForQuarter', () => {
     expect(kpis.needsFilled).toBe(1)
     expect(kpis.medianTimeToFillMs).toBe(20 * 86_400_000)
     expect(kpis.participationRate).toBeNull()
-    // Only the July entry is in Q3: 3 of 6 teams.
-    expect(kpis.coordinationRate).toBeCloseTo(0.5)
+    // Only the July entry is in Q3: 3 of the coordination teams.
+    expect(kpis.coordinationRate).toBeCloseTo(3 / COORDINATION_TEAMS.length)
   })
 
   it('returns nulls for medians and rates with no data', () => {

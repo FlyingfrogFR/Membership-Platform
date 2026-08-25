@@ -8,7 +8,7 @@ function need(over: Partial<Need> & Pick<Need, 'id' | 'posted'>): Need {
   return {
     type: 'ponctuel',
     title: 'Relecture',
-    department: 'Nav Team',
+    department: 'Ops & Nav',
     description: 'x',
     skills: [],
     contact: 'x',
@@ -63,7 +63,7 @@ describe('computeHealthAlerts', () => {
       slug: '2026-q2',
       published: new Date('2026-06-30'),
       intro: 'x',
-      departments: [{ name: 'Nav Team' as const, done: ['x'], in_progress: [], next: [], help_wanted: [], images: [] }],
+      departments: [{ name: 'Ops & Nav' as const, done: ['x'], in_progress: [], next: [], help_wanted: [], images: [] }],
       body: '',
     }
     const drafts = [{ slug: '2026-q2' }, { slug: '2026-q2' }, { slug: '2026-q3' }]

@@ -2,7 +2,7 @@
 
 Plateforme du pôle Membership de la vACC France (VATSIM France). Un site public, rapide et en lecture seule, qui porte les quatre piliers du mandat :
 
-1. **Visibilité** — le **Point vACC**, un digest trimestriel de l'avancement de chaque pôle.
+1. **Visibilité** — le **Point vACC**, un digest trimestriel de l'avancement de chaque équipe.
 2. **Contact** — une porte d'entrée clairement identifiée (les tickets restent sur Discord, catégorie « Membership »).
 3. **Contribution** — le tableau **Contribuer** : postes ouverts et besoins ponctuels, toujours à jour.
 4. **Coordination** — des points mensuels asynchrones avec les référents d'équipe (phase 2, privé).
@@ -23,7 +23,7 @@ Dans tous les cas, le Head of Membership relit et harmonise le ton avant publica
 
 Le site sait s'authentifier auprès du broker d'identité de la vACC (`auth.vatsim.fr`, OpenID Connect). Le site étant 100 % statique, il agit comme **client public avec PKCE** : aucun secret, nulle part. Le bouton « Se connecter avec VATSIM France » n'apparaît sur les pages internes que lorsque le client est configuré :
 
-1. Demander à la Digital Team un client OIDC **public** (PKCE S256) dans le realm `frenchvacc_prod`, avec :
+1. Demander à l'équipe Digital un client OIDC **public** (PKCE S256) dans le realm `frenchvacc_prod`, avec :
    - redirect URI : `https://<domaine du site>/auth/callback` (+ `http://localhost:5173/auth/callback` pour le dev) ;
    - web origins (CORS) : l'origine du site (nécessaire pour l'échange de code depuis le navigateur) ;
    - deux rôles, à assigner aux bonnes personnes : `membership-admin` (Espace Membership + formulaires) et `membership-referent` (formulaires `/proposer`). Rôles de realm ou de client : les deux sont lus.
@@ -53,7 +53,7 @@ Sans ces variables, les fonctions répondent 503, les boutons n'apparaissent pas
 - `content/membership/tickets-log.yaml` — journal manuel et **anonyme** des sollicitations Membership (équipe + horodatages, aucune donnée personnelle). Alimente les statistiques par équipe affichées sur la page Point vACC, en attendant l'accord pour un lien automatique avec Discord.
 - `content/membership/coordination.yaml` — suivi du pilier Coordination : quelles équipes ont envoyé leur point mensuel (**booléens et dates uniquement** — jamais le contenu des points, qui reste privé).
 
-La liste des pôles et leur ordre d'affichage sont définis à un seul endroit : `src/config/departments.ts`.
+La liste des équipes et leur ordre d'affichage sont définis à un seul endroit : `src/config/departments.ts`.
 
 ## Développement
 
@@ -83,7 +83,7 @@ Sortie statique dans `dist/`, déployable telle quelle sur Vercel (config fourni
 
 ## Décisions (tranchées par Pierre)
 
-1. **Liste des équipes** : alignée sur le document officiel « Fonctionnement des équipes » — Nav Team, Doc Team, Event Team, Digital Team, Training Department, vACC Directors — complétée, à la demande du HoM, d'une catégorie **Membership** (absente du document, mais nécessaire pour catégoriser les sollicitations adressées au Membership lui-même). Le tout dans `src/config/departments.ts`.
+1. **Liste des équipes** : alignée sur la page officielle [« Organisation et rôles dans la vACC »](https://doc.vatsim.fr/fr/general/vacc-roles) — **vACC Directors, Ops & Nav, Training Department, Digital, Events, Membership** (le Membership fait partie de l'organisation officielle : visibilité trimestrielle, tickets Discord, résolution de conflits entre membres). Le tout dans `src/config/departments.ts`, à mettre à jour uniquement quand la page officielle change.
 2. **Thème** : identité chaleureuse et communautaire, dans les tons de la vACC — fond bleu clair (famille dorian), primaire **bleu ciel** et accent **corail**, formes bien arrondies et ombres douces, en **Nunito** (sans-serif ronde, auto-hébergée via Fontsource : le site reste statique). Centralisé dans `src/index.css` (import de la police dans `src/main.tsx`), contrastes vérifiés WCAG AA.
 3. **Fusion à terme dans vatsim.fr** : c'est l'objectif à long terme. L'architecture est donc gardée « portable » (logique dans `src/lib`, composants présentationnels autonomes, thème et i18n centralisés). À noter : vatsim.fr tourne sous **Angular + Tailwind**, alors que cette plateforme est en **React + Vite + Tailwind** (stack habituelle de Pierre, cf. brief §8) — une fusion réelle impliquera soit d'embarquer ce build, soit de porter les composants ; le thème étant centralisé dans un seul fichier, il reste réalignable sur la charte de vatsim.fr si la fusion l'exige.
 4. **VATSIM Connect (phase 2)** : reporté à l'ouverture de la phase 2 (qui demande les identifiants OAuth2 sera décidé à ce moment-là).
