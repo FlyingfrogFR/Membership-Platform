@@ -30,23 +30,23 @@ describe('computeCadence', () => {
   })
 
   it('targets the quarter after the latest edition', () => {
-    const cadence = computeCadence(new Date('2026-07-22T12:00:00Z'), [edition('2026-q2', ['Nav Team'])])
+    const cadence = computeCadence(new Date('2026-07-22T12:00:00Z'), [edition('2026-q2', ['Ops & Nav'])])
     expect(quarterSlug(cadence.next)).toBe('2026-q3')
   })
 
   it('rolls over the year after Q4', () => {
-    const cadence = computeCadence(new Date('2027-01-10T12:00:00Z'), [edition('2026-q4', ['Nav Team'])])
+    const cadence = computeCadence(new Date('2027-01-10T12:00:00Z'), [edition('2026-q4', ['Ops & Nav'])])
     expect(quarterSlug(cadence.next)).toBe('2027-q1')
   })
 
   it('catches up to the current quarter after a dormant period', () => {
-    const cadence = computeCadence(new Date('2027-08-01T12:00:00Z'), [edition('2026-q2', ['Nav Team'])])
+    const cadence = computeCadence(new Date('2027-08-01T12:00:00Z'), [edition('2026-q2', ['Ops & Nav'])])
     expect(quarterSlug(cadence.next)).toBe('2027-q3')
   })
 
   it('skips to the running quarter when the next edition window already closed', () => {
     // Latest edition 2026-q2, now = 5 Oct 2026: q3's window has passed → target q4.
-    const cadence = computeCadence(new Date('2026-10-05T12:00:00Z'), [edition('2026-q2', ['Nav Team'])])
+    const cadence = computeCadence(new Date('2026-10-05T12:00:00Z'), [edition('2026-q2', ['Ops & Nav'])])
     expect(quarterSlug(cadence.next)).toBe('2026-q4')
   })
 })
@@ -75,13 +75,13 @@ describe('checklistFor', () => {
 describe('participationMatrix', () => {
   it('marks presence and counts absence streaks from the newest edition', () => {
     const editions = [
-      edition('2026-q3', ['Nav Team']), // newest
-      edition('2026-q2', ['Nav Team', 'Doc Team']),
+      edition('2026-q3', ['Ops & Nav']), // newest
+      edition('2026-q2', ['Ops & Nav', 'Training Department']),
     ]
     const matrix = participationMatrix(editions)
-    const nav = matrix.rows.find((r) => r.team === 'Nav Team')!
-    const doc = matrix.rows.find((r) => r.team === 'Doc Team')!
-    const event = matrix.rows.find((r) => r.team === 'Event Team')!
+    const nav = matrix.rows.find((r) => r.team === 'Ops & Nav')!
+    const doc = matrix.rows.find((r) => r.team === 'Training Department')!
+    const event = matrix.rows.find((r) => r.team === 'Events')!
     expect(nav.cells).toEqual([true, true])
     expect(nav.absentStreak).toBe(0)
     expect(doc.cells).toEqual([false, true])

@@ -13,11 +13,11 @@
 C'est la voie normale pour un référent : chaque équipe envoie **sa** rubrique, sans attendre les autres — le Head of Membership assemble ensuite l'édition complète depuis l'Espace Membership. Le formulaire `/proposer` génère ce fichier tout seul ; à la main, créez `content/point-vacc/drafts/<slug>/<équipe>.yaml` :
 
 - `<slug>` est l'édition visée (ex. `2026-q3`) ;
-- le nom du fichier est le nom de l'équipe en minuscules-tirets (ex. `nav-team.yaml`, `training-department.yaml`) — la validation le vérifie ;
+- le nom du fichier est le nom de l'équipe en minuscules-tirets (ex. `ops-nav.yaml`, `training-department.yaml`) — la validation le vérifie ;
 - le fichier contient **une seule rubrique**, au même format qu'une section d'édition :
 
 ```yaml
-name: "Nav Team"
+name: "Ops & Nav"
 notes: >-            # optionnel : commentaire libre en markdown
   Le mot de l'équipe sur le trimestre.
 done:
@@ -47,7 +47,7 @@ published: 2026-09-30
 intro: >-
   Texte d'introduction du Head of Membership.
 departments:
-  - name: "Nav Team"
+  - name: "Ops & Nav"
     done:
       - "Chose terminée ce trimestre"
     in_progress:
@@ -56,7 +56,7 @@ departments:
       - "Chose prévue"
     help_wanted:            # optionnel
       - "Coup de main recherché"
-  - name: "Event Team"
+  - name: "Events"
     done:
       - "…"
 ---
@@ -66,12 +66,12 @@ Texte de conclusion optionnel, en markdown, affiché après les sections des éq
 
 Règles :
 
-- `name` doit être une équipe de la liste `src/config/departments.ts` (`Nav Team`, `Doc Team`, `Event Team`, `Digital Team`, `Training Department`, `vACC Directors`, `Membership`), alignée sur le document officiel « Fonctionnement des équipes » (catégorie Membership ajoutée en complément). L'ordre d'affichage sur le site suit cette liste, pas l'ordre du fichier.
+- `name` doit être une équipe de la liste `src/config/departments.ts` (`vACC Directors`, `Ops & Nav`, `Training Department`, `Digital`, `Events`, `Membership`), alignée sur la page officielle « Organisation et rôles dans la vACC » (doc.vatsim.fr). L'ordre d'affichage sur le site suit cette liste, pas l'ordre du fichier.
 - `done`, `in_progress`, `next`, `help_wanted` sont tous optionnels — n'indiquez que ce qui existe. Une équipe sans aucun item n'apparaît ni sur le site ni dans l'export Discord.
 - `notes` (optionnel) : un **commentaire libre** en markdown pour l'équipe qui veut raconter un peu plus que des puces — affiché en tête de sa rubrique, repris dans l'export Discord :
 
   ```yaml
-  - name: "Nav Team"
+  - name: "Ops & Nav"
     notes: >-
       Quelques phrases libres sur le trimestre de l'équipe,
       en markdown si besoin.
@@ -81,7 +81,7 @@ Règles :
 - Chaque équipe peut joindre des **captures d'écran** :
 
   ```yaml
-  - name: "Nav Team"
+  - name: "Ops & Nav"
     done:
       - "…"
     images:
@@ -97,10 +97,10 @@ Règles :
 Ajoutez un item au tableau dans `content/contribuer/needs.yaml` :
 
 ```yaml
-- id: "nav-relecture-lfpg"      # unique, en kebab-case
+- id: "ops-nav-relecture-lfpg"      # unique, en kebab-case
   type: "ponctuel"              # ponctuel | poste
   title: "Relecture documentation LFPG"
-  department: "Nav Team"        # une équipe de src/config/departments.ts
+  department: "Ops & Nav"        # une équipe de src/config/departments.ts
   description: "Relire et commenter la nouvelle doc avant publication."
   skills: ["Connaissances ATC"] # optionnel
   time_estimate: "2–3 h"        # optionnel mais recommandé
@@ -124,8 +124,8 @@ Un fichier vide (ou ne contenant que des commentaires) est accepté : le site af
 En attendant un lien automatique avec Discord, le suivi des sollicitations se fait **à la main** dans `content/membership/tickets-log.yaml`. Ce fichier ne contient **aucune donnée personnelle** : uniquement l'équipe concernée et des horodatages. Il alimente le bloc « Statistiques du Membership » de la page Point vACC.
 
 ```yaml
-- id: "2026-06-01-nav"          # unique, en kebab-case
-  department: "Nav Team"        # une équipe de src/config/departments.ts
+- id: "2026-06-01-ops-nav"          # unique, en kebab-case
+  department: "Ops & Nav"        # une équipe de src/config/departments.ts
   opened: 2026-06-01T18:30:00Z  # obligatoire (ISO 8601 avec fuseau)
   first_response: 2026-06-01T19:05:00Z  # optionnel — sert au délai de 1re réponse
   closed: 2026-06-03T20:00:00Z          # optionnel — absent = encore ouvert

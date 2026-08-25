@@ -4,7 +4,7 @@
 // once a client_id is configured (Vercel env var) — until then the passphrase
 // curtain remains the only door, and it stays available as a fallback after.
 //
-// To activate: ask the Digital Team for a public client (PKCE S256) with
+// To activate: ask the Digital team for a public client (PKCE S256) with
 // redirect URI <origin>/auth/callback, then set VITE_OIDC_CLIENT_ID in Vercel.
 // The two roles below are read from the tokens (realm or client roles).
 import { ROLE_ADMIN, ROLE_REFERENT } from './roles'
