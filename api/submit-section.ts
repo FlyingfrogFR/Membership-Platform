@@ -1,6 +1,8 @@
-// .mts on purpose: with "type": "module" in package.json, a .ts function can
-// be emitted as CommonJS yet loaded as ESM, crashing every invocation
-// (FUNCTION_INVOCATION_FAILED). The .mts extension pins the emit to ESM.
+// Must stay .ts: Vercel's api/ detector only registers js|mjs|ts|tsx files.
+// And package.json must stay WITHOUT "type": "module": Vercel compiles this
+// file to CommonJS, which an ESM-typed package would make Node load as ESM —
+// crashing every invocation (FUNCTION_INVOCATION_FAILED). ESM-only tooling
+// files opt in individually via the .mts extension instead.
 import { handleSectionSubmit, json, realDeps } from './_shared'
 
 export async function POST(request: Request): Promise<Response> {
