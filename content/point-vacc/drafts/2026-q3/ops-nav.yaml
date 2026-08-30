@@ -1,0 +1,22 @@
+name: Ops & Nav
+done:
+  - Restructuration du pack contrôleur et de son programme d’installation.
+  - Les secteurs sont désormais entièrement à jour.
+  - Mise à jour des limites des FIR dans VATSpy, des secteurs TRACON dans SimAware et des données VATGlasses.
+  - Création de nouveaux modèles QGIS standardisés pour les AVISO et les schémas.
+in_progress:
+  - Ajout progressif des positions de contrôle et des schémas sur le site de documentation, parallèlement à la rédaction des SOP.
+  - Rédaction des SOP pour les terrains qui n’en disposent pas encore.
+  - Mise à jour du plugin d’export QGIS pour les cartes de CoFrance v2.
+  - Mise à jour des profils vATIS afin de reproduire les formats utilisés dans la réalité, ainsi que des formats D-ATIS adaptés à VATSIM.
+  - Refonte des schémas des secteurs d’approche.
+next:
+  - Mise à jour continue des cartes contrôleur, avec des améliorations progressives visant à faciliter leur utilisation, ainsi que l’ajout graduel des noms de points, des procédures et d’autres informations utiles.
+  - Mise en œuvre du nouveau système CDM & VIFF développé par Roger, avec un objectif de déploiement fixé au mois d’octobre.
+  - Mise en œuvre de l’intégration de vSID dans le pack contrôleur.
+help_wanted:
+  - Recherche de volontaires pour participer à la rédaction de documents, notamment des SOP et des briefings pilotes.
+  - Nous recherchons également des personnes souhaitant contribuer à la création de schémas et de AVISO, ayant une expérience de QGIS ou étant motivées pour apprendre à l’utiliser.
+images:
+  - src: /images/point-vacc/2026-q3/CCA LYON QFU17.png
+  - src: /images/point-vacc/2026-q3/CCA NICE.png
