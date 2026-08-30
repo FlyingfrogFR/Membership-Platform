@@ -3,7 +3,9 @@
 // schemas the build validates with.
 import { dump } from 'js-yaml'
 import type { Department } from '../config/departments'
-import { SITE } from '../config/site'
+// .js extension: this module is part of the serverless functions' import
+// graph, which runs as per-file Node ESM in production (see api/_shared.ts).
+import { SITE } from '../config/site.js'
 import type { DepartmentEntry } from './schemas'
 
 export interface EditionImageDraft {

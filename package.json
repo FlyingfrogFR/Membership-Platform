@@ -2,6 +2,7 @@
   "name": "membership-platform",
   "private": true,
   "version": "0.1.0",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "validate": "tsx scripts/validate-content.mts",

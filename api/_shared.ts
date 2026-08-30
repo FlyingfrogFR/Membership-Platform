@@ -12,12 +12,14 @@
 // to also accept the referent passphrase (X-Team-Pass header, hash-checked
 // against TEAM_PASS_HASH / ADMIN_PASS_HASH, themselves defaulting to the
 // VITE_ overrides then to src/config/gateHashes.ts).
+// Explicit .js extensions on relative imports: Vercel emits this graph as
+// per-file ESM and Node ESM cannot resolve extensionless specifiers.
 import { createRemoteJWKSet, jwtVerify, type JWTPayload } from 'jose'
 import { z } from 'zod'
-import { DEPARTMENTS } from '../src/config/departments'
-import { DEFAULT_ADMIN_HASH, DEFAULT_TEAM_HASH } from '../src/config/gateHashes'
-import { ROLE_ADMIN, ROLE_REFERENT } from '../src/config/roles'
-import { sha256Hex } from '../src/lib/hash'
+import { DEPARTMENTS } from '../src/config/departments.js'
+import { DEFAULT_ADMIN_HASH, DEFAULT_TEAM_HASH } from '../src/config/gateHashes.js'
+import { ROLE_ADMIN, ROLE_REFERENT } from '../src/config/roles.js'
+import { sha256Hex } from '../src/lib/hash.js'
 import {
   composeNeedYaml,
   composeSectionYaml,
@@ -25,7 +27,7 @@ import {
   NEEDS_FILE_PATH,
   slugify,
   type EditionDepartmentDraft,
-} from '../src/lib/compose'
+} from '../src/lib/compose.js'
 
 export const SUBMIT_ROLES = [ROLE_ADMIN, ROLE_REFERENT]
 
