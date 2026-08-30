@@ -6,12 +6,18 @@
 //
 // Required env (Vercel): GITHUB_BOT_TOKEN (fine-grained PAT: contents +
 // pull-requests write on the repo). Optional: GITHUB_REPO (owner/name),
-// OIDC_ISSUER / OIDC_CLIENT_ID (default to the VITE_ ones), and
-// DISCORD_WEBHOOK_URL to ping a staff channel on each submission.
+// OIDC_ISSUER / OIDC_CLIENT_ID (default to the VITE_ ones),
+// DISCORD_WEBHOOK_URL to ping a staff channel on each submission, and —
+// transitional, while the SSO client is not provisioned — VITE_PASS_SUBMIT=1
+// to also accept the referent passphrase (X-Team-Pass header, hash-checked
+// against TEAM_PASS_HASH / ADMIN_PASS_HASH, themselves defaulting to the
+// VITE_ overrides then to src/config/gateHashes.ts).
 import { createRemoteJWKSet, jwtVerify, type JWTPayload } from 'jose'
 import { z } from 'zod'
 import { DEPARTMENTS } from '../src/config/departments'
+import { DEFAULT_ADMIN_HASH, DEFAULT_TEAM_HASH } from '../src/config/gateHashes'
 import { ROLE_ADMIN, ROLE_REFERENT } from '../src/config/roles'
+import { sha256Hex } from '../src/lib/hash'
 import {
   composeNeedYaml,
   composeSectionYaml,
@@ -31,6 +37,9 @@ function env() {
     botToken: process.env.GITHUB_BOT_TOKEN || '',
     repo: process.env.GITHUB_REPO || 'FlyingfrogFR/Membership-Platform',
     webhook: process.env.DISCORD_WEBHOOK_URL || '',
+    passSubmit: process.env.VITE_PASS_SUBMIT === '1',
+    teamHash: process.env.TEAM_PASS_HASH || process.env.VITE_TEAM_PASS_HASH || DEFAULT_TEAM_HASH,
+    adminHash: process.env.ADMIN_PASS_HASH || process.env.VITE_ADMIN_PASS_HASH || DEFAULT_ADMIN_HASH,
   }
 }
 
@@ -82,22 +91,41 @@ export interface Deps {
 }
 
 // Auth guard shared by every submission endpoint. Returns a Response on
-// failure so handlers can early-return it.
+// failure so handlers can early-return it. Two accepted paths: a verified
+// VATSIM France SSO token, or — transitional passphrase mode — the same
+// referent secret the /proposer gate uses, re-checked here server-side. The
+// PR review by the HoM remains the actual publication gate either way.
 export async function requireSubmitter(request: Request, deps: Deps): Promise<Response | null> {
-  const { clientId, botToken } = env()
-  if (!clientId || !botToken) return json(503, { error: 'disabled' })
+  const { clientId, botToken, passSubmit, teamHash, adminHash } = env()
+  if (!botToken || (!clientId && !passSubmit)) return json(503, { error: 'disabled' })
+
   const header = request.headers.get('authorization') ?? ''
   const token = header.startsWith('Bearer ') ? header.slice(7) : ''
-  if (!token) return json(401, { error: 'auth' })
-  let payload: JWTPayload
-  try {
-    payload = await deps.verify(token)
-  } catch {
-    return json(401, { error: 'auth' })
+  if (token) {
+    if (!clientId) return json(503, { error: 'disabled' })
+    let payload: JWTPayload
+    try {
+      payload = await deps.verify(token)
+    } catch {
+      return json(401, { error: 'auth' })
+    }
+    const roles = rolesFromPayload(payload, clientId)
+    if (!SUBMIT_ROLES.some((role) => roles.has(role))) return json(403, { error: 'role' })
+    return null
   }
-  const roles = rolesFromPayload(payload, clientId)
-  if (!SUBMIT_ROLES.some((role) => roles.has(role))) return json(403, { error: 'role' })
-  return null
+
+  const passHeader = request.headers.get('x-team-pass')
+  if (passSubmit && passHeader) {
+    let pass = passHeader
+    try {
+      pass = decodeURIComponent(passHeader)
+    } catch {
+      // Not URI-encoded: compare the raw header value.
+    }
+    const hash = await sha256Hex(pass)
+    if (hash === teamHash || hash === adminHash) return null
+  }
+  return json(401, { error: 'auth' })
 }
 
 // --- GitHub ------------------------------------------------------------------

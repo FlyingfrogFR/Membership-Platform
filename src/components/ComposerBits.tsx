@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from 'react'
-import { directSubmitEnabled, oidcConfig } from '../config/auth'
+import { directSubmitEnabled, oidcConfig, passSubmitEnabled, ssoEnabled } from '../config/auth'
 import { fr } from '../i18n/fr'
 import { githubEditFileUrl, githubNewFileUrl } from '../lib/compose'
+import { getGatePass, relock } from '../lib/gate'
 import { beginLogin, getSsoToken } from '../lib/oidc'
 
 export function Field({ label, htmlFor, children, hint }: { label: string; htmlFor: string; children: ReactNode; hint?: string }) {
@@ -157,30 +158,36 @@ export function OutputPanel({
 
 // One-click submission through the serverless functions: the function opens
 // the GitHub proposal itself (no GitHub account needed) and pings the HoM on
-// Discord. Renders nothing until VITE_DIRECT_SUBMIT + the SSO are configured.
+// Discord. Renders nothing until VITE_DIRECT_SUBMIT plus an auth path (SSO,
+// or the transitional VITE_PASS_SUBMIT passphrase mode) are configured.
 export function DirectSend({ endpoint, payload }: { endpoint: string; payload: unknown }) {
   const t = fr.compose.direct
-  const [state, setState] = useState<'idle' | 'sending' | 'done' | 'expired' | 'error'>('idle')
+  const [state, setState] = useState<'idle' | 'sending' | 'done' | 'expired' | 'locked' | 'error'>('idle')
   const [prUrl, setPrUrl] = useState('')
   const [detail, setDetail] = useState('')
 
   if (!directSubmitEnabled()) return null
 
   async function onSend() {
+    // SSO token first; otherwise the transitional passphrase kept by the gate.
     const token = getSsoToken()
-    if (!token) {
-      setState('expired')
+    const pass = !token && passSubmitEnabled() ? getGatePass() : null
+    if (!token && !pass) {
+      setState(ssoEnabled() ? 'expired' : 'locked')
       return
     }
     setState('sending')
     try {
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : { 'X-Team-Pass': encodeURIComponent(pass ?? '') }),
+        },
         body: JSON.stringify(payload),
       })
       if (response.status === 401) {
-        setState('expired')
+        setState(token ? 'expired' : 'locked')
         return
       }
       if (!response.ok) {
@@ -228,6 +235,20 @@ export function DirectSend({ endpoint, payload }: { endpoint: string; payload: u
           <p className="text-warn">{t.expired}</p>
           <button type="button" onClick={() => void onReconnect()} className="btn btn-secondary mt-3">
             {t.reconnect}
+          </button>
+        </div>
+      ) : state === 'locked' ? (
+        <div className="rounded-xl bg-warn-soft p-4 text-sm">
+          <p className="text-warn">{t.passMissing}</p>
+          <button
+            type="button"
+            onClick={() => {
+              relock()
+              window.location.reload()
+            }}
+            className="btn btn-secondary mt-3"
+          >
+            {t.relock}
           </button>
         </div>
       ) : (

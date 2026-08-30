@@ -3,14 +3,14 @@
 // SHA-256 hashes live here — never the passphrases themselves. This is a
 // deterrent curtain by deliberate choice, NOT security: the check runs in the
 // browser and the pages hold nothing sensitive. Real permissions stay on
-// GitHub; real auth arrives with VATSIM Connect (Phase 2).
+// GitHub; real auth arrives with the VATSIM France SSO.
 //
-// To change a passphrase: generate the new hash and replace it below (or set
-// VITE_ADMIN_PASS_HASH / VITE_TEAM_PASS_HASH in Vercel to override without a
-// code change):
+// To change a passphrase: generate the new hash and replace it in
+// src/config/gateHashes.ts (or set VITE_ADMIN_PASS_HASH / VITE_TEAM_PASS_HASH
+// in Vercel to override without a code change):
 //   node -e "console.log(require('crypto').createHash('sha256').update('NouveauMotDePasse').digest('hex'))"
-const DEFAULT_ADMIN_HASH = '25036181304a565bea0cd01fe6680d5452e1294afbe20c1271505d90085b4ad3'
-const DEFAULT_TEAM_HASH = 'ce5e18af4c489b7343c4ef35987681db76cd570f92903344e5ef84abefca3f87'
+import { DEFAULT_ADMIN_HASH, DEFAULT_TEAM_HASH } from '../config/gateHashes'
+export { sha256Hex } from './hash'
 
 const ADMIN_HASH: string = (import.meta.env.VITE_ADMIN_PASS_HASH as string | undefined) || DEFAULT_ADMIN_HASH
 const TEAM_HASH: string = (import.meta.env.VITE_TEAM_PASS_HASH as string | undefined) || DEFAULT_TEAM_HASH
@@ -32,9 +32,37 @@ const STORAGE_KEYS: Record<GateKind, string> = {
   member: 'membership-gate-member',
 }
 
-export async function sha256Hex(text: string): Promise<string> {
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))
-  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('')
+// Transitional direct-send support (VITE_PASS_SUBMIT=1, no SSO yet): the
+// passphrase the user just typed is kept for this tab only, so the /api
+// functions can re-check it server-side on each one-click submission. Dropped
+// with the tab; never written anywhere else.
+const PASS_KEY = 'membership-gate-pass'
+
+export function rememberGatePass(pass: string): void {
+  try {
+    sessionStorage.setItem(PASS_KEY, pass)
+  } catch {
+    // Private mode: direct send will ask to re-enter the passphrase.
+  }
+}
+
+export function getGatePass(): string | null {
+  try {
+    return sessionStorage.getItem(PASS_KEY)
+  } catch {
+    return null
+  }
+}
+
+// Drops every unlock (and the kept passphrase) so the gate shows again after a
+// reload — the recovery path when the direct-send passphrase is gone or stale.
+export function relock(): void {
+  try {
+    for (const key of Object.values(STORAGE_KEYS)) sessionStorage.removeItem(key)
+    sessionStorage.removeItem(PASS_KEY)
+  } catch {
+    // Nothing to drop if storage is unavailable.
+  }
 }
 
 export function isUnlocked(kind: GateKind): boolean {

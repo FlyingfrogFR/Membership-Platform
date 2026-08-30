@@ -179,12 +179,22 @@ export const fr = {
       viewPr: 'Suivre la proposition sur GitHub',
       expired: 'Session VATSIM France expirée ou absente — reconnectez-vous pour envoyer en un clic.',
       reconnect: 'Se reconnecter',
+      passMissing: 'Le mot de passe de la session n’est plus disponible — re-entrez-le pour envoyer en un clic.',
+      relock: 'Re-entrer le mot de passe',
       error: (detail: string) => `L’envoi direct a échoué (${detail}). Réessayez, ou utilisez les boutons ci-dessous.`,
     },
     draft: {
       autosave: 'Vos saisies sont enregistrées automatiquement sur cet appareil — vous pouvez fermer la page et revenir plus tard.',
       restored: 'Brouillon précédent restauré.',
       reset: 'Repartir de zéro',
+    },
+    importFile: {
+      cta: 'Importer un fichier .yaml',
+      sectionHint: 'Vous avez téléchargé ou reçu un fichier de rubrique ? Importez-le : il remplit les champs de l’équipe concernée.',
+      needHint: 'Un fichier de besoin déjà généré ? Importez-le pour remplir les champs.',
+      sectionOk: (team: string) => `Rubrique « ${team} » importée.`,
+      needOk: 'Besoin importé — vérifiez les champs avant envoi.',
+      err: (file: string) => `« ${file} » n’a pas pu être importé — vérifiez qu’il s’agit bien d’un fichier généré par ce formulaire.`,
     },
     edition: {
       title: 'Contribution au Point vACC',

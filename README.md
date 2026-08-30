@@ -13,7 +13,7 @@ Tout le contenu vit dans ce dépôt sous forme de fichiers (`/content`) : publie
 
 Trois façons de faire, de la plus simple à la plus directe :
 
-1. **Le formulaire** : la page **`/proposer`** du site génère le contenu au bon format — un clic ouvre GitHub pré-rempli pour créer la proposition, ou copiez le résultat et envoyez-le au Head of Membership sur Discord. Pour le Point vACC, **chaque équipe envoie sa rubrique séparément** (un petit fichier de brouillon sous `content/point-vacc/drafts/`) sans attendre les autres ; le Head of Membership assemble ensuite l'édition complète. Les saisies sont **enregistrées automatiquement dans le navigateur** : on peut fermer la page et reprendre plus tard.
+1. **Le formulaire** : la page **`/proposer`** du site génère le contenu au bon format — un clic ouvre GitHub pré-rempli pour créer la proposition, ou copiez le résultat et envoyez-le au Head of Membership sur Discord. Pour le Point vACC, **chaque équipe envoie sa rubrique séparément** (un petit fichier de brouillon sous `content/point-vacc/drafts/`) sans attendre les autres ; le Head of Membership assemble ensuite l'édition complète. Les saisies sont **enregistrées automatiquement dans le navigateur** : on peut fermer la page et reprendre plus tard. Un fichier `.yaml` téléchargé (ou reçu d'un référent) peut être **réimporté** dans le formulaire pour re-remplir les champs.
 2. **Le message** : envoyez votre texte brut au Head of Membership (ticket Discord catégorie « Membership », ou message direct). Il le met en forme et l'intègre.
 3. **La pull request à la main** : modifiez directement les fichiers de `/content` — le format exact est décrit dans [CONTRIBUTING.md](CONTRIBUTING.md). La validation tourne sur chaque PR : si le format n'est pas bon, la PR le signale avant publication.
 
@@ -38,7 +38,8 @@ En complément du SSO, deux fonctions Vercel (`api/submit-section.ts`, `api/subm
 Variables d'environnement Vercel :
 
 - `GITHUB_BOT_TOKEN` (**requis**) : un fine-grained PAT limité à ce dépôt, permissions *Contents: Read and write* et *Pull requests: Read and write* ;
-- `VITE_DIRECT_SUBMIT=1` (**requis**) : affiche les boutons « Envoyer directement au Membership » (le SSO doit aussi être configuré) ;
+- `VITE_DIRECT_SUBMIT=1` (**requis**) : affiche les boutons « Envoyer directement au Membership » (il faut aussi un moyen d'authentification : le SSO, ou le mode transitoire ci-dessous) ;
+- `VITE_PASS_SUBMIT=1` (**transitoire**) : en attendant le client SSO, autorise l'envoi direct authentifié par le mot de passe référent, revérifié côté serveur à chaque envoi. À retirer dès que le SSO est actif ;
 - `GITHUB_REPO` (optionnel, défaut : ce dépôt) ;
 - `DISCORD_WEBHOOK_URL` (optionnel) : webhook d'un canal staff à prévenir à chaque envoi ;
 - `OIDC_ISSUER` / `OIDC_CLIENT_ID` (optionnels, défaut : les valeurs `VITE_…`).
