@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { DirectSend, DraftBar, ErrorList, Field, inputClass, ListInput, OutputPanel } from '../components/ComposerBits'
 import { Gate } from '../components/Gate'
 import { DEPARTMENTS, type Department } from '../config/departments'
@@ -15,6 +15,7 @@ import {
   type EditionImageDraft,
 } from '../lib/compose'
 import { asBool, asEnum, asInt, asRecord, asString, asStringList } from '../lib/draft'
+import { parseNeedImport, parseSectionImport } from '../lib/importYaml'
 import { useDraft } from '../lib/useDraft'
 import { usePageTitle } from '../lib/usePageTitle'
 
@@ -120,11 +121,67 @@ function reviveNeedDraft(stored: unknown, initial: NeedDraftState): NeedDraftSta
   }
 }
 
+// Small "load a generated .yaml back into the form" affordance, shared by both
+// composers. onFile receives the file's text and name, one call per file.
+function ImportYamlRow({ idBase, hint, message, onFile }: { idBase: string; hint: string; message: string; onFile: (text: string, fileName: string) => void }) {
+  const t = fr.compose.importFile
+  const inputId = `${idBase}-import`
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
+      <label
+        htmlFor={inputId}
+        className="inline-block cursor-pointer rounded-full border border-line bg-paper px-3.5 py-1.5 text-xs font-bold text-accent transition-colors hover:border-accent"
+      >
+        {t.cta}
+      </label>
+      <input
+        id={inputId}
+        type="file"
+        accept=".yaml,.yml,text/yaml,application/yaml"
+        multiple
+        className="sr-only"
+        onChange={(event) => {
+          void (async (files: FileList | null) => {
+            for (const file of [...(files ?? [])]) onFile(await file.text(), file.name)
+          })(event.target.files)
+          event.target.value = ''
+        }}
+      />
+      <span className="text-xs text-ink-soft">{hint}</span>
+      <span aria-live="polite" className="text-xs font-bold text-accent-strong">
+        {message}
+      </span>
+    </div>
+  )
+}
+
 function NeedComposer() {
   const t = fr.compose.need
   const draft = useDraft(NEED_DRAFT_KEY, initialNeedDraft, reviveNeedDraft)
   const d = draft.value
   const patch = (partial: Partial<NeedDraftState>) => draft.set((prev) => ({ ...prev, ...partial }))
+  const [importMsg, setImportMsg] = useState('')
+
+  function onImport(text: string, fileName: string) {
+    const need = parseNeedImport(text)
+    if (!need) {
+      setImportMsg(fr.compose.importFile.err(fileName))
+      return
+    }
+    patch({
+      type: need.type,
+      title: need.title,
+      department: need.department,
+      description: need.description,
+      skills: need.skills,
+      timeEstimate: need.time_estimate,
+      contact: need.contact,
+      posted: need.posted,
+      idTouched: true,
+      id: need.id,
+    })
+    setImportMsg(fr.compose.importFile.needOk)
+  }
 
   const autoId = useMemo(() => slugify(`${d.department} ${d.title}`), [d.department, d.title])
   const effectiveId = d.idTouched ? d.id : autoId
@@ -158,6 +215,7 @@ function NeedComposer() {
       <h2 className="text-xl font-extrabold">{t.title}</h2>
       <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-soft">{t.help}</p>
       <DraftBar restored={draft.restored} onReset={draft.reset} />
+      <ImportYamlRow idBase="need" hint={fr.compose.importFile.needHint} message={importMsg} onFile={onImport} />
 
       <div className="mt-6 grid gap-5 sm:grid-cols-2">
         <Field label={t.type} htmlFor="need-type">
@@ -318,6 +376,7 @@ function EditionComposer() {
   const t = fr.compose.edition
   const draft = useDraft(EDITION_DRAFT_KEY, initialEditionDraft, reviveEditionDraft)
   const { quarter, year, departments } = draft.value
+  const [importMsg, setImportMsg] = useState('')
 
   const slug = `${year}-q${quarter}`
   const yearValid = Number.isInteger(year) && year >= 2020 && year <= 2100
@@ -329,11 +388,23 @@ function EditionComposer() {
       departments: { ...prev.departments, [dept]: { ...prev.departments[dept], ...partial } },
     }))
 
+  function onImport(text: string, fileName: string) {
+    const section = parseSectionImport(text)
+    if (!section) {
+      setImportMsg(fr.compose.importFile.err(fileName))
+      return
+    }
+    const { name, ...rest } = section
+    patchSection(name, rest)
+    setImportMsg(fr.compose.importFile.sectionOk(name))
+  }
+
   return (
     <section aria-label={t.title} className="card p-6 sm:p-8">
       <h2 className="text-xl font-extrabold">{t.title}</h2>
       <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-soft">{t.help}</p>
       <DraftBar restored={draft.restored} onReset={draft.reset} />
+      <ImportYamlRow idBase="edition" hint={fr.compose.importFile.sectionHint} message={importMsg} onFile={onImport} />
 
       <div className="mt-6 grid gap-5 sm:grid-cols-2">
         <Field label={t.quarter} htmlFor="ed-quarter">

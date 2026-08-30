@@ -21,11 +21,20 @@ export function ssoEnabled(): boolean {
   return AUTH.clientId !== ''
 }
 
+// Transitional, while the SSO client is not provisioned: VITE_PASS_SUBMIT=1
+// lets the direct-send functions authenticate with the referent passphrase
+// (re-checked server-side). One switch read by both the browser and the
+// functions — remove the variable once the SSO is live.
+export function passSubmitEnabled(): boolean {
+  return (import.meta.env.VITE_PASS_SUBMIT as string | undefined) === '1'
+}
+
 // One-click submission through the serverless functions (/api/submit-*).
-// Needs the SSO (Bearer token) plus the server-side env vars documented in
-// the README; VITE_DIRECT_SUBMIT=1 turns the buttons on once both exist.
+// Needs an auth path (SSO, or the transitional passphrase mode) plus the
+// server-side env vars documented in the README; VITE_DIRECT_SUBMIT=1 turns
+// the buttons on once both exist.
 export function directSubmitEnabled(): boolean {
-  return ssoEnabled() && (import.meta.env.VITE_DIRECT_SUBMIT as string | undefined) === '1'
+  return (ssoEnabled() || passSubmitEnabled()) && (import.meta.env.VITE_DIRECT_SUBMIT as string | undefined) === '1'
 }
 
 export function oidcConfig() {

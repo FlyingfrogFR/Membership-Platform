@@ -1,7 +1,7 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
-import { oidcConfig, ssoEnabled } from '../config/auth'
+import { oidcConfig, passSubmitEnabled, ssoEnabled } from '../config/auth'
 import { fr } from '../i18n/fr'
-import { GATE_HASHES, isUnlocked, rememberUnlock, sha256Hex, type GateKind } from '../lib/gate'
+import { GATE_HASHES, isUnlocked, rememberGatePass, rememberUnlock, sha256Hex, type GateKind } from '../lib/gate'
 import { beginLogin } from '../lib/oidc'
 import { Field, inputClass } from './ComposerBits'
 
@@ -33,6 +33,9 @@ function GateForm({ kind, onUnlock }: { kind: GateKind; onUnlock: () => void }) 
     const accepted = GATE_HASHES[kind]
     if (accepted.includes(hash)) {
       rememberUnlock(kind, hash === GATE_HASHES.admin[0])
+      // Kept for this tab only, so one-click direct send can re-authenticate
+      // server-side while the SSO is not live.
+      if (passSubmitEnabled()) rememberGatePass(password)
       onUnlock()
     } else {
       setError(true)

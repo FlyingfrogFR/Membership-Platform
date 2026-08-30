@@ -2,7 +2,15 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import type { Deps } from './_shared'
 import { handleNeedSubmit, handleSectionSubmit, rolesFromPayload } from './_shared'
 
-const ENV_KEYS = ['OIDC_CLIENT_ID', 'GITHUB_BOT_TOKEN', 'VITE_OIDC_CLIENT_ID', 'DISCORD_WEBHOOK_URL'] as const
+const ENV_KEYS = [
+  'OIDC_CLIENT_ID',
+  'GITHUB_BOT_TOKEN',
+  'VITE_OIDC_CLIENT_ID',
+  'DISCORD_WEBHOOK_URL',
+  'VITE_PASS_SUBMIT',
+  'TEAM_PASS_HASH',
+  'ADMIN_PASS_HASH',
+] as const
 
 beforeEach(() => {
   process.env.OIDC_CLIENT_ID = 'membership-site'
@@ -78,6 +86,66 @@ describe('auth guard', () => {
   it('accepts the admin role too', async () => {
     const { deps } = fakeDeps({ roles: ['membership-admin'] })
     expect((await handleSectionSubmit(post(validSection), deps)).status).toBe(200)
+  })
+})
+
+// Transitional passphrase mode (VITE_PASS_SUBMIT=1): the referent secret from
+// the /proposer gate is accepted instead of an SSO token, hash-checked
+// server-side. Tests use their own hash so no real passphrase appears here.
+describe('auth guard — passphrase mode', () => {
+  const TEST_PASS = 'pass-de-test'
+
+  async function hashOf(text: string): Promise<string> {
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))
+    return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('')
+  }
+
+  function postWithPass(payload: unknown, pass: string): Request {
+    return new Request('http://localhost/api/test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Team-Pass': encodeURIComponent(pass) },
+      body: JSON.stringify(payload),
+    })
+  }
+
+  beforeEach(async () => {
+    delete process.env.OIDC_CLIENT_ID
+    process.env.VITE_PASS_SUBMIT = '1'
+    process.env.TEAM_PASS_HASH = await hashOf(TEST_PASS)
+  })
+
+  it('accepts the referent passphrase without any SSO configured', async () => {
+    const { deps, calls } = fakeDeps()
+    const response = await handleSectionSubmit(postWithPass(validSection, TEST_PASS), deps)
+    expect(response.status).toBe(200)
+    expect(calls.openPr).toHaveLength(1)
+  })
+
+  it('accepts the admin passphrase too', async () => {
+    process.env.ADMIN_PASS_HASH = await hashOf('admin-de-test')
+    const { deps } = fakeDeps()
+    expect((await handleSectionSubmit(postWithPass(validSection, 'admin-de-test'), deps)).status).toBe(200)
+  })
+
+  it('rejects a wrong passphrase', async () => {
+    const { deps } = fakeDeps()
+    expect((await handleSectionSubmit(postWithPass(validSection, 'mauvais'), deps)).status).toBe(401)
+  })
+
+  it('ignores the passphrase header when the mode is off', async () => {
+    delete process.env.VITE_PASS_SUBMIT
+    const { deps } = fakeDeps()
+    // No SSO client and no pass mode: the functions are simply disabled.
+    expect((await handleSectionSubmit(postWithPass(validSection, TEST_PASS), deps)).status).toBe(503)
+    // With the SSO configured but pass mode off, the passphrase is not an auth.
+    process.env.OIDC_CLIENT_ID = 'membership-site'
+    expect((await handleSectionSubmit(postWithPass(validSection, TEST_PASS), deps)).status).toBe(401)
+  })
+
+  it('still verifies bearer tokens normally when both modes are on', async () => {
+    process.env.OIDC_CLIENT_ID = 'membership-site'
+    const { deps } = fakeDeps({ roles: ['other-role'] })
+    expect((await handleSectionSubmit(post(validSection), deps)).status).toBe(403)
   })
 })
 
