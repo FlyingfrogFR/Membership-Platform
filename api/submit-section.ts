@@ -1,17 +1,13 @@
-// Must stay .ts: Vercel's api/ detector only registers js|mjs|ts|tsx files.
-// And package.json must stay WITHOUT "type": "module": Vercel compiles this
-// file to CommonJS, which an ESM-typed package would make Node load as ESM —
-// crashing every invocation (FUNCTION_INVOCATION_FAILED). ESM-only tooling
-// files opt in individually via the .mts extension instead.
-import { handleSectionSubmit, json, realDeps } from './_shared'
-
+// No top-level imports: the endpoint itself always loads, and a failure while
+// importing the shared module (or handling the request) is caught and returned
+// as JSON — instead of an opaque FUNCTION_INVOCATION_FAILED with no detail.
 export async function POST(request: Request): Promise<Response> {
   try {
+    const { handleSectionSubmit, realDeps } = await import('./_shared')
     return await handleSectionSubmit(request, realDeps)
   } catch (error) {
-    // Surface the real cause to the form (shown in its error line) and to the
-    // Vercel function logs, instead of an opaque platform 500.
     console.error('submit-section failed:', error)
-    return json(500, { error: error instanceof Error ? error.message : 'internal' })
+    const detail = error instanceof Error ? `${error.name}: ${error.message}` : String(error)
+    return new Response(JSON.stringify({ error: detail }), { status: 500, headers: { 'Content-Type': 'application/json' } })
   }
 }
