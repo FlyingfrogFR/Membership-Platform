@@ -25,6 +25,8 @@ interface FakeOptions {
   roles?: string[]
   verifyFails?: boolean
   existingFile?: { sha: string; text: string } | null
+  // Per-path overrides, checked before existingFile (e.g. image existence).
+  files?: Record<string, { sha: string; text: string } | null>
 }
 
 function fakeDeps(options: FakeOptions = {}) {
@@ -37,7 +39,8 @@ function fakeDeps(options: FakeOptions = {}) {
         resource_access: { 'membership-site': { roles: options.roles ?? ['membership-referent'] } },
       })
     },
-    getFileOnMain: () => Promise.resolve(options.existingFile ?? null),
+    getFileOnMain: (path) =>
+      Promise.resolve(options.files && path in options.files ? options.files[path] : (options.existingFile ?? null)),
     openPr: (input) => {
       calls.openPr.push(input)
       return Promise.resolve('https://github.com/x/y/pull/1')
@@ -164,6 +167,23 @@ describe('handleSectionSubmit', () => {
     expect(pr.sha).toBe('abc123')
     expect(calls.notify[0]).toContain('Ops & Nav')
     expect(calls.notify[0]).toContain('/pull/1')
+  })
+
+  it('refuses a rubrique whose image is not on main, naming the file', async () => {
+    const withImage = {
+      slug: '2026-q3',
+      section: { ...validSection.section, images: [{ name: 'CCA NICE.png', caption: '' }] },
+    }
+    const { deps } = fakeDeps()
+    const response = await handleSectionSubmit(post(withImage), deps)
+    expect(response.status).toBe(400)
+    const body = (await response.json()) as { error: string }
+    expect(body.error).toContain('CCA NICE.png')
+    expect(body.error).toContain('public/images/point-vacc/2026-q3')
+
+    // Same rubrique goes through once the image exists at the exact path.
+    const ok = fakeDeps({ files: { 'public/images/point-vacc/2026-q3/CCA NICE.png': { sha: 'img', text: '' } } })
+    expect((await handleSectionSubmit(post(withImage), ok.deps)).status).toBe(200)
   })
 
   it('rejects malformed, empty and path-escaping payloads', async () => {

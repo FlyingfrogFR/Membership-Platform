@@ -272,6 +272,18 @@ export async function handleSectionSubmit(request: Request, deps: Deps): Promise
     draft.images.length > 0
   if (!hasContent) return json(400, { error: 'empty' })
 
+  // A rubrique referencing an image that is not on main would merge into a
+  // build-time validation failure that blocks EVERY deploy. Refuse it here
+  // instead, with the exact file name (mind spaces vs underscores).
+  for (const image of draft.images) {
+    const imagePath = `public/images/point-vacc/${slug}/${image.name}`
+    if (!(await deps.getFileOnMain(imagePath))) {
+      return json(400, {
+        error: `image introuvable sur GitHub : « ${image.name} » — téléversez-la d'abord dans ${imagePath.slice(0, imagePath.lastIndexOf('/'))}/ (nom identique, espaces comprises)`,
+      })
+    }
+  }
+
   const path = editionSectionDraftPath(slug, section.name)
   const existing = await deps.getFileOnMain(path)
   const title = `Rubrique ${section.name} — Point vACC ${slug}`
