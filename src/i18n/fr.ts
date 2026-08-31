@@ -171,6 +171,8 @@ export const fr = {
     openGithubEdit: 'Ouvrir le fichier sur GitHub',
     githubHelp:
       'Un compte GitHub suffit : le contenu est copié automatiquement, l’éditeur s’ouvre (pré-rempli quand c’est possible — sinon collez), puis « Propose changes » crée la proposition que le Membership relit et publie.',
+    githubCopiedHint:
+      '📋 Contenu copié dans le presse-papiers — si l’éditeur GitHub s’ouvre vide (fichier trop grand pour être pré-rempli), collez simplement avec Ctrl+V / Cmd+V.',
     discordAlt: 'Pas de compte GitHub ? Copiez le résultat et envoyez-le au Membership sur Discord — ça marche aussi très bien.',
     errorsHeading: 'À compléter avant envoi :',
     direct: {
