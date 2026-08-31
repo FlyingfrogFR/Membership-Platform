@@ -330,6 +330,7 @@ export const fr = {
       editionTitle: 'Titre de l’édition',
       published: 'Date de publication',
       intro: 'Introduction (mot du Head of Membership)',
+      introHint: 'Paragraphes et sauts de ligne conservés sur la page publiée — markdown accepté.',
       body: 'Mot de la fin (optionnel, markdown)',
       errTitle: 'Le titre de l’édition est requis.',
       errIntro: 'L’introduction est requise.',
