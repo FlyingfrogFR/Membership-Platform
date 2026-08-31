@@ -2,3 +2,20 @@
 # Fichier vide = tableau vide (état valide). Format documenté dans CONTRIBUTING.md ;
 # le plus simple reste le formulaire « Proposer du contenu » du site, qui génère
 # le bloc au bon format. Validé par `npm run validate`.
+- id: ops-nav-navigation-avisos
+  type: ponctuel
+  title: Navigation — AVISOs
+  department: Ops & Nav
+  description: Create and maintain accurate ground radar maps, ensuring airport layouts, taxiways, runways, stands and other essential features are represented clearly and consistently.
+  skills:
+    - Good understanding of airport layouts and ground operations
+    - Ability to interpret aerodrome charts and navigation data
+    - Experience with GIS software
+    - Strong spatial awareness and attention to detail
+    - Ability to draw taxiways, runways, stands and airport features accurately
+    - Consistent use of established colours, symbols and naming conventions
+    - Willingness to incorporate feedback from controllers
+  time_estimate: 2–4 hours per week, with more time occasionally required for new or extensively updated aerodromes.
+  contact: chrissKLO on Discord
+  status: open
+  posted: '2026-08-31'
