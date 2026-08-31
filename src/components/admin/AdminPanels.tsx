@@ -337,7 +337,7 @@ export function AssemblePanel({ now }: { now: Date }) {
             />
           </Field>
           <div className="sm:col-span-2">
-            <Field label={t.intro} htmlFor="as-intro">
+            <Field label={t.intro} htmlFor="as-intro" hint={t.introHint}>
               <textarea id="as-intro" className={`${inputClass} min-h-24`} value={d.intro} onChange={(e) => patch({ intro: e.target.value })} />
             </Field>
           </div>

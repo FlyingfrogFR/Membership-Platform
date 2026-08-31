@@ -47,7 +47,12 @@ export function PointVaccEdition() {
         <p className="mt-2 text-sm text-ink-soft">
           {fr.pointVacc.publishedOn} {formatDate(edition.published)}
         </p>
-        <p className="mt-5 max-w-3xl text-lg leading-relaxed text-ink-soft">{edition.intro}</p>
+        {/* Markdown like the notes and body: the intro is written in a
+            textarea, its paragraphs and formatting must survive publication. */}
+        <div
+          className="rich-text mt-5 max-w-3xl text-lg leading-relaxed text-ink-soft"
+          dangerouslySetInnerHTML={{ __html: marked.parse(edition.intro) as string }}
+        />
         <div className="mt-6">
           <DiscordExport chunks={formatEditionForDiscord(edition, window.location.origin)} />
         </div>

@@ -21,9 +21,12 @@ export function formatDuration(ms: number): string {
   return `${Math.round(ms / 86_400_000)} j`
 }
 
+// Teaser for cards: first paragraph only (a multi-paragraph intro must not
+// run on as one blob), shortened at a word boundary.
 export function excerpt(text: string, max = 220): string {
-  if (text.length <= max) return text
-  const cut = text.slice(0, max)
+  const firstParagraph = text.split(/\n\s*\n/, 1)[0].replace(/\s+/g, ' ').trim()
+  if (firstParagraph.length <= max) return firstParagraph
+  const cut = firstParagraph.slice(0, max)
   const lastSpace = cut.lastIndexOf(' ')
   return `${cut.slice(0, lastSpace > 0 ? lastSpace : max)}…`
 }
