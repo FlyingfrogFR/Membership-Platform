@@ -2,3 +2,20 @@
 # Fichier vide = tableau vide (état valide). Format documenté dans CONTRIBUTING.md ;
 # le plus simple reste le formulaire « Proposer du contenu » du site, qui génère
 # le bloc au bon format. Validé par `npm run validate`.
+- id: ops-nav-operations-documentation-sops
+  type: ponctuel
+  title: Operations — Documentation SOPs
+  department: Ops & Nav
+  description: Help create, review and maintain Standard Operating Procedures for French airports and sectors. You will work to ensure our operational documentation is accurate, consistent and easy for controllers to use.
+  skills:
+    - Good understanding of ATC procedures and phraseology
+    - Ability to interpret AIP material and operational publications
+    - Clear, structured technical writing
+    - Strong attention to detail and consistency
+    - Experience with document formatting and version control
+    - Ability to collaborate with controllers and subject-matter experts
+    - Able to work effectively as part of a team.
+  time_estimate: 3–5 hours per week, with occasional increases during major procedural updates.
+  contact: chrissKLO on Discord
+  status: open
+  posted: '2026-08-31'
