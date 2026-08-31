@@ -2,3 +2,20 @@
 # Fichier vide = tableau vide (état valide). Format documenté dans CONTRIBUTING.md ;
 # le plus simple reste le formulaire « Proposer du contenu » du site, qui génère
 # le bloc au bon format. Validé par `npm run validate`.
+- id: ops-nav-operations-controller-diagrams
+  type: ponctuel
+  title: Operations — Controller Diagrams
+  department: Ops & Nav
+  description: Design and maintain practical diagrams that help controllers quickly understand sector structures, coordination procedures, runway configurations and other operational concepts.
+  skills:
+    - Good understanding of airspace, ATC positions and coordination flows
+    - Ability to turn complex procedures into clear visual diagrams
+    - Strong spatial awareness and attention to detail
+    - Familiarity with graphic-design or GIS software
+    - Consistent application of colours, symbols and visual standards
+    - Willingness to revise designs following operational feedback
+    - Able to work effectively as part of a team.
+  time_estimate: 2–4 hours per week, with additional time occasionally required for complex diagrams.
+  contact: chrissKLO on Discord
+  status: open
+  posted: '2026-08-31'
