@@ -2,3 +2,20 @@
 # Fichier vide = tableau vide (état valide). Format documenté dans CONTRIBUTING.md ;
 # le plus simple reste le formulaire « Proposer du contenu » du site, qui génère
 # le bloc au bon format. Validé par `npm run validate`.
+- id: ops-nav-operations-documentation-pilot-briefings
+  type: ponctuel
+  title: Operations — Documentation Pilot Briefings
+  department: Ops & Nav
+  description: Produce clear pilot briefings covering local procedures, airport operations and other information pilots need when flying in French airspace.
+  skills:
+    - Understanding of pilot operations and flight-planning needs
+    - Familiarity with French airspace, airports and local procedures
+    - Ability to explain complex information clearly and concisely
+    - Strong written English; written French is also valuable
+    - Good sense of document structure and visual presentation
+    - Ability to approach procedures from a pilot’s perspective
+    - Able to work effectively as part of a team.
+  time_estimate: 2–4 hours per week, depending on the number of briefings being created or updated.
+  contact: chrissKLO on Discord
+  status: open
+  posted: '2026-08-31'
