@@ -13,8 +13,10 @@ function finalizeChunks(blocks: string[]): string[] {
   return chunks.map((chunk, i) => `${chunk}\n\n${fr.discord.partSuffix(i + 1, chunks.length)}`)
 }
 
-export function formatEditionForDiscord(edition: Edition): string[] {
-  return finalizeChunks(buildBlocks(edition))
+// siteOrigin turns repo screenshots into absolute URLs Discord can embed;
+// without it only https:// images are included.
+export function formatEditionForDiscord(edition: Edition, siteOrigin?: string): string[] {
+  return finalizeChunks(buildBlocks(edition, siteOrigin))
 }
 
 // Discord version of the Contribuer board: open needs grouped by team. The
@@ -38,23 +40,29 @@ export function formatNeedsForDiscord(needs: Need[], siteOrigin?: string): strin
   return finalizeChunks(blocks)
 }
 
-function buildBlocks(edition: Edition): string[] {
+function buildBlocks(edition: Edition, siteOrigin?: string): string[] {
   const blocks = [`**📍 ${edition.title}**\n\n${edition.intro}`]
   for (const dept of sortByDepartmentOrder(edition.departments, (d) => d.name)) {
-    const block = formatDepartment(dept)
+    const block = formatDepartment(dept, siteOrigin)
     if (block) blocks.push(block)
   }
   if (edition.body) blocks.push(edition.body)
   return blocks
 }
 
-function formatDepartment(dept: DepartmentEntry): string | undefined {
+function formatDepartment(dept: DepartmentEntry, siteOrigin?: string): string | undefined {
   const lines = [`**${dept.name}**`]
   if (dept.notes) lines.push(dept.notes)
   appendSection(lines, `✅ ${fr.edition.done}`, dept.done)
   appendSection(lines, `🔄 ${fr.edition.inProgress}`, dept.in_progress)
   appendSection(lines, `🔜 ${fr.edition.next}`, dept.next)
   appendSection(lines, `🙋 ${fr.edition.helpWanted}`, dept.help_wanted)
+  // Bare URLs so Discord renders the screenshots as embeds. encodeURI keeps
+  // file names with spaces or accents fetchable.
+  for (const image of dept.images) {
+    const url = image.src.startsWith('/') ? (siteOrigin ? siteOrigin + encodeURI(image.src) : undefined) : encodeURI(image.src)
+    if (url) lines.push(`🖼️ ${image.caption ? `${image.caption} — ` : ''}${url}`)
+  }
   return lines.length > 1 ? lines.join('\n') : undefined
 }
 
