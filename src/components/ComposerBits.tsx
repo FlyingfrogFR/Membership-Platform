@@ -104,15 +104,18 @@ export function OutputPanel({
   downloadName?: string
 }) {
   const [copied, setCopied] = useState<'ok' | 'fail' | null>(null)
+  const [githubOpened, setGithubOpened] = useState(false)
 
   async function onCopy() {
     setCopied((await copyText(content)) ? 'ok' : 'fail')
     window.setTimeout(() => setCopied(null), 2500)
   }
 
-  // Copy first so the user can paste even if GitHub ignores the prefill.
+  // Copy first so the user can paste even if GitHub ignores the prefill (a
+  // large file cannot travel in the URL, so the editor opens empty).
   async function onGithub() {
     await copyText(content)
+    setGithubOpened(true)
     const url = mode === 'new-file' ? githubNewFileUrl(filePath, content) : githubEditFileUrl(filePath)
     window.open(url, '_blank', 'noopener')
   }
@@ -150,6 +153,11 @@ export function OutputPanel({
       <p aria-live="polite" className="sr-only">
         {copied === 'ok' ? fr.compose.copied : ''}
       </p>
+      {githubOpened && (
+        <p role="status" className="mt-3 max-w-2xl rounded-xl bg-accent-soft p-3 text-xs leading-relaxed font-semibold text-accent-strong">
+          {fr.compose.githubCopiedHint}
+        </p>
+      )}
       <p className="mt-3 max-w-2xl text-xs leading-relaxed text-ink-soft">{fr.compose.githubHelp}</p>
       <p className="mt-1 max-w-2xl text-xs leading-relaxed text-ink-soft">{fr.compose.discordAlt}</p>
     </div>
