@@ -49,7 +49,7 @@ export function PointVaccEdition() {
         </p>
         <p className="mt-5 max-w-3xl text-lg leading-relaxed text-ink-soft">{edition.intro}</p>
         <div className="mt-6">
-          <DiscordExport chunks={formatEditionForDiscord(edition)} />
+          <DiscordExport chunks={formatEditionForDiscord(edition, window.location.origin)} />
         </div>
       </header>
       <div className="mt-10 space-y-6">

@@ -17,6 +17,30 @@ function makeEdition(overrides: Partial<Edition> = {}): Edition {
   }
 }
 
+describe('formatEditionForDiscord — images', () => {
+  it('embeds repo screenshots as absolute URLs, encoding special characters', () => {
+    const edition = makeEdition()
+    edition.departments[1].images = [
+      { src: '/images/point-vacc/2026-q3/CCA NICE.png', caption: 'Vue de Nice' },
+      { src: 'https://exemple.org/externe.png' },
+    ]
+    const joined = formatEditionForDiscord(edition, 'https://membership-vaccfr.vercel.app').join('\n')
+    expect(joined).toContain('🖼️ Vue de Nice — https://membership-vaccfr.vercel.app/images/point-vacc/2026-q3/CCA%20NICE.png')
+    expect(joined).toContain('🖼️ https://exemple.org/externe.png')
+  })
+
+  it('keeps only https images when no origin is provided', () => {
+    const edition = makeEdition()
+    edition.departments[1].images = [
+      { src: '/images/point-vacc/2026-q3/a.png', caption: 'Locale' },
+      { src: 'https://exemple.org/externe.png' },
+    ]
+    const joined = formatEditionForDiscord(edition).join('\n')
+    expect(joined).not.toContain('a.png')
+    expect(joined).toContain('https://exemple.org/externe.png')
+  })
+})
+
 describe('formatEditionForDiscord', () => {
   it('produces a single unnumbered chunk for a short edition', () => {
     const chunks = formatEditionForDiscord(makeEdition())
