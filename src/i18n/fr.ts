@@ -96,6 +96,7 @@ export const fr = {
       `Discord limite chaque message à 2000 caractères : cette édition est découpée en ${n} messages, à coller l’un après l’autre.`,
     manualFallback: 'La copie automatique a échoué — sélectionnez le texte ci-dessous et copiez-le à la main.',
     partSuffix: (i: number, n: number) => `*(message ${i}/${n})*`,
+    continued: '*(suite)*',
   },
   contribuer: {
     title: 'Contribuer',

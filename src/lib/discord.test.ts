@@ -118,6 +118,19 @@ describe('formatEditionForDiscord', () => {
     })
   })
 
+  it('repeats the team header with (suite) when one section exceeds a full message', () => {
+    const items = Array.from({ length: 30 }, (_, i) => `Élément ${i} — ${'x'.repeat(90)}`)
+    const edition = makeEdition({
+      departments: [{ name: 'Ops & Nav', done: items, in_progress: [], next: [], help_wanted: [], images: [] }],
+    })
+    const chunks = formatEditionForDiscord(edition)
+    expect(chunks.length).toBeGreaterThan(1)
+    const joined = chunks.join('\n')
+    expect(joined).toContain('**Ops & Nav** *(suite)*')
+    chunks.forEach((chunk) => expect(chunk.length).toBeLessThanOrEqual(DISCORD_MESSAGE_LIMIT))
+    for (const item of items) expect(joined).toContain(item)
+  })
+
   it('keeps every line of a long edition', () => {
     const items = Array.from({ length: 60 }, (_, i) => `Ligne ${i}`)
     const edition = makeEdition({

@@ -72,11 +72,14 @@ function appendSection(lines: string[], label: string, items: string[]) {
   for (const item of items) lines.push(`- ${item}`)
 }
 
+// Sections are packed whole: a section that no longer fits closes the current
+// message and opens the next one. Only a section larger than a full message on
+// its own is split — at line boundaries, with its header repeated (suite).
 function packIntoChunks(blocks: string[], budget: number): string[] {
   const chunks: string[] = []
   let current = ''
   for (const block of blocks) {
-    const pieces = block.length > budget ? splitOversizedBlock(block, budget) : [block]
+    const pieces = block.length > budget ? splitOversizedBlock(block, budget, continuationHeader(block)) : [block]
     for (const piece of pieces) {
       if (!current) {
         current = piece
@@ -92,19 +95,28 @@ function packIntoChunks(blocks: string[], budget: number): string[] {
   return chunks
 }
 
-function splitOversizedBlock(block: string, budget: number): string[] {
+// When a section header opens the block (bold line), continuation pieces
+// repeat it with a "(suite)" marker so readers keep context across messages.
+function continuationHeader(block: string): string | undefined {
+  const first = block.split('\n', 1)[0]
+  return first.startsWith('**') ? `${first} ${fr.discord.continued}` : undefined
+}
+
+function splitOversizedBlock(block: string, budget: number, contHeader?: string): string[] {
   const pieces: string[] = []
   let current = ''
+  const startPiece = (segment: string) =>
+    pieces.length > 0 && contHeader && contHeader.length + 1 + segment.length <= budget ? `${contHeader}\n${segment}` : segment
   for (const line of block.split('\n')) {
     const segments = line.length > budget ? sliceHard(line, budget) : [line]
     for (const segment of segments) {
       if (!current) {
-        current = segment
+        current = startPiece(segment)
       } else if (current.length + 1 + segment.length <= budget) {
         current += `\n${segment}`
       } else {
         pieces.push(current)
-        current = segment
+        current = startPiece(segment)
       }
     }
   }
