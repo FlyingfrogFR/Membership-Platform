@@ -53,9 +53,10 @@ function buildBlocks(edition: Edition, siteOrigin?: string): string[] {
 function formatDepartment(dept: DepartmentEntry, siteOrigin?: string): string | undefined {
   const lines = [`**${dept.name}**`]
   if (dept.notes) lines.push(dept.notes)
-  appendSection(lines, `✅ ${fr.edition.done}`, dept.done)
-  appendSection(lines, `🔄 ${fr.edition.inProgress}`, dept.in_progress)
-  appendSection(lines, `🔜 ${fr.edition.next}`, dept.next)
+  // Status dots rather than pictograms: quicker to scan in an announcement.
+  appendSection(lines, `🟢 ${fr.edition.done}`, dept.done)
+  appendSection(lines, `🟡 ${fr.edition.inProgress}`, dept.in_progress)
+  appendSection(lines, `🔵 ${fr.edition.next}`, dept.next)
   appendSection(lines, `🙋 ${fr.edition.helpWanted}`, dept.help_wanted)
   // Bare URLs so Discord renders the screenshots as embeds. encodeURI keeps
   // file names with spaces or accents fetchable.
