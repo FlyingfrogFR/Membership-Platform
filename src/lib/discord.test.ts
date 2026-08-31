@@ -48,7 +48,7 @@ describe('formatEditionForDiscord', () => {
     expect(chunks[0]).not.toContain('(message')
     expect(chunks[0]).toContain('**📍 Point vACC — T2 2026**')
     expect(chunks[0]).toContain('**Ops & Nav**')
-    expect(chunks[0]).toContain('✅ Fait :')
+    expect(chunks[0]).toContain('🟢 Fait :')
     expect(chunks[0]).toContain('- Cartes LFPG publiées')
   })
 
@@ -66,7 +66,7 @@ describe('formatEditionForDiscord', () => {
         ],
       }),
     )
-    expect(chunks[0]).not.toContain('🔜')
+    expect(chunks[0]).not.toContain('🔵 À venir')
     expect(chunks[0]).not.toContain('🙋')
     expect(chunks[0]).not.toContain('**Training Department**')
   })
@@ -95,7 +95,7 @@ describe('formatEditionForDiscord', () => {
     const chunk = chunks[0]
     expect(chunk).toContain('Gros trimestre pour Ops & Nav.')
     expect(chunk.indexOf('**Ops & Nav**')).toBeLessThan(chunk.indexOf('Gros trimestre'))
-    expect(chunk.indexOf('Gros trimestre')).toBeLessThan(chunk.indexOf('✅ Fait :'))
+    expect(chunk.indexOf('Gros trimestre')).toBeLessThan(chunk.indexOf('🟢 Fait :'))
   })
 
   it('splits long editions into numbered chunks under the Discord limit', () => {
