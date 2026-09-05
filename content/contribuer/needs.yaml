@@ -11,3 +11,71 @@
   contact: 'Ouvrir un ticket Ops&Nav sur #bot-spam'
   status: open
   posted: '2026-08-31'
+- id: ops-nav-operations-documentation-sops
+  type: ponctuel
+  title: Operations — Documentation SOPs
+  department: Ops & Nav
+  description: Help create, review and maintain Standard Operating Procedures for French airports and sectors. You will work to ensure our operational documentation is accurate, consistent and easy for controllers to use.
+  skills:
+    - Good understanding of ATC procedures and phraseology
+    - Ability to interpret AIP material and operational publications
+    - Clear, structured technical writing
+    - Strong attention to detail and consistency
+    - Experience with document formatting and version control
+    - Ability to collaborate with controllers and subject-matter experts
+    - Able to work effectively as part of a team.
+  time_estimate: 3–5 hours per week, with occasional increases during major procedural updates.
+  contact: chrissKLO on Discord
+  status: open
+  posted: '2026-08-31'
+- id: ops-nav-operations-documentation-pilot-briefings
+  type: ponctuel
+  title: Operations — Documentation Pilot Briefings
+  department: Ops & Nav
+  description: Produce clear pilot briefings covering local procedures, airport operations and other information pilots need when flying in French airspace.
+  skills:
+    - Understanding of pilot operations and flight-planning needs
+    - Familiarity with French airspace, airports and local procedures
+    - Ability to explain complex information clearly and concisely
+    - Strong written English; written French is also valuable
+    - Good sense of document structure and visual presentation
+    - Ability to approach procedures from a pilot’s perspective
+    - Able to work effectively as part of a team.
+  time_estimate: 2–4 hours per week, depending on the number of briefings being created or updated.
+  contact: chrissKLO on Discord
+  status: open
+  posted: '2026-08-31'
+- id: ops-nav-operations-controller-diagrams
+  type: ponctuel
+  title: Operations — Controller Diagrams
+  department: Ops & Nav
+  description: Design and maintain practical diagrams that help controllers quickly understand sector structures, coordination procedures, runway configurations and other operational concepts.
+  skills:
+    - Good understanding of airspace, ATC positions and coordination flows
+    - Ability to turn complex procedures into clear visual diagrams
+    - Strong spatial awareness and attention to detail
+    - Familiarity with graphic-design or GIS software
+    - Consistent application of colours, symbols and visual standards
+    - Willingness to revise designs following operational feedback
+    - Able to work effectively as part of a team.
+  time_estimate: 2–4 hours per week, with additional time occasionally required for complex diagrams.
+  contact: chrissKLO on Discord
+  status: open
+  posted: '2026-08-31'
+- id: ops-nav-navigation-avisos
+  type: ponctuel
+  title: Navigation — AVISOs
+  department: Ops & Nav
+  description: Create and maintain accurate ground radar maps, ensuring airport layouts, taxiways, runways, stands and other essential features are represented clearly and consistently.
+  skills:
+    - Good understanding of airport layouts and ground operations
+    - Ability to interpret aerodrome charts and navigation data
+    - Experience with GIS software
+    - Strong spatial awareness and attention to detail
+    - Ability to draw taxiways, runways, stands and airport features accurately
+    - Consistent use of established colours, symbols and naming conventions
+    - Willingness to incorporate feedback from controllers
+  time_estimate: 2–4 hours per week, with more time occasionally required for new or extensively updated aerodromes.
+  contact: chrissKLO on Discord
+  status: open
+  posted: '2026-08-31'
