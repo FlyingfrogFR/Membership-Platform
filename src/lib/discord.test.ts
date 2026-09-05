@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DISCORD_MESSAGE_LIMIT, formatEditionForDiscord, formatNeedsForDiscord } from './discord'
+import { DISCORD_MESSAGE_LIMIT, formatEditionForDiscord, formatNeedAnnouncement, formatNeedsForDiscord } from './discord'
 import type { Edition, Need } from './schemas'
 
 function makeEdition(overrides: Partial<Edition> = {}): Edition {
@@ -204,5 +204,49 @@ describe('formatNeedsForDiscord', () => {
     const chunks = formatNeedsForDiscord(many)
     expect(chunks.length).toBeGreaterThan(1)
     for (const chunk of chunks) expect(chunk.length).toBeLessThanOrEqual(DISCORD_MESSAGE_LIMIT)
+  })
+})
+
+describe('formatNeedAnnouncement', () => {
+  const need: Need = {
+    id: 'nav-relecture',
+    type: 'ponctuel',
+    title: 'Relecture LFPG',
+    department: 'Ops & Nav',
+    description: 'Relire la doc avant publication.',
+    skills: ['Rigueur', 'Connaissance IFR'],
+    time_estimate: '2–3 h',
+    contact: 'Ticket Membership',
+    status: 'open',
+    posted: new Date('2026-07-01'),
+  }
+
+  it('builds a standalone announcement with every field and a footer link', () => {
+    const message = formatNeedAnnouncement(need, 'https://exemple.fr')
+    expect(message).toContain('**🙌 Relecture LFPG**')
+    expect(message).toContain('Ops & Nav · Ponctuel · ⏱️ 2–3 h')
+    expect(message).toContain('Relire la doc avant publication.')
+    expect(message).toContain('🧰 Compétences : Rigueur · Connaissance IFR')
+    expect(message).toContain('📩 Ticket Membership')
+    expect(message).toContain('https://exemple.fr/contribuer')
+  })
+
+  it('omits the skills and time lines when they are empty', () => {
+    const message = formatNeedAnnouncement({ ...need, skills: [], time_estimate: undefined })
+    expect(message).not.toContain('🧰')
+    expect(message).not.toContain('⏱️')
+    expect(message).toContain('Ops & Nav · Ponctuel\n')
+  })
+
+  it('shortens an oversized description at a word boundary to fit one message', () => {
+    const message = formatNeedAnnouncement(
+      { ...need, description: Array.from({ length: 400 }, (_, i) => `mot${i}fin`).join(' ') },
+      'https://exemple.fr',
+    )
+    expect(message.length).toBeLessThanOrEqual(DISCORD_MESSAGE_LIMIT)
+    const truncated = /(\S+)…/.exec(message)
+    expect(truncated?.[1]).toMatch(/^mot\d+fin$/)
+    expect(message).toContain('📩 Ticket Membership')
+    expect(message).toContain('https://exemple.fr/contribuer')
   })
 })

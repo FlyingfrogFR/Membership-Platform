@@ -19,6 +19,31 @@ export function formatEditionForDiscord(edition: Edition, siteOrigin?: string): 
   return finalizeChunks(buildBlocks(edition, siteOrigin))
 }
 
+// One standalone announcement per need — the standard format a future bot can
+// post verbatim. Guaranteed to fit a single Discord message: an oversized
+// description is shortened at a word boundary rather than overflowing.
+export function formatNeedAnnouncement(need: Need, siteOrigin?: string): string {
+  const build = (description: string) => {
+    const lines = [
+      `**🙌 ${need.title}**`,
+      `${need.department} · ${fr.contribuer.type[need.type]}${need.time_estimate ? ` · ⏱️ ${need.time_estimate}` : ''}`,
+      '',
+      description,
+    ]
+    if (need.skills.length > 0) lines.push('', `🧰 ${fr.contribuer.skills} : ${need.skills.join(' · ')}`)
+    lines.push('', `📩 ${need.contact}`)
+    if (siteOrigin) lines.push(fr.discordNeeds.footer(siteOrigin))
+    return lines.join('\n')
+  }
+
+  const full = build(need.description)
+  if (full.length <= DISCORD_MESSAGE_LIMIT) return full
+  const budget = need.description.length - (full.length - DISCORD_MESSAGE_LIMIT) - 1
+  const cut = need.description.slice(0, Math.max(0, budget))
+  const lastSpace = cut.lastIndexOf(' ')
+  return build(`${cut.slice(0, lastSpace > 0 ? lastSpace : cut.length)}…`)
+}
+
 // Discord version of the Contribuer board: open needs grouped by team. The
 // optional siteOrigin adds a footer link back to the full board.
 export function formatNeedsForDiscord(needs: Need[], siteOrigin?: string): string[] {

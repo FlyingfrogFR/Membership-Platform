@@ -346,6 +346,9 @@ export const fr = {
       title: 'Contribuer — export Discord',
       help: 'La version Discord du tableau des besoins ouverts — à poster par exemple une fois par mois pour amener les membres vers les équipes.',
       empty: 'Aucun besoin ouvert à exporter pour le moment.',
+      singleTitle: 'Annonce individuelle par besoin',
+      singleHelp:
+        'Une annonce autonome au format standard, prête à poster dans un canal — un clic copie le message du besoin. Le même format pourra être publié automatiquement par un bot.',
     },
     coordination: {
       title: 'Coordination — points mensuels',
