@@ -1,4 +1,5 @@
 import { DEPARTMENTS, sortByDepartmentOrder } from '../config/departments'
+import { DISCORD_STRINGS, type DiscordLang, type DiscordStrings } from '../i18n/discordLocales'
 import { fr } from '../i18n/fr'
 import type { DepartmentEntry, Edition, Need } from './schemas'
 
@@ -7,10 +8,10 @@ export const DISCORD_MESSAGE_LIMIT = 2000
 // Headroom below the hard limit so the "(message i/N)" suffix always fits.
 const CHUNK_BUDGET = 1900
 
-function finalizeChunks(blocks: string[]): string[] {
-  const chunks = packIntoChunks(blocks, CHUNK_BUDGET)
+function finalizeChunks(blocks: string[], s: DiscordStrings = DISCORD_STRINGS.fr): string[] {
+  const chunks = packIntoChunks(blocks, CHUNK_BUDGET, s)
   if (chunks.length <= 1) return chunks
-  return chunks.map((chunk, i) => `${chunk}\n\n${fr.discord.partSuffix(i + 1, chunks.length)}`)
+  return chunks.map((chunk, i) => `${chunk}\n\n${s.partSuffix(i + 1, chunks.length)}`)
 }
 
 // siteOrigin turns repo screenshots into absolute URLs Discord can embed;
@@ -22,17 +23,18 @@ export function formatEditionForDiscord(edition: Edition, siteOrigin?: string): 
 // One standalone announcement per need — the standard format a future bot can
 // post verbatim. Guaranteed to fit a single Discord message: an oversized
 // description is shortened at a word boundary rather than overflowing.
-export function formatNeedAnnouncement(need: Need, siteOrigin?: string): string {
+export function formatNeedAnnouncement(need: Need, siteOrigin?: string, lang: DiscordLang = 'fr'): string {
+  const s = DISCORD_STRINGS[lang]
   const build = (description: string) => {
     const lines = [
       `**🙌 ${need.title}**`,
-      `${need.department} · ${fr.contribuer.type[need.type]}${need.time_estimate ? ` · ⏱️ ${need.time_estimate}` : ''}`,
+      `${need.department} · ${s.type[need.type]}${need.time_estimate ? ` · ⏱️ ${need.time_estimate}` : ''}`,
       '',
       description,
     ]
-    if (need.skills.length > 0) lines.push('', `🧰 ${fr.contribuer.skills} : ${need.skills.join(' · ')}`)
+    if (need.skills.length > 0) lines.push('', `🧰 ${s.skills(need.skills.join(' · '))}`)
     lines.push('', `📩 ${need.contact}`)
-    if (siteOrigin) lines.push(fr.discordNeeds.footer(siteOrigin))
+    if (siteOrigin) lines.push(s.needsFooter(siteOrigin))
     return lines.join('\n')
   }
 
@@ -45,25 +47,27 @@ export function formatNeedAnnouncement(need: Need, siteOrigin?: string): string 
 }
 
 // Discord version of the Contribuer board: open needs grouped by team. The
-// optional siteOrigin adds a footer link back to the full board.
-export function formatNeedsForDiscord(needs: Need[], siteOrigin?: string): string[] {
+// optional siteOrigin adds a footer link back to the full board. lang localizes
+// the frame of the message only — the needs stay as the teams wrote them.
+export function formatNeedsForDiscord(needs: Need[], siteOrigin?: string, lang: DiscordLang = 'fr'): string[] {
+  const s = DISCORD_STRINGS[lang]
   const open = needs.filter((need) => need.status === 'open')
   if (open.length === 0) return []
-  const blocks = [`**🙌 ${fr.discordNeeds.title}**\n\n${fr.discordNeeds.intro}`]
+  const blocks = [`**🙌 ${s.needsTitle}**\n\n${s.needsIntro}`]
   for (const team of DEPARTMENTS) {
     const teamNeeds = open.filter((need) => need.department === team)
     if (teamNeeds.length === 0) continue
     const lines = [`**${team}**`]
     for (const need of teamNeeds) {
-      lines.push(`- **${need.title}** · ${fr.contribuer.type[need.type]}${need.time_estimate ? ` · ⏱️ ${need.time_estimate}` : ''}`)
+      lines.push(`- **${need.title}** · ${s.type[need.type]}${need.time_estimate ? ` · ⏱️ ${need.time_estimate}` : ''}`)
       lines.push(`  ${need.description}`)
-      if (need.skills.length > 0) lines.push(`  🧰 ${fr.contribuer.skills} : ${need.skills.join(' · ')}`)
+      if (need.skills.length > 0) lines.push(`  🧰 ${s.skills(need.skills.join(' · '))}`)
       lines.push(`  📩 ${need.contact}`)
     }
     blocks.push(lines.join('\n'))
   }
-  if (siteOrigin) blocks.push(fr.discordNeeds.footer(siteOrigin))
-  return finalizeChunks(blocks)
+  if (siteOrigin) blocks.push(s.needsFooter(siteOrigin))
+  return finalizeChunks(blocks, s)
 }
 
 function buildBlocks(edition: Edition, siteOrigin?: string): string[] {
@@ -102,11 +106,11 @@ function appendSection(lines: string[], label: string, items: string[]) {
 // Sections are packed whole: a section that no longer fits closes the current
 // message and opens the next one. Only a section larger than a full message on
 // its own is split — at line boundaries, with its header repeated (suite).
-function packIntoChunks(blocks: string[], budget: number): string[] {
+function packIntoChunks(blocks: string[], budget: number, s: DiscordStrings): string[] {
   const chunks: string[] = []
   let current = ''
   for (const block of blocks) {
-    const pieces = block.length > budget ? splitOversizedBlock(block, budget, continuationHeader(block)) : [block]
+    const pieces = block.length > budget ? splitOversizedBlock(block, budget, continuationHeader(block, s)) : [block]
     for (const piece of pieces) {
       if (!current) {
         current = piece
@@ -124,9 +128,9 @@ function packIntoChunks(blocks: string[], budget: number): string[] {
 
 // When a section header opens the block (bold line), continuation pieces
 // repeat it with a "(suite)" marker so readers keep context across messages.
-function continuationHeader(block: string): string | undefined {
+function continuationHeader(block: string, s: DiscordStrings): string | undefined {
   const first = block.split('\n', 1)[0]
-  return first.startsWith('**') ? `${first} ${fr.discord.continued}` : undefined
+  return first.startsWith('**') ? `${first} ${s.continued}` : undefined
 }
 
 function splitOversizedBlock(block: string, budget: number, contHeader?: string): string[] {

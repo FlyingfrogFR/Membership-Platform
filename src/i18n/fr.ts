@@ -349,6 +349,10 @@ export const fr = {
       singleTitle: 'Annonce individuelle par besoin',
       singleHelp:
         'Une annonce autonome au format standard, prête à poster dans un canal — un clic copie le message du besoin. Le même format pourra être publié automatiquement par un bot.',
+      lang: 'Langue du message',
+      langHint: 'Change les titres, libellés et lien du message — le contenu des besoins reste tel que saisi par les équipes.',
+      langFr: 'Français',
+      langEn: 'English',
     },
     coordination: {
       title: 'Coordination — points mensuels',
