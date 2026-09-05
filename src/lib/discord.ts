@@ -25,25 +25,37 @@ export function formatEditionForDiscord(edition: Edition, siteOrigin?: string): 
 // description is shortened at a word boundary rather than overflowing.
 export function formatNeedAnnouncement(need: Need, siteOrigin?: string, lang: DiscordLang = 'fr'): string {
   const s = DISCORD_STRINGS[lang]
+  const text = needText(need, lang)
   const build = (description: string) => {
     const lines = [
-      `**🙌 ${need.title}**`,
+      `**🙌 ${text.title}**`,
       `${need.department} · ${s.type[need.type]}${need.time_estimate ? ` · ⏱️ ${need.time_estimate}` : ''}`,
       '',
       description,
     ]
-    if (need.skills.length > 0) lines.push('', `🧰 ${s.skills(need.skills.join(' · '))}`)
+    if (text.skills.length > 0) lines.push('', `🧰 ${s.skills(text.skills.join(' · '))}`)
     lines.push('', `📩 ${need.contact}`)
     if (siteOrigin) lines.push(s.needsFooter(siteOrigin))
     return lines.join('\n')
   }
 
-  const full = build(need.description)
+  const full = build(text.description)
   if (full.length <= DISCORD_MESSAGE_LIMIT) return full
-  const budget = need.description.length - (full.length - DISCORD_MESSAGE_LIMIT) - 1
-  const cut = need.description.slice(0, Math.max(0, budget))
+  const budget = text.description.length - (full.length - DISCORD_MESSAGE_LIMIT) - 1
+  const cut = text.description.slice(0, Math.max(0, budget))
   const lastSpace = cut.lastIndexOf(' ')
   return build(`${cut.slice(0, lastSpace > 0 ? lastSpace : cut.length)}…`)
+}
+
+// The English exports post the need's English fields when the file has them,
+// and fall back to the French text otherwise (only the frame is localized).
+function needText(need: Need, lang: DiscordLang): { title: string; description: string; skills: string[] } {
+  if (lang !== 'en') return { title: need.title, description: need.description, skills: need.skills }
+  return {
+    title: need.title_en || need.title,
+    description: need.description_en || need.description,
+    skills: need.skills_en?.length ? need.skills_en : need.skills,
+  }
 }
 
 // Discord version of the Contribuer board: open needs grouped by team. The
@@ -59,9 +71,10 @@ export function formatNeedsForDiscord(needs: Need[], siteOrigin?: string, lang: 
     if (teamNeeds.length === 0) continue
     const lines = [`**${team}**`]
     for (const need of teamNeeds) {
-      lines.push(`- **${need.title}** · ${s.type[need.type]}${need.time_estimate ? ` · ⏱️ ${need.time_estimate}` : ''}`)
-      lines.push(`  ${need.description}`)
-      if (need.skills.length > 0) lines.push(`  🧰 ${s.skills(need.skills.join(' · '))}`)
+      const text = needText(need, lang)
+      lines.push(`- **${text.title}** · ${s.type[need.type]}${need.time_estimate ? ` · ⏱️ ${need.time_estimate}` : ''}`)
+      lines.push(`  ${text.description}`)
+      if (text.skills.length > 0) lines.push(`  🧰 ${s.skills(text.skills.join(' · '))}`)
       lines.push(`  📩 ${need.contact}`)
     }
     blocks.push(lines.join('\n'))

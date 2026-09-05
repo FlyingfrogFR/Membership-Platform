@@ -81,6 +81,9 @@ interface NeedDraftState {
   department: Department
   description: string
   skills: string[]
+  titleEn: string
+  descriptionEn: string
+  skillsEn: string[]
   timeEstimate: string
   contact: string
   posted: string
@@ -97,6 +100,9 @@ function initialNeedDraft(): NeedDraftState {
     department: DEPARTMENTS[0],
     description: '',
     skills: [],
+    titleEn: '',
+    descriptionEn: '',
+    skillsEn: [],
     timeEstimate: '',
     contact: '',
     posted: today(),
@@ -113,6 +119,9 @@ function reviveNeedDraft(stored: unknown, initial: NeedDraftState): NeedDraftSta
     department: asEnum(s.department, DEPARTMENTS, initial.department),
     description: asString(s.description),
     skills: asStringList(s.skills),
+    titleEn: asString(s.titleEn),
+    descriptionEn: asString(s.descriptionEn),
+    skillsEn: asStringList(s.skillsEn),
     timeEstimate: asString(s.timeEstimate),
     contact: asString(s.contact),
     posted: asString(s.posted, initial.posted),
@@ -174,6 +183,9 @@ function NeedComposer() {
       department: need.department,
       description: need.description,
       skills: need.skills,
+      titleEn: need.title_en,
+      descriptionEn: need.description_en,
+      skillsEn: need.skills_en,
       timeEstimate: need.time_estimate,
       contact: need.contact,
       posted: need.posted,
@@ -203,6 +215,9 @@ function NeedComposer() {
           department: d.department,
           description: d.description,
           skills: d.skills,
+          title_en: d.titleEn,
+          description_en: d.descriptionEn,
+          skills_en: d.skillsEn,
           time_estimate: d.timeEstimate,
           contact: d.contact,
           status: 'open',
@@ -257,6 +272,30 @@ function NeedComposer() {
         <div className="sm:col-span-2">
           <ListInput label={t.skills} value={d.skills} onChange={(skills) => patch({ skills })} idBase="need-skill" />
         </div>
+        <fieldset className="rounded-xl border border-line bg-canvas/50 p-4 sm:col-span-2">
+          <legend className="px-1 text-sm font-extrabold">{t.enTitle}</legend>
+          <p className="mb-4 max-w-2xl text-xs leading-relaxed text-ink-soft">{t.enHelp}</p>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <Field label={t.titleEn} htmlFor="need-title-en">
+                <input id="need-title-en" className={inputClass} value={d.titleEn} onChange={(e) => patch({ titleEn: e.target.value })} />
+              </Field>
+            </div>
+            <div className="sm:col-span-2">
+              <Field label={t.descriptionEn} htmlFor="need-description-en">
+                <textarea
+                  id="need-description-en"
+                  className={`${inputClass} min-h-20`}
+                  value={d.descriptionEn}
+                  onChange={(e) => patch({ descriptionEn: e.target.value })}
+                />
+              </Field>
+            </div>
+            <div className="sm:col-span-2">
+              <ListInput label={t.skillsEn} value={d.skillsEn} onChange={(skillsEn) => patch({ skillsEn })} idBase="need-skill-en" />
+            </div>
+          </div>
+        </fieldset>
         <Field label={t.time} htmlFor="need-time">
           <input id="need-time" className={inputClass} placeholder={t.timePlaceholder} value={d.timeEstimate} onChange={(e) => patch({ timeEstimate: e.target.value })} />
         </Field>
@@ -288,6 +327,9 @@ function NeedComposer() {
               department: d.department,
               description: d.description.trim(),
               skills: d.skills.filter((skill) => skill.trim()),
+              title_en: d.titleEn.trim(),
+              description_en: d.descriptionEn.trim(),
+              skills_en: d.skillsEn.filter((skill) => skill.trim()),
               time_estimate: d.timeEstimate.trim(),
               contact: d.contact.trim(),
               posted: d.posted,

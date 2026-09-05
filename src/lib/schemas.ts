@@ -52,6 +52,13 @@ export const needSchema = z
     department: z.enum(DEPARTMENTS),
     description: nonEmptyString,
     skills: z.array(nonEmptyString).default([]),
+    // Optional English mirror of the announcement fields, used by the English
+    // Discord exports (which otherwise fall back to the French text). Left
+    // blank at submission, the direct-send function can fill them by AI
+    // translation — reviewed in the pull request like everything else.
+    title_en: nonEmptyString.optional(),
+    description_en: nonEmptyString.optional(),
+    skills_en: z.array(nonEmptyString).optional(),
     time_estimate: nonEmptyString.optional(),
     contact: nonEmptyString,
     status: z.enum(['open', 'filled', 'closed']),

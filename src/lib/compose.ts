@@ -39,6 +39,11 @@ export interface NeedDraft {
   department: Department
   description: string
   skills: string[]
+  // English version for the Discord exports — optional, empty means "not
+  // provided" (the direct-send function may then fill it by AI translation).
+  title_en: string
+  description_en: string
+  skills_en: string[]
   time_estimate: string
   contact: string
   status: 'open' | 'filled' | 'closed'
@@ -181,6 +186,10 @@ export function composeNeedYaml(draft: NeedDraft): string {
   }
   const skills = cleanList(draft.skills)
   if (skills.length) item.skills = skills
+  if (draft.title_en.trim()) item.title_en = draft.title_en.trim()
+  if (draft.description_en.trim()) item.description_en = draft.description_en.trim()
+  const skillsEn = cleanList(draft.skills_en)
+  if (skillsEn.length) item.skills_en = skillsEn
   if (draft.time_estimate.trim()) item.time_estimate = draft.time_estimate.trim()
   item.contact = draft.contact.trim()
   item.status = draft.status

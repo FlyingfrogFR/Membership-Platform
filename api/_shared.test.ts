@@ -33,6 +33,8 @@ interface FakeOptions {
   openPrs?: Record<string, string>
   // The first N putFile calls fail (simulating a concurrent-append race).
   putFailures?: number
+  // What the fake translator returns (default null = unavailable/failed).
+  translation?: { title_en: string; description_en: string; skills_en: string[] }
 }
 
 function fakeDeps(options: FakeOptions = {}) {
@@ -42,6 +44,7 @@ function fakeDeps(options: FakeOptions = {}) {
     notify: [] as string[],
     created: [] as string[],
     resets: [] as string[],
+    translates: [] as Array<Parameters<Deps['translate']>[0]>,
   }
   const branches: Record<string, string> = { main: 'main-sha', ...(options.branches ?? {}) }
   let putFailures = options.putFailures ?? 0
@@ -89,6 +92,10 @@ function fakeDeps(options: FakeOptions = {}) {
     notify: (message) => {
       calls.notify.push(message)
       return Promise.resolve()
+    },
+    translate: (input) => {
+      calls.translates.push(input)
+      return Promise.resolve(options.translation ?? null)
     },
   }
   return { deps, calls }
@@ -324,6 +331,50 @@ describe('handleNeedSubmit — rolling branch', () => {
     expect((await handleNeedSubmit(post(validNeed), deps)).status).toBe(500)
     const withFile = fakeDeps({ existingFile: { sha: 's', text: '' } })
     expect((await handleNeedSubmit(post({ ...validNeed, id: 'Bad Id!' }), withFile.deps)).status).toBe(400)
+  })
+})
+
+// AI translation of the English version, filled at submission when the
+// referent left it blank. The fake translator stands in for the Anthropic
+// call; the real one is behind Deps.translate and never blocks a submission.
+describe('handleNeedSubmit — traduction automatique', () => {
+  const existing = { sha: 'needsha', text: '# Tableau Contribuer\n' }
+  const translation = { title_en: 'LFPG proofreading', description_en: 'Proofread the docs.', skills_en: ['Thoroughness'] }
+
+  it('fills the missing English version from the translator', async () => {
+    const { deps, calls } = fakeDeps({ existingFile: existing, translation })
+    const withSkills = { ...validNeed, skills: ['Rigueur'] }
+    expect((await handleNeedSubmit(post(withSkills), deps)).status).toBe(200)
+    expect(calls.translates).toEqual([{ title: 'Relecture LFPG', description: 'Relire la doc.', skills: ['Rigueur'] }])
+    const content = calls.puts[0].content
+    expect(content).toContain('title_en: LFPG proofreading')
+    expect(content).toContain('description_en: Proofread the docs.')
+    expect(content).toContain('Thoroughness')
+  })
+
+  it('keeps the referent’s own English and skips the translator entirely', async () => {
+    const { deps, calls } = fakeDeps({ existingFile: existing, translation })
+    const withEn = { ...validNeed, title_en: 'My own title', description_en: 'My own description.' }
+    expect((await handleNeedSubmit(post(withEn), deps)).status).toBe(200)
+    expect(calls.translates).toHaveLength(0)
+    expect(calls.puts[0].content).toContain('title_en: My own title')
+  })
+
+  it('only fills the blanks when the English is partially provided', async () => {
+    const { deps, calls } = fakeDeps({ existingFile: existing, translation })
+    const partial = { ...validNeed, title_en: 'My own title' }
+    expect((await handleNeedSubmit(post(partial), deps)).status).toBe(200)
+    expect(calls.translates).toHaveLength(1)
+    const content = calls.puts[0].content
+    expect(content).toContain('title_en: My own title')
+    expect(content).toContain('description_en: Proofread the docs.')
+  })
+
+  it('submits untranslated when the translator is unavailable', async () => {
+    const { deps, calls } = fakeDeps({ existingFile: existing })
+    expect((await handleNeedSubmit(post(validNeed), deps)).status).toBe(200)
+    expect(calls.translates).toHaveLength(1)
+    expect(calls.puts[0].content).not.toContain('_en')
   })
 })
 

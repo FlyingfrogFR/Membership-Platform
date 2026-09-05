@@ -53,6 +53,9 @@ export function parseNeedImport(text: string): NeedDraft | null {
     department: need.department as Department,
     description: need.description,
     skills: need.skills,
+    title_en: need.title_en ?? '',
+    description_en: need.description_en ?? '',
+    skills_en: need.skills_en ?? [],
     time_estimate: need.time_estimate ?? '',
     contact: need.contact,
     // Imported needs go back to the board as open proposals.

@@ -42,6 +42,8 @@ function env() {
     passSubmit: process.env.VITE_PASS_SUBMIT === '1',
     teamHash: process.env.TEAM_PASS_HASH || process.env.VITE_TEAM_PASS_HASH || DEFAULT_TEAM_HASH,
     adminHash: process.env.ADMIN_PASS_HASH || process.env.VITE_ADMIN_PASS_HASH || DEFAULT_ADMIN_HASH,
+    anthropicKey: process.env.ANTHROPIC_API_KEY || '',
+    anthropicModel: process.env.ANTHROPIC_MODEL || 'claude-opus-5',
   }
 }
 
@@ -95,6 +97,7 @@ export interface Deps {
   findOpenPr: (head: string) => Promise<string | null>
   createPr: (input: { head: string; title: string; prBody: string }) => Promise<string>
   notify: (message: string) => Promise<void>
+  translate: (input: NeedTranslationInput) => Promise<NeedTranslation | null>
 }
 
 // Auth guard shared by every submission endpoint. Returns a Response on
@@ -245,6 +248,62 @@ export async function discordNotify(message: string): Promise<void> {
   }
 }
 
+// --- AI translation ----------------------------------------------------------
+
+export interface NeedTranslationInput {
+  title: string
+  description: string
+  skills: string[]
+}
+
+export interface NeedTranslation {
+  title_en: string
+  description_en: string
+  skills_en: string[]
+}
+
+// Fills the English version of a need when the referent left it blank and
+// ANTHROPIC_API_KEY is set on Vercel. The translation lands in the same pull
+// request as the need itself, so the HoM reviews it before anything ships.
+// Any failure (no key, timeout, API error) returns null and never blocks the
+// submission — the English Discord export then falls back to the French text.
+export async function aiTranslateNeed(input: NeedTranslationInput): Promise<NeedTranslation | null> {
+  const { anthropicKey, anthropicModel } = env()
+  if (!anthropicKey) return null
+  try {
+    // Dynamic import: the SDK only loads on the rare request that translates.
+    const { default: Anthropic } = await import('@anthropic-ai/sdk')
+    const { zodOutputFormat } = await import('@anthropic-ai/sdk/helpers/zod')
+    const shape = z.object({
+      title_en: z.string(),
+      description_en: z.string(),
+      skills_en: z.array(z.string()),
+    })
+    // Tight timeout, no retry: the submission must finish well within the
+    // function's time budget even when the translation gives up.
+    const client = new Anthropic({ apiKey: anthropicKey, timeout: 25_000, maxRetries: 0 })
+    const response = await client.messages.parse({
+      model: anthropicModel,
+      max_tokens: 4000,
+      output_config: { effort: 'low', format: zodOutputFormat(shape) },
+      system:
+        'Translate volunteer-role announcements of VATSIM France (a flight simulation network community) from French to English. ' +
+        'Keep aviation terms, ICAO codes, proper nouns and any markdown formatting as they are. Match the concise, friendly tone of the original. ' +
+        'Return skills_en with exactly one translation per input skill, in the same order (empty list if there are none).',
+      messages: [{ role: 'user', content: JSON.stringify(input) }],
+    })
+    const out = response.parsed_output
+    if (!out) return null
+    return {
+      title_en: out.title_en.trim(),
+      description_en: out.description_en.trim(),
+      skills_en: out.skills_en.map((skill) => skill.trim()).filter(Boolean),
+    }
+  } catch {
+    return null
+  }
+}
+
 export const realDeps: Deps = {
   verify: verifyBearer,
   getFile: githubGetFile,
@@ -255,6 +314,7 @@ export const realDeps: Deps = {
   findOpenPr: githubFindOpenPr,
   createPr: githubCreatePr,
   notify: discordNotify,
+  translate: aiTranslateNeed,
 }
 
 // --- Payloads ----------------------------------------------------------------
@@ -285,6 +345,9 @@ export const needSubmitSchema = z.strictObject({
   department: z.enum(DEPARTMENTS),
   description: z.string().trim().min(1).max(2000),
   skills: z.array(z.string().max(120)).max(10).default([]),
+  title_en: z.string().trim().max(200).default(''),
+  description_en: z.string().trim().max(2000).default(''),
+  skills_en: z.array(z.string().max(120)).max(10).default([]),
   time_estimate: z.string().max(120).default(''),
   contact: z.string().trim().min(1).max(200),
   posted: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -350,7 +413,21 @@ export async function handleNeedSubmit(request: Request, deps: Deps): Promise<Re
 
   const parsed = needSubmitSchema.safeParse(await request.json().catch(() => null))
   if (!parsed.success) return json(400, { error: 'payload' })
-  const need = parsed.data
+  let need = parsed.data
+
+  // English version left blank: fill it by AI translation when configured.
+  // The referent's own words always win over the machine's.
+  if (!need.title_en || !need.description_en || (need.skills.length > 0 && need.skills_en.length === 0)) {
+    const translated = await deps.translate({ title: need.title, description: need.description, skills: need.skills })
+    if (translated) {
+      need = {
+        ...need,
+        title_en: need.title_en || translated.title_en,
+        description_en: need.description_en || translated.description_en,
+        skills_en: need.skills_en.length > 0 ? need.skills_en : translated.skills_en,
+      }
+    }
+  }
 
   const yaml = composeNeedYaml({ ...need, status: 'open' })
   const title = `Besoin : ${need.title} (${need.department})`

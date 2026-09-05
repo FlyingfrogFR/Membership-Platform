@@ -232,6 +232,12 @@ export const fr = {
       description: 'Description',
       descriptionPlaceholder: 'Ce qu’il y a à faire, pour qui, et pourquoi ça aide.',
       skills: 'Compétences utiles (optionnel)',
+      enTitle: 'Version anglaise (optionnelle)',
+      enHelp:
+        'Pour les annonces Discord en anglais. Laissée vide, elle est traduite automatiquement par IA lors de l’envoi direct (quand la traduction est configurée) — le résultat se relit dans la pull request avant publication, comme le reste.',
+      titleEn: 'Titre (EN)',
+      descriptionEn: 'Description (EN)',
+      skillsEn: 'Compétences (EN)',
       time: 'Temps estimé (optionnel)',
       timePlaceholder: 'Ex. : 2–3 h, ou 2 h / semaine',
       contact: 'Contact',
