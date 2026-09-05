@@ -55,8 +55,9 @@ export function formatNeedsForDiscord(needs: Need[], siteOrigin?: string): strin
     if (teamNeeds.length === 0) continue
     const lines = [`**${team}**`]
     for (const need of teamNeeds) {
-      lines.push(`- **${need.title}**${need.time_estimate ? ` · ${need.time_estimate}` : ''}`)
+      lines.push(`- **${need.title}** · ${fr.contribuer.type[need.type]}${need.time_estimate ? ` · ⏱️ ${need.time_estimate}` : ''}`)
       lines.push(`  ${need.description}`)
+      if (need.skills.length > 0) lines.push(`  🧰 ${fr.contribuer.skills} : ${need.skills.join(' · ')}`)
       lines.push(`  📩 ${need.contact}`)
     }
     blocks.push(lines.join('\n'))

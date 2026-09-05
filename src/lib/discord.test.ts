@@ -149,7 +149,7 @@ describe('formatNeedsForDiscord', () => {
       title: 'Relecture LFPG',
       department: 'Ops & Nav',
       description: 'Relire la doc avant publication.',
-      skills: [],
+      skills: ['Rigueur', 'Connaissance IFR'],
       time_estimate: '2–3 h',
       contact: 'Ticket Membership',
       status: 'open',
@@ -182,10 +182,17 @@ describe('formatNeedsForDiscord', () => {
   it('groups open needs by team in config order with a footer link', () => {
     const [chunk] = formatNeedsForDiscord(needs, 'https://exemple.fr')
     expect(chunk).toContain('**Ops & Nav**')
-    expect(chunk).toContain('- **Relecture LFPG** · 2–3 h')
+    expect(chunk).toContain('- **Relecture LFPG** · Ponctuel · ⏱️ 2–3 h')
     expect(chunk).toContain('📩 Ticket Membership')
     expect(chunk.indexOf('**Ops & Nav**')).toBeLessThan(chunk.indexOf('**Events**'))
     expect(chunk).toContain('https://exemple.fr/contribuer')
+  })
+
+  it('lists skills on each need and omits the line when a need has none', () => {
+    const [chunk] = formatNeedsForDiscord(needs)
+    expect(chunk).toContain('🧰 Compétences : Rigueur · Connaissance IFR')
+    const eventsEntry = chunk.slice(chunk.indexOf('Affiche de rentrée'))
+    expect(eventsEntry).not.toContain('🧰')
   })
 
   it('excludes filled needs and returns nothing when no need is open', () => {
