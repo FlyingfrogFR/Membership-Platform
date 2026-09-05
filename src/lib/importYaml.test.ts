@@ -46,6 +46,9 @@ describe('parseNeedImport', () => {
       department: 'Ops & Nav',
       description: 'Relire la doc.',
       skills: ['Rigueur'],
+      title_en: 'LFPG proofreading',
+      description_en: 'Proofread the docs.',
+      skills_en: ['Thoroughness'],
       time_estimate: '2–3 h',
       contact: 'Ticket Membership',
       status: 'open',
@@ -57,6 +60,9 @@ describe('parseNeedImport', () => {
     expect(draft.posted).toBe('2026-08-01')
     expect(draft.status).toBe('open')
     expect(draft.time_estimate).toBe('2–3 h')
+    expect(draft.title_en).toBe('LFPG proofreading')
+    expect(draft.description_en).toBe('Proofread the docs.')
+    expect(draft.skills_en).toEqual(['Thoroughness'])
   })
 
   it('re-opens filled needs and rejects malformed files', () => {

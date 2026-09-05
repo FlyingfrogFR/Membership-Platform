@@ -44,7 +44,8 @@ Variables d'environnement Vercel :
 - `VITE_PASS_SUBMIT=1` (**transitoire**) : en attendant le client SSO, autorise l'envoi direct authentifié par le mot de passe référent, revérifié côté serveur à chaque envoi. À retirer dès que le SSO est actif ;
 - `GITHUB_REPO` (optionnel, défaut : ce dépôt) ;
 - `DISCORD_WEBHOOK_URL` (optionnel) : webhook d'un canal staff à prévenir à chaque envoi ;
-- `OIDC_ISSUER` / `OIDC_CLIENT_ID` (optionnels, défaut : les valeurs `VITE_…`).
+- `OIDC_ISSUER` / `OIDC_CLIENT_ID` (optionnels, défaut : les valeurs `VITE_…`) ;
+- `ANTHROPIC_API_KEY` (optionnel) : active la **traduction automatique** des besoins — quand un besoin arrive sans version anglaise (`title_en` / `description_en` / `skills_en`, utilisées par les exports Discord en anglais), la fonction la fait traduire par IA et l'inclut dans la même PR, relue par le HoM avant publication. Sans la clé (ou si l'appel échoue), l'envoi passe tel quel et l'export anglais retombe sur le texte français. `ANTHROPIC_MODEL` (optionnel) change le modèle utilisé.
 
 Sans ces variables, les fonctions répondent 503, les boutons n'apparaissent pas, et le site reste 100 % statique.
 

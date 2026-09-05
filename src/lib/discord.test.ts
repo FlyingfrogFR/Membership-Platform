@@ -245,6 +245,19 @@ describe('English variants', () => {
     expect(message).toContain('https://exemple.fr/contribuer')
   })
 
+  it('posts the English fields when the need carries them, French export unchanged', () => {
+    const bilingual: Need = { ...need, title_en: 'LFPG proofreading', description_en: 'Proofread the docs.', skills_en: ['Thoroughness'] }
+    const message = formatNeedAnnouncement(bilingual, undefined, 'en')
+    expect(message).toContain('**🙌 LFPG proofreading**')
+    expect(message).toContain('Proofread the docs.')
+    expect(message).toContain('🧰 Skills: Thoroughness')
+    expect(message).not.toContain('Relecture LFPG')
+    expect(formatNeedAnnouncement(bilingual)).toContain('**🙌 Relecture LFPG**')
+    const [chunk] = formatNeedsForDiscord([bilingual], undefined, 'en')
+    expect(chunk).toContain('- **LFPG proofreading**')
+    expect(chunk).toContain('Proofread the docs.')
+  })
+
   it('splits large English boards with an English continuation marker', () => {
     const many: Need[] = Array.from({ length: 15 }, (_, i) => ({
       ...need,

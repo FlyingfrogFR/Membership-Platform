@@ -154,6 +154,9 @@ describe('composeNeedYaml', () => {
       department: 'Ops & Nav',
       description: 'Relire la doc.',
       skills: [' Rigueur ', ''],
+      title_en: 'LFPG proofreading',
+      description_en: 'Proofread the docs.',
+      skills_en: [' Thoroughness ', ''],
       time_estimate: '2–3 h',
       contact: 'Ticket Membership',
       status: 'open',
@@ -163,6 +166,9 @@ describe('composeNeedYaml', () => {
     const need = needSchema.parse(item)
     expect(need.id).toBe('nav-relecture-lfpg')
     expect(need.skills).toEqual(['Rigueur'])
+    expect(need.title_en).toBe('LFPG proofreading')
+    expect(need.description_en).toBe('Proofread the docs.')
+    expect(need.skills_en).toEqual(['Thoroughness'])
     expect(need.posted.getUTCMonth()).toBe(7)
   })
 
@@ -174,6 +180,9 @@ describe('composeNeedYaml', () => {
       department: 'Digital',
       description: 'D',
       skills: [],
+      title_en: '',
+      description_en: '',
+      skills_en: [],
       time_estimate: '',
       contact: 'C',
       status: 'open',
@@ -181,6 +190,7 @@ describe('composeNeedYaml', () => {
     })
     expect(yaml).not.toContain('skills')
     expect(yaml).not.toContain('time_estimate')
+    expect(yaml).not.toContain('_en')
   })
 })
 
