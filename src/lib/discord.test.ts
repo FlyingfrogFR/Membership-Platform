@@ -214,6 +214,55 @@ describe('formatNeedsForDiscord', () => {
   })
 })
 
+describe('English variants', () => {
+  const need: Need = {
+    id: 'nav-relecture',
+    type: 'ponctuel',
+    title: 'Relecture LFPG',
+    department: 'Ops & Nav',
+    description: 'Relire la doc avant publication.',
+    skills: ['Rigueur', 'Connaissance IFR'],
+    time_estimate: '2–3 h',
+    contact: 'Ticket Membership',
+    status: 'open',
+    posted: new Date('2026-07-01'),
+  }
+
+  it('frames the board export in English, keeping the needs as written', () => {
+    const [chunk] = formatNeedsForDiscord([need], 'https://exemple.fr', 'en')
+    expect(chunk).toContain('**🙌 Get involved — the vACC could use a hand**')
+    expect(chunk).toContain('- **Relecture LFPG** · One-off · ⏱️ 2–3 h')
+    expect(chunk).toContain('Relire la doc avant publication.')
+    expect(chunk).toContain('🧰 Skills: Rigueur · Connaissance IFR')
+    expect(chunk).toContain('📎 The full board (filters and details): https://exemple.fr/contribuer')
+    expect(chunk).not.toContain('Compétences')
+  })
+
+  it('frames the individual announcement in English, including position types', () => {
+    const message = formatNeedAnnouncement({ ...need, type: 'poste' }, 'https://exemple.fr', 'en')
+    expect(message).toContain('Ops & Nav · Position · ⏱️ 2–3 h')
+    expect(message).toContain('🧰 Skills: Rigueur · Connaissance IFR')
+    expect(message).toContain('https://exemple.fr/contribuer')
+  })
+
+  it('splits large English boards with an English continuation marker', () => {
+    const many: Need[] = Array.from({ length: 15 }, (_, i) => ({
+      ...need,
+      id: `n-${i}`,
+      title: `Besoin ${i}`,
+      department: 'Ops & Nav',
+      description: 'x'.repeat(400),
+    }))
+    const chunks = formatNeedsForDiscord(many, undefined, 'en')
+    expect(chunks.length).toBeGreaterThan(1)
+    for (const chunk of chunks) expect(chunk.length).toBeLessThanOrEqual(DISCORD_MESSAGE_LIMIT)
+    const joined = chunks.join('\n')
+    expect(joined).toContain('*(message 1/')
+    expect(joined).toContain('*(continued)*')
+    expect(joined).not.toContain('*(suite)*')
+  })
+})
+
 describe('formatNeedAnnouncement', () => {
   const need: Need = {
     id: 'nav-relecture',
