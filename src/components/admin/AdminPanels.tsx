@@ -25,7 +25,7 @@ import {
   quarterSlug,
   type Quarter,
 } from '../../lib/dates'
-import { formatNeedsForDiscord } from '../../lib/discord'
+import { formatNeedAnnouncement, formatNeedsForDiscord } from '../../lib/discord'
 import { asBool, asInt, asRecord, asString } from '../../lib/draft'
 import { formatDate, formatDuration } from '../../lib/format'
 import { computeHealthAlerts, type AlertSeverity } from '../../lib/health'
@@ -398,6 +398,7 @@ export function AssemblePanel({ now }: { now: Date }) {
 export function NeedsExportPanel() {
   const t = fr.admin.needsExport
   const chunks = useMemo(() => formatNeedsForDiscord(getNeeds(), window.location.origin), [])
+  const open = useMemo(() => getNeeds().filter((need) => need.status === 'open'), [])
   return (
     <section aria-labelledby="admin-needs-export" className="mt-10">
       <h2 id="admin-needs-export" className="text-2xl font-extrabold">
@@ -405,6 +406,17 @@ export function NeedsExportPanel() {
       </h2>
       <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-soft">{t.help}</p>
       <div className="mt-4">{chunks.length === 0 ? <p className="text-sm text-ink-soft">{t.empty}</p> : <DiscordExport chunks={chunks} />}</div>
+      {open.length > 0 && (
+        <>
+          <h3 className="mt-6 text-lg font-extrabold">{t.singleTitle}</h3>
+          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-ink-soft">{t.singleHelp}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {open.map((need) => (
+              <CopyButton key={need.id} label={need.title} text={formatNeedAnnouncement(need, window.location.origin)} />
+            ))}
+          </div>
+        </>
+      )}
     </section>
   )
 }
