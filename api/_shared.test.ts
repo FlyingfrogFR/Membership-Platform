@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import type { Deps } from './_shared'
-import { handleNeedSubmit, handleSectionSubmit, rolesFromPayload } from './_shared'
+import { handleNeedSubmit, handleSectionSubmit, NEEDS_BRANCH, rolesFromPayload } from './_shared'
 
 const ENV_KEYS = [
   'OIDC_CLIENT_ID',
@@ -27,10 +27,24 @@ interface FakeOptions {
   existingFile?: { sha: string; text: string } | null
   // Per-path overrides, checked before existingFile (e.g. image existence).
   files?: Record<string, { sha: string; text: string } | null>
+  // Extra branches that already exist (main always does, at 'main-sha').
+  branches?: Record<string, string>
+  // Pre-existing open PRs, head -> url.
+  openPrs?: Record<string, string>
+  // The first N putFile calls fail (simulating a concurrent-append race).
+  putFailures?: number
 }
 
 function fakeDeps(options: FakeOptions = {}) {
-  const calls = { openPr: [] as Array<Parameters<Deps['openPr']>[0]>, notify: [] as string[] }
+  const calls = {
+    puts: [] as Array<Parameters<Deps['putFile']>[0]>,
+    prs: [] as Array<{ head: string; title: string; url: string }>,
+    notify: [] as string[],
+    created: [] as string[],
+    resets: [] as string[],
+  }
+  const branches: Record<string, string> = { main: 'main-sha', ...(options.branches ?? {}) }
+  let putFailures = options.putFailures ?? 0
   const deps: Deps = {
     verify: (token) => {
       if (options.verifyFails) return Promise.reject(new Error('bad token'))
@@ -39,11 +53,38 @@ function fakeDeps(options: FakeOptions = {}) {
         resource_access: { 'membership-site': { roles: options.roles ?? ['membership-referent'] } },
       })
     },
-    getFileOnMain: (path) =>
-      Promise.resolve(options.files && path in options.files ? options.files[path] : (options.existingFile ?? null)),
-    openPr: (input) => {
-      calls.openPr.push(input)
-      return Promise.resolve('https://github.com/x/y/pull/1')
+    // Reads see the latest successful put on the same branch (like GitHub
+    // would), then fall back to the configured fixtures.
+    getFile: (path, ref) => {
+      const lastPut = [...calls.puts].reverse().find((put) => put.branch === ref && put.path === path)
+      if (lastPut) return Promise.resolve({ sha: `put-sha-${calls.puts.indexOf(lastPut)}`, text: lastPut.content })
+      return Promise.resolve(options.files && path in options.files ? options.files[path] : (options.existingFile ?? null))
+    },
+    getBranchSha: (branch) => Promise.resolve(branches[branch] ?? null),
+    createBranch: (branch, fromSha) => {
+      branches[branch] = fromSha
+      calls.created.push(branch)
+      return Promise.resolve()
+    },
+    resetBranch: (branch, sha) => {
+      branches[branch] = sha
+      calls.resets.push(branch)
+      return Promise.resolve()
+    },
+    putFile: (input) => {
+      if (putFailures > 0) {
+        putFailures--
+        return Promise.reject(new Error('GitHub write failed (HTTP 409)'))
+      }
+      calls.puts.push(input)
+      return Promise.resolve()
+    },
+    findOpenPr: (head) =>
+      Promise.resolve(calls.prs.find((pr) => pr.head === head)?.url ?? options.openPrs?.[head] ?? null),
+    createPr: ({ head, title }) => {
+      const url = `https://github.com/x/y/pull/${calls.prs.length + 1}`
+      calls.prs.push({ head, title, url })
+      return Promise.resolve(url)
     },
     notify: (message) => {
       calls.notify.push(message)
@@ -121,7 +162,7 @@ describe('auth guard — passphrase mode', () => {
     const { deps, calls } = fakeDeps()
     const response = await handleSectionSubmit(postWithPass(validSection, TEST_PASS), deps)
     expect(response.status).toBe(200)
-    expect(calls.openPr).toHaveLength(1)
+    expect(calls.puts).toHaveLength(1)
   })
 
   it('accepts the admin passphrase too', async () => {
@@ -158,13 +199,15 @@ describe('handleSectionSubmit', () => {
     const response = await handleSectionSubmit(post(validSection), deps)
     expect(response.status).toBe(200)
     expect(((await response.json()) as { prUrl: string }).prUrl).toContain('/pull/1')
-    const pr = calls.openPr[0]
-    expect(pr.path).toBe('content/point-vacc/drafts/2026-q3/ops-nav.yaml')
-    expect(pr.branch).toMatch(/^proposer-2026-q3-ops-nav-/)
-    expect(pr.content).toContain('name: Ops & Nav')
-    expect(pr.content).toContain('Cartes LFPG publiées')
+    const put = calls.puts[0]
+    expect(put.path).toBe('content/point-vacc/drafts/2026-q3/ops-nav.yaml')
+    expect(put.branch).toMatch(/^proposer-2026-q3-ops-nav-/)
+    expect(put.content).toContain('name: Ops & Nav')
+    expect(put.content).toContain('Cartes LFPG publiées')
     // Updating an already-sent rubrique forwards the existing blob sha.
-    expect(pr.sha).toBe('abc123')
+    expect(put.sha).toBe('abc123')
+    expect(calls.created).toContain(put.branch)
+    expect(calls.prs[0].head).toBe(put.branch)
     expect(calls.notify[0]).toContain('Ops & Nav')
     expect(calls.notify[0]).toContain('/pull/1')
   })
@@ -211,18 +254,69 @@ const validNeed = {
   posted: '2026-08-07',
 }
 
-describe('handleNeedSubmit', () => {
-  it('appends the need to needs.yaml and opens a PR', async () => {
-    const existing = { sha: 'needsha', text: '# Tableau Contribuer\n' }
+describe('handleNeedSubmit — rolling branch', () => {
+  const existing = { sha: 'needsha', text: '# Tableau Contribuer\n' }
+
+  it('creates the rolling branch from main, appends and opens one PR', async () => {
     const { deps, calls } = fakeDeps({ existingFile: existing })
     const response = await handleNeedSubmit(post(validNeed), deps)
     expect(response.status).toBe(200)
-    const pr = calls.openPr[0]
-    expect(pr.path).toBe('content/contribuer/needs.yaml')
-    expect(pr.sha).toBe('needsha')
-    expect(pr.content.startsWith('# Tableau Contribuer\n')).toBe(true)
-    expect(pr.content).toContain('id: nav-relecture-lfpg')
-    expect(pr.content).toContain('status: open')
+    expect(calls.created).toEqual([NEEDS_BRANCH])
+    const put = calls.puts[0]
+    expect(put.branch).toBe(NEEDS_BRANCH)
+    expect(put.path).toBe('content/contribuer/needs.yaml')
+    expect(put.sha).toBe('needsha')
+    expect(put.content.startsWith('# Tableau Contribuer\n')).toBe(true)
+    expect(put.content).toContain('id: nav-relecture-lfpg')
+    expect(put.content).toContain('status: open')
+    expect(calls.prs).toHaveLength(1)
+    expect(calls.prs[0].head).toBe(NEEDS_BRANCH)
+  })
+
+  it('chains a second need onto the open proposal without a new PR', async () => {
+    const { deps, calls } = fakeDeps({ existingFile: existing })
+    expect((await handleNeedSubmit(post(validNeed), deps)).status).toBe(200)
+    const second = { ...validNeed, id: 'events-affiche', title: 'Affiche de rentrée', department: 'Events' }
+    expect((await handleNeedSubmit(post(second), deps)).status).toBe(200)
+    expect(calls.prs).toHaveLength(1)
+    const lastPut = calls.puts[1]
+    expect(lastPut.content).toContain('id: nav-relecture-lfpg')
+    expect(lastPut.content).toContain('id: events-affiche')
+  })
+
+  it('rejects a duplicate id already present in the proposal', async () => {
+    const { deps, calls } = fakeDeps({ existingFile: existing })
+    expect((await handleNeedSubmit(post(validNeed), deps)).status).toBe(200)
+    const response = await handleNeedSubmit(post(validNeed), deps)
+    expect(response.status).toBe(400)
+    expect(((await response.json()) as { error: string }).error).toContain('nav-relecture-lfpg')
+    expect(calls.puts).toHaveLength(1)
+  })
+
+  it('retries once when a concurrent append moves the file', async () => {
+    const { deps, calls } = fakeDeps({ existingFile: existing, putFailures: 1 })
+    expect((await handleNeedSubmit(post(validNeed), deps)).status).toBe(200)
+    expect(calls.puts).toHaveLength(1)
+  })
+
+  it('resets a leftover branch when no proposal is open anymore', async () => {
+    const { deps, calls } = fakeDeps({ existingFile: existing, branches: { [NEEDS_BRANCH]: 'stale-sha' } })
+    expect((await handleNeedSubmit(post(validNeed), deps)).status).toBe(200)
+    expect(calls.resets).toEqual([NEEDS_BRANCH])
+    expect(calls.created).toEqual([])
+  })
+
+  it('reuses a pre-existing open proposal PR', async () => {
+    const url = 'https://github.com/x/y/pull/99'
+    const { deps, calls } = fakeDeps({
+      existingFile: existing,
+      branches: { [NEEDS_BRANCH]: 'live-sha' },
+      openPrs: { [NEEDS_BRANCH]: url },
+    })
+    const response = await handleNeedSubmit(post(validNeed), deps)
+    expect(((await response.json()) as { prUrl: string }).prUrl).toBe(url)
+    expect(calls.prs).toHaveLength(0)
+    expect(calls.resets).toEqual([])
   })
 
   it('fails cleanly when needs.yaml is missing and on bad payloads', async () => {

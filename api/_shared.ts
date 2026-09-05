@@ -87,8 +87,13 @@ export async function verifyBearer(token: string): Promise<JWTPayload> {
 
 export interface Deps {
   verify: (token: string) => Promise<JWTPayload>
-  getFileOnMain: (path: string) => Promise<{ sha: string; text: string } | null>
-  openPr: (input: { branch: string; path: string; content: string; sha?: string; title: string; prBody: string }) => Promise<string>
+  getFile: (path: string, ref: string) => Promise<{ sha: string; text: string } | null>
+  getBranchSha: (branch: string) => Promise<string | null>
+  createBranch: (branch: string, fromSha: string) => Promise<void>
+  resetBranch: (branch: string, sha: string) => Promise<void>
+  putFile: (input: { branch: string; path: string; content: string; sha?: string; message: string }) => Promise<void>
+  findOpenPr: (head: string) => Promise<string | null>
+  createPr: (input: { head: string; title: string; prBody: string }) => Promise<string>
   notify: (message: string) => Promise<void>
 }
 
@@ -147,57 +152,82 @@ async function gh(path: string, init?: RequestInit): Promise<Response> {
   return response
 }
 
-export async function githubGetFileOnMain(path: string): Promise<{ sha: string; text: string } | null> {
-  const response = await gh(`/repos/${env().repo}/contents/${encodeURIComponent(path).replace(/%2F/g, '/')}?ref=main`)
+function contentsUrl(path: string): string {
+  return `/repos/${env().repo}/contents/${encodeURIComponent(path).replace(/%2F/g, '/')}`
+}
+
+export async function githubGetFile(path: string, ref: string): Promise<{ sha: string; text: string } | null> {
+  const response = await gh(`${contentsUrl(path)}?ref=${encodeURIComponent(ref)}`)
   if (response.status === 404) return null
   if (!response.ok) throw new Error(`GitHub read failed (HTTP ${response.status})`)
   const body = (await response.json()) as { sha: string; content: string }
   return { sha: body.sha, text: Buffer.from(body.content, 'base64').toString('utf8') }
 }
 
-export async function githubOpenPr({
+export async function githubGetBranchSha(branch: string): Promise<string | null> {
+  const response = await gh(`/repos/${env().repo}/git/ref/heads/${encodeURIComponent(branch)}`)
+  if (response.status === 404) return null
+  if (!response.ok) throw new Error(`GitHub ref failed (HTTP ${response.status})`)
+  return ((await response.json()) as { object: { sha: string } }).object.sha
+}
+
+export async function githubCreateBranch(branch: string, fromSha: string): Promise<void> {
+  const response = await gh(`/repos/${env().repo}/git/refs`, {
+    method: 'POST',
+    body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: fromSha }),
+  })
+  // 422 = the branch appeared concurrently; the caller re-reads it anyway.
+  if (!response.ok && response.status !== 422) throw new Error(`GitHub branch failed (HTTP ${response.status})`)
+}
+
+export async function githubResetBranch(branch: string, sha: string): Promise<void> {
+  const response = await gh(`/repos/${env().repo}/git/refs/heads/${encodeURIComponent(branch)}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ sha, force: true }),
+  })
+  if (!response.ok) throw new Error(`GitHub reset failed (HTTP ${response.status})`)
+}
+
+export async function githubPutFile({
   branch,
   path,
   content,
   sha,
-  title,
-  prBody,
+  message,
 }: {
   branch: string
   path: string
   content: string
   sha?: string
-  title: string
-  prBody: string
-}): Promise<string> {
-  const repo = env().repo
-  const main = await gh(`/repos/${repo}/git/ref/heads/main`)
-  if (!main.ok) throw new Error(`GitHub ref failed (HTTP ${main.status})`)
-  const mainSha = ((await main.json()) as { object: { sha: string } }).object.sha
-
-  const ref = await gh(`/repos/${repo}/git/refs`, {
-    method: 'POST',
-    body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: mainSha }),
-  })
-  if (!ref.ok) throw new Error(`GitHub branch failed (HTTP ${ref.status})`)
-
-  const put = await gh(`/repos/${repo}/contents/${encodeURIComponent(path).replace(/%2F/g, '/')}`, {
+  message: string
+}): Promise<void> {
+  const response = await gh(contentsUrl(path), {
     method: 'PUT',
     body: JSON.stringify({
-      message: title,
+      message,
       content: Buffer.from(content, 'utf8').toString('base64'),
       branch,
       ...(sha ? { sha } : {}),
     }),
   })
-  if (!put.ok) throw new Error(`GitHub write failed (HTTP ${put.status})`)
+  if (!response.ok) throw new Error(`GitHub write failed (HTTP ${response.status})`)
+}
 
-  const pr = await gh(`/repos/${repo}/pulls`, {
+export async function githubFindOpenPr(head: string): Promise<string | null> {
+  const owner = env().repo.split('/')[0]
+  const response = await gh(`/repos/${env().repo}/pulls?state=open&head=${encodeURIComponent(`${owner}:${head}`)}`)
+  if (!response.ok) throw new Error(`GitHub PR lookup failed (HTTP ${response.status})`)
+  const prs = (await response.json()) as Array<{ html_url: string }>
+  return prs[0]?.html_url ?? null
+}
+
+export async function githubCreatePr({ head, title, prBody }: { head: string; title: string; prBody: string }): Promise<string> {
+  const response = await gh(`/repos/${env().repo}/pulls`, {
     method: 'POST',
-    body: JSON.stringify({ title, head: branch, base: 'main', body: prBody }),
+    body: JSON.stringify({ title, head, base: 'main', body: prBody }),
   })
-  if (!pr.ok) throw new Error(`GitHub PR failed (HTTP ${pr.status})`)
-  return ((await pr.json()) as { html_url: string }).html_url
+  if (!response.ok) throw new Error(`GitHub PR failed (HTTP ${response.status})`)
+  return ((await response.json()) as { html_url: string }).html_url
 }
 
 export async function discordNotify(message: string): Promise<void> {
@@ -217,8 +247,13 @@ export async function discordNotify(message: string): Promise<void> {
 
 export const realDeps: Deps = {
   verify: verifyBearer,
-  getFileOnMain: githubGetFileOnMain,
-  openPr: githubOpenPr,
+  getFile: githubGetFile,
+  getBranchSha: githubGetBranchSha,
+  createBranch: githubCreateBranch,
+  resetBranch: githubResetBranch,
+  putFile: githubPutFile,
+  findOpenPr: githubFindOpenPr,
+  createPr: githubCreatePr,
   notify: discordNotify,
 }
 
@@ -277,7 +312,7 @@ export async function handleSectionSubmit(request: Request, deps: Deps): Promise
   // instead, with the exact file name (mind spaces vs underscores).
   for (const image of draft.images) {
     const imagePath = `public/images/point-vacc/${slug}/${image.name}`
-    if (!(await deps.getFileOnMain(imagePath))) {
+    if (!(await deps.getFile(imagePath, 'main'))) {
       return json(400, {
         error: `image introuvable sur GitHub : « ${image.name} » — téléversez-la d'abord dans ${imagePath.slice(0, imagePath.lastIndexOf('/'))}/ (nom identique, espaces comprises)`,
       })
@@ -285,19 +320,29 @@ export async function handleSectionSubmit(request: Request, deps: Deps): Promise
   }
 
   const path = editionSectionDraftPath(slug, section.name)
-  const existing = await deps.getFileOnMain(path)
+  const existing = await deps.getFile(path, 'main')
   const title = `Rubrique ${section.name} — Point vACC ${slug}`
-  const prUrl = await deps.openPr({
-    branch: `proposer-${slug}-${slugify(section.name)}-${Date.now().toString(36)}`,
-    path,
-    content: composeSectionYaml(slug, draft),
-    sha: existing?.sha,
+  const mainSha = await deps.getBranchSha('main')
+  if (!mainSha) return json(500, { error: 'github' })
+  const branch = `proposer-${slug}-${slugify(section.name)}-${Date.now().toString(36)}`
+  await deps.createBranch(branch, mainSha)
+  await deps.putFile({ branch, path, content: composeSectionYaml(slug, draft), sha: existing?.sha, message: title })
+  const prUrl = await deps.createPr({
+    head: branch,
     title,
     prBody: 'Rubrique envoyée depuis le formulaire « Proposer du contenu » (envoi direct).',
   })
   await deps.notify(`📬 Rubrique **${section.name}** reçue pour le Point vACC ${slug} — ${prUrl}`)
   return json(200, { prUrl })
 }
+
+// All needs land on ONE rolling branch, appended commit by commit: concurrent
+// proposals no longer produce per-need PRs that conflict with each other the
+// moment the first one merges. The HoM reviews (and can edit) the single open
+// PR; merging publishes the batch, and the next submission starts a fresh
+// cycle from main. While that PR is open, edit needs.yaml through it rather
+// than directly on main.
+export const NEEDS_BRANCH = 'proposer-besoins'
 
 export async function handleNeedSubmit(request: Request, deps: Deps): Promise<Response> {
   const denied = await requireSubmitter(request, deps)
@@ -308,17 +353,51 @@ export async function handleNeedSubmit(request: Request, deps: Deps): Promise<Re
   const need = parsed.data
 
   const yaml = composeNeedYaml({ ...need, status: 'open' })
-  const file = await deps.getFileOnMain(NEEDS_FILE_PATH)
-  if (!file) return json(500, { error: 'needs-file-missing' })
   const title = `Besoin : ${need.title} (${need.department})`
-  const prUrl = await deps.openPr({
-    branch: `proposer-besoin-${need.id}-${Date.now().toString(36)}`,
-    path: NEEDS_FILE_PATH,
-    content: `${file.text.trimEnd()}\n${yaml}`,
-    sha: file.sha,
-    title,
-    prBody: 'Besoin envoyé depuis le formulaire « Proposer du contenu » (envoi direct).',
-  })
+
+  const mainSha = await deps.getBranchSha('main')
+  if (!mainSha) return json(500, { error: 'github' })
+  const openPrUrl = await deps.findOpenPr(NEEDS_BRANCH)
+  if ((await deps.getBranchSha(NEEDS_BRANCH)) === null) {
+    await deps.createBranch(NEEDS_BRANCH, mainSha)
+  } else if (!openPrUrl) {
+    // Leftover branch from a merged/closed cycle: restart it from main so the
+    // new proposal cannot resurrect (or revert) anything.
+    await deps.resetBranch(NEEDS_BRANCH, mainSha)
+  }
+
+  for (let attempt = 0; ; attempt++) {
+    const file = await deps.getFile(NEEDS_FILE_PATH, NEEDS_BRANCH)
+    if (!file) return json(500, { error: 'needs-file-missing' })
+    if (file.text.includes(`id: ${need.id}\n`)) {
+      return json(400, {
+        error: `l'identifiant « ${need.id} » existe déjà (tableau ou proposition en cours) — changez le titre ou l'identifiant`,
+      })
+    }
+    try {
+      await deps.putFile({
+        branch: NEEDS_BRANCH,
+        path: NEEDS_FILE_PATH,
+        content: `${file.text.trimEnd()}\n${yaml}`,
+        sha: file.sha,
+        message: title,
+      })
+      break
+    } catch (error) {
+      // Concurrent append moved the blob between read and write: one clean
+      // retry against the fresh branch state.
+      if (attempt >= 1) throw error
+    }
+  }
+
+  const prUrl =
+    openPrUrl ??
+    (await deps.createPr({
+      head: NEEDS_BRANCH,
+      title: 'Besoins proposés — à relire',
+      prBody:
+        'Les besoins envoyés depuis « Proposer du contenu » s’accumulent ici, un commit par besoin. Fusionner publie tout le lot — retouchez le fichier dans cette PR si nécessaire. Supprimer la branche remet le fil à zéro.',
+    }))
   await deps.notify(`📬 Nouveau besoin « ${need.title} » (${need.department}) — ${prUrl}`)
   return json(200, { prUrl })
 }

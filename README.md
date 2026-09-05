@@ -35,6 +35,8 @@ Le site sait s'authentifier auprès du broker d'identité de la vACC (`auth.vats
 
 En complément du SSO, deux fonctions Vercel (`api/submit-section.ts`, `api/submit-need.ts`) permettent aux référents connectés d'envoyer leur rubrique ou un besoin **en un clic, sans compte GitHub** : la fonction vérifie cryptographiquement le jeton VATSIM France (signature JWKS, émetteur, rôle Membership), compose le fichier au bon format et **ouvre elle-même la pull request** que le Head of Membership relit — puis prévient sur Discord si un webhook est configuré. Rien n'est stocké côté serveur : le dépôt reste la seule source de vérité.
 
+Chaque rubrique du Point vACC ouvre sa propre PR (un fichier par équipe, pas de conflit possible). Les **besoins**, eux, s'accumulent sur **une seule PR ouverte** (branche `proposer-besoins`, un commit par besoin) : des envois simultanés ne se bloquent plus entre eux, et fusionner publie le lot. Pendant qu'elle est ouverte, retouchez `needs.yaml` via cette PR plutôt que directement sur `main` ; supprimer la branche remet le fil à zéro.
+
 Variables d'environnement Vercel :
 
 - `GITHUB_BOT_TOKEN` (**requis**) : un fine-grained PAT limité à ce dépôt, permissions *Contents: Read and write* et *Pull requests: Read and write* ;
