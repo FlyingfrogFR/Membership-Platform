@@ -2,3 +2,12 @@
 # Fichier vide = tableau vide (état valide). Format documenté dans CONTRIBUTING.md ;
 # le plus simple reste le formulaire « Proposer du contenu » du site, qui génère
 # le bloc au bon format. Validé par `npm run validate`.
+- id: ops-nav-redaction-et-relecture-de-documents-sop-et-briefing-pilotes
+  type: ponctuel
+  title: Redaction et relecture de documents (SOP et Briefing Pilotes)
+  department: Ops & Nav
+  description: Recherche de volontaires pour participer à la rédaction de documents, notamment des SOP et des briefings pilotes.
+  time_estimate: 2h
+  contact: 'Ouvrir un ticket Ops&Nav sur #bot-spam'
+  status: open
+  posted: '2026-08-31'
