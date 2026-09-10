@@ -97,3 +97,21 @@
   contact: MP Anthony Guerrand
   status: open
   posted: '2026-09-05'
+- id: digital-ramp-agent-airport-configs-improvements
+  type: ponctuel
+  title: Ramp Agent Airport Configs improvements
+  department: Digital
+  description: |-
+    The Digital Team is looking for motivated members to help improve the informations available in Ramp Agent (gate assigner) Airports configs.
+    These improvements will help better assign correct gates to arrival traffics based on a number of properties of each flights as well as to add useful information specific to each stand in the Telex message sent to pilot.
+    The configs are in JSON format and [documentations](https://github.com/vaccfr/RampAgent-Config/wiki) / [schema](https://github.com/vaccfr/RampAgent-Config/blob/main/.github/schema/airportConfig.schema.json) are available.
+    Every bit of help is appreciated, you do not have to complete an entire config.
+  skills:
+    - Airport knowledge
+    - Find useful information online / onsite
+    - JSON formatting & Validation
+    - IRL Telex messages format is a plus
+  time_estimate: 1h / week
+  contact: Alexis B. - 1459318
+  status: open
+  posted: '2026-07-28'
